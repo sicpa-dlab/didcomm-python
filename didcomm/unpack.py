@@ -17,28 +17,33 @@ class UnpackResult(NamedTuple):
 class UnpackBuilder:
 
     async def unpack(self, msg: JSON) -> UnpackResult:
-        pass
+        return UnpackResult(
+            payload={},
+            signed_payload="",
+            metadata=Metadata(),
+            frm=""
+        )
 
     def did_resolver(self, did_resolver: DIDResolver) -> UnpackBuilder:
-        pass
+        return self
 
     def secrets_resolver(self, secrets_resolver: SecretsResolver) -> UnpackBuilder:
-        pass
+        return self
 
     def is_forward(self, value: bool = False) -> UnpackBuilder:
-        pass
+        return self
 
     def expect_signed(self, value: bool = False) -> UnpackBuilder:
-        pass
+        return self
 
     def expect_authcrypted(self, value: bool = False) -> UnpackBuilder:
-        pass
+        return self
 
     def expect_anoncrypted(self, value: bool = False) -> UnpackBuilder:
-        pass
+        return self
 
     def expect_signed_by_encrypter(self, value: bool = True) -> UnpackBuilder:
-        pass
+        return self
 
     def expect_decrypt_by_all_keys(self, value: bool = False) -> UnpackBuilder:
-        pass
+        return self

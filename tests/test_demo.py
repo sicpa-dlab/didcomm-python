@@ -1,3 +1,5 @@
+import pytest as pytest
+
 from didcomm.algorithms import EncAlgAnonCrypt
 from didcomm.pack import MessageBuilder, PackBuilder
 from didcomm.unpack import UnpackBuilder
@@ -7,7 +9,8 @@ BOB_DID = "did:example:bob"
 CAROL_DID = "did:example:carol"
 
 
-async def demo_anoncrypt_authcrypt_signed():
+@pytest.mark.asyncio
+async def test_demo_anoncrypt_authcrypt_signed():
     # ALICE
     payload = {"aaa": 1, "bbb": 2}
     msg = MessageBuilder(payload=payload, id="1234567890", type="my-protocol/1.0") \

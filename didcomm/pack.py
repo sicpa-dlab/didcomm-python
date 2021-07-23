@@ -40,67 +40,67 @@ class PackBuilder:
         self.__msg = msg
 
     async def pack(self) -> JSON:
-        pass
+        return ""
 
     def did_resolver(self, did_resolver: DIDResolver) -> PackBuilder:
-        pass
+        return self
 
     def secrets_resolver(self, secrets_resolver: SecretsResolver) -> PackBuilder:
-        pass
+        return self
 
     def sign_from_did(self, from_did: DID) -> _PackBuilderSigned:
-        pass
+        return _PackBuilderSigned()
 
     def sign_from_kid(self, from_kid: KID) -> _PackBuilderSigned:
-        pass
+        return _PackBuilderSigned()
 
     def anon_crypt(self, to_dids: List[DID],
-                         enc: EncAlgAnonCrypt,
-                         alg: KWAlgAnonCrypt = KWAlgAnonCrypt.ECDH_ES_A256KW) -> _PackBuilderAnonCrypted:
-        pass
+                   enc: EncAlgAnonCrypt,
+                   alg: KWAlgAnonCrypt = KWAlgAnonCrypt.ECDH_ES_A256KW) -> _PackBuilderAnonCrypted:
+        return _PackBuilderAnonCrypted()
 
     def auth_crypt_from_did(self, from_did: DID, to_dids: List[DID],
-                                  enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
-                                  alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
-        pass
+                            enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
+                            alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
+        return _PackBuilderAuthCrypted()
 
     def auth_crypt_from_kid(self, from_kid: KID, to_dids: List[DID],
-                                  enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
-                                  alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
-        pass
+                            enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
+                            alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
+        return _PackBuilderAuthCrypted()
 
 
 class _PackBuilderSigned:
 
     async def pack(self) -> JSON:
-        pass
+        return ""
 
     def anon_crypt(self, to_dids: List[DID],
-                         enc: EncAlgAnonCrypt,
-                         alg: KWAlgAnonCrypt = KWAlgAnonCrypt.ECDH_ES_A256KW) -> _PackBuilderAnonCrypted:
-        pass
+                   enc: EncAlgAnonCrypt,
+                   alg: KWAlgAnonCrypt = KWAlgAnonCrypt.ECDH_ES_A256KW) -> _PackBuilderAnonCrypted:
+        return _PackBuilderAnonCrypted()
 
     def auth_crypt_from_did(self, from_did: DID, to_dids: List[DID],
-                                  enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
-                                  alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
-        pass
+                            enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
+                            alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
+        return _PackBuilderAuthCrypted()
 
     def auth_crypt_from_kid(self, from_kid: KID, to_dids: List[DID],
-                                  enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
-                                  alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
-        pass
+                            enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
+                            alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
+        return _PackBuilderAuthCrypted()
 
 
 class _PackBuilderAuthCrypted:
     async def pack(self) -> JSON:
-        pass
+        return ""
 
     def anon_crypt(self, to_dids: List[DID],
-                         enc: EncAlgAnonCrypt,
-                         alg: KWAlgAnonCrypt = KWAlgAnonCrypt.ECDH_ES_A256KW) -> _PackBuilderAnonCrypted:
-        pass
+                   enc: EncAlgAnonCrypt,
+                   alg: KWAlgAnonCrypt = KWAlgAnonCrypt.ECDH_ES_A256KW) -> _PackBuilderAnonCrypted:
+        return _PackBuilderAnonCrypted()
 
 
 class _PackBuilderAnonCrypted:
     async def pack(self) -> JSON:
-        pass
+        return ""
