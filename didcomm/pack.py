@@ -9,13 +9,16 @@ from didcomm.types.message import Message
 from didcomm.types.types import JSON, DID, KID
 
 
+class Packer:
+
+    async def pack(self, msg: Message) -> JSON:
+        return ""
+
+
 class PackBuilder:
 
-    def __init__(self, msg: Message) -> None:
-        self.__msg = msg
-
-    async def pack(self) -> JSON:
-        return ""
+    def finalize(self) -> Packer:
+        return Packer()
 
     def did_resolver(self, did_resolver: DIDResolver) -> PackBuilder:
         return self
@@ -23,10 +26,7 @@ class PackBuilder:
     def secrets_resolver(self, secrets_resolver: SecretsResolver) -> PackBuilder:
         return self
 
-    def sign_from_did(self, from_did: DID) -> _PackBuilderSigned:
-        return _PackBuilderSigned()
-
-    def sign_from_kid(self, from_kid: KID) -> _PackBuilderSigned:
+    def sign(self, from_did: DID, from_kid: KID = None) -> _PackBuilderSigned:
         return _PackBuilderSigned()
 
     def anon_crypt(self, to_dids: List[DID],
@@ -34,41 +34,33 @@ class PackBuilder:
                    alg: KWAlgAnonCrypt = KWAlgAnonCrypt.ECDH_ES_A256KW) -> _PackBuilderAnonCrypted:
         return _PackBuilderAnonCrypted()
 
-    def auth_crypt_from_did(self, from_did: DID, to_dids: List[DID],
-                            enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
-                            alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
-        return _PackBuilderAuthCrypted()
-
-    def auth_crypt_from_kid(self, from_kid: KID, to_dids: List[DID],
-                            enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
-                            alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
+    def auth_crypt(self, from_did: DID, to_dids: List[DID],
+                   enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
+                   alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW,
+                   from_kid: KID = None) -> _PackBuilderAuthCrypted:
         return _PackBuilderAuthCrypted()
 
 
 class _PackBuilderSigned:
 
-    async def pack(self) -> JSON:
-        return ""
+    def finalize(self) -> Packer:
+        return Packer()
 
     def anon_crypt(self, to_dids: List[DID],
                    enc: EncAlgAnonCrypt,
                    alg: KWAlgAnonCrypt = KWAlgAnonCrypt.ECDH_ES_A256KW) -> _PackBuilderAnonCrypted:
         return _PackBuilderAnonCrypted()
 
-    def auth_crypt_from_did(self, from_did: DID, to_dids: List[DID],
-                            enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
-                            alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
-        return _PackBuilderAuthCrypted()
-
-    def auth_crypt_from_kid(self, from_kid: KID, to_dids: List[DID],
-                            enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
-                            alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW) -> _PackBuilderAuthCrypted:
+    def auth_crypt(self, from_did: DID, to_dids: List[DID],
+                   enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
+                   alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW,
+                   from_kid: KID = None) -> _PackBuilderAuthCrypted:
         return _PackBuilderAuthCrypted()
 
 
 class _PackBuilderAuthCrypted:
-    async def pack(self) -> JSON:
-        return ""
+    def finalize(self) -> Packer:
+        return Packer()
 
     def anon_crypt(self, to_dids: List[DID],
                    enc: EncAlgAnonCrypt,
@@ -77,5 +69,5 @@ class _PackBuilderAuthCrypted:
 
 
 class _PackBuilderAnonCrypted:
-    async def pack(self) -> JSON:
-        return ""
+    def finalize(self) -> Packer:
+        return Packer()

@@ -8,14 +8,19 @@ from didcomm.types.types import JSON
 from didcomm.types.unpack_result import UnpackResult, Metadata
 
 
-class UnpackBuilder:
-
+class Unpacker:
     async def unpack(self, msg: JSON) -> UnpackResult:
         return UnpackResult(
             msg=Message(payload={}, id="", type=""),
             metadata=Metadata(),
             signed_payload=None
         )
+
+
+class UnpackBuilder:
+
+    def finalize(self) -> Unpacker:
+        return Unpacker()
 
     def did_resolver(self, did_resolver: DIDResolver) -> UnpackBuilder:
         return self

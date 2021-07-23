@@ -23,19 +23,21 @@ async def test_demo_anoncrypt_authcrypt_signed():
         .expires_time(1516385931) \
         .typ("application/didcomm-plain+json") \
         .finalize()
-    packed_msg = await PackBuilder(msg) \
+    packed_msg = await PackBuilder() \
         .did_resolver(TestDIDResolver()) \
         .secrets_resolver(TestSecretsResolver()) \
-        .sign_from_did(from_did=ALICE_DID) \
-        .auth_crypt_from_did(from_did=ALICE_DID, to_dids=[BOB_DID, CAROL_DID]) \
+        .sign(from_did=ALICE_DID) \
+        .auth_crypt(from_did=ALICE_DID, to_dids=[BOB_DID, CAROL_DID]) \
         .anon_crypt(to_dids=[BOB_DID, CAROL_DID], enc=EncAlgAnonCrypt.XC20P) \
-        .pack()
+        .finalize() \
+        .pack(msg)
 
     # BOB
     unpack_result_bob = await UnpackBuilder() \
         .did_resolver(TestDIDResolver()) \
         .secrets_resolver(TestSecretsResolver()) \
         .mtc(MTC.build().finalize()) \
+        .finalize() \
         .unpack(packed_msg)
 
     # CAROL
@@ -43,4 +45,5 @@ async def test_demo_anoncrypt_authcrypt_signed():
         .did_resolver(TestDIDResolver()) \
         .secrets_resolver(TestSecretsResolver()) \
         .mtc(MTC.build().finalize()) \
+        .finalize() \
         .unpack(packed_msg)
