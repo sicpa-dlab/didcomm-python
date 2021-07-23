@@ -9,27 +9,14 @@ from didcomm.types.unpack_result import UnpackResult, Metadata
 
 
 class Unpacker:
+
+    def __init__(self, mtc: MTC = None, is_forward: bool = False,
+                 secrets_resolver: SecretsResolver = None, did_resolver: DIDResolver = None) -> None:
+        pass
+
     async def unpack(self, msg: JSON) -> UnpackResult:
         return UnpackResult(
             msg=Message(payload={}, id="", type=""),
             metadata=Metadata(),
             signed_payload=None
         )
-
-
-class UnpackBuilder:
-
-    def finalize(self) -> Unpacker:
-        return Unpacker()
-
-    def did_resolver(self, did_resolver: DIDResolver) -> UnpackBuilder:
-        return self
-
-    def secrets_resolver(self, secrets_resolver: SecretsResolver) -> UnpackBuilder:
-        return self
-
-    def mtc(self, mtc: MTC) -> UnpackBuilder:
-        return self
-
-    def is_forward(self, value: bool = False) -> UnpackBuilder:
-        return self
