@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from didcomm.types import JWK
+from didcomm.types.types import JWK
 
 
 class SecretsResolver(ABC):

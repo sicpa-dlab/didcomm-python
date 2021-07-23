@@ -2,41 +2,16 @@ from __future__ import annotations
 
 from typing import List
 
-from didcomm.algorithms import KWAlgAuthCrypt, EncAlgAnonCrypt, KWAlgAnonCrypt, EncAlgAuthCrypt
 from didcomm.interfaces.did_resolver import DIDResolver
 from didcomm.interfaces.secrets_resolver import SecretsResolver
-from didcomm.types import Payload, JSON, DID, KID
-
-
-class MessageBuilder:
-
-    def __init__(self, payload: Payload, id: str, type: str) -> None:
-        self.__payload = payload
-        self.__id = id
-        self.__type = type
-
-    def build(self) -> JSON:
-        pass
-
-    def typ(self, typ: str) -> MessageBuilder:
-        return self
-
-    def frm(self, frm: DID) -> MessageBuilder:
-        return self
-
-    def to(self, to: List[DID]) -> MessageBuilder:
-        return self
-
-    def created_time(self, created_time: int) -> MessageBuilder:
-        return self
-
-    def expires_time(self, expires_time: int) -> MessageBuilder:
-        return self
+from didcomm.types.algorithms import EncAlgAnonCrypt, KWAlgAnonCrypt, EncAlgAuthCrypt, KWAlgAuthCrypt
+from didcomm.types.message import Message
+from didcomm.types.types import JSON, DID, KID
 
 
 class PackBuilder:
 
-    def __init__(self, msg: JSON) -> None:
+    def __init__(self, msg: Message) -> None:
         self.__msg = msg
 
     async def pack(self) -> JSON:

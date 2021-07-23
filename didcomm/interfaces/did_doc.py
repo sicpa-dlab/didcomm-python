@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from didcomm.types import JWK
+from didcomm.types.types import JWK
 
 
-class DIDDOC(ABC):
+class DIDDoc(ABC):
 
     @abstractmethod
     def key_agreement(self, kid: str) -> JWK:
