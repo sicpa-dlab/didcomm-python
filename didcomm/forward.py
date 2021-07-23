@@ -1,5 +1,5 @@
-from didcomm.algorithms import KWAlgAnonCrypt, EncAlgAnonCrypt
-from didcomm.types import JSON
+from didcomm.types.algorithms import EncAlgAnonCrypt, KWAlgAnonCrypt
+from didcomm.types.types import JSON
 
 
 async def forward(packed_msg: JSON, to_did: str,
