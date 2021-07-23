@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from didcomm.interfaces.did_resolver import DIDResolver
 from didcomm.interfaces.secrets_resolver import SecretsResolver
 from didcomm.types.message import Message

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import NamedTuple, Optional, List
 
 from didcomm.types.types import Payload, DID
