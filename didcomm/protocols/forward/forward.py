@@ -13,7 +13,7 @@ from didcomm.types.unpack_result import UnpackResult, Metadata
 
 class ForwardUnpackResult(NamedTuple):
     forward_unpack_result: Optional[UnpackResult]
-    payload_unpack_result: UnpackResult
+    payload_unpack_result: Optional[UnpackResult]
 
 
 class Forwarder:
