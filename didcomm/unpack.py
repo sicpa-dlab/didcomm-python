@@ -8,8 +8,10 @@ from didcomm.types.unpack_result import UnpackResult, Metadata
 
 class Unpacker:
 
-    def __init__(self, mtc: MTC = None, is_forward: bool = False,
-                 secrets_resolver: SecretsResolver = None, did_resolver: DIDResolver = None) -> None:
+    def __init__(self,
+                 mtc: MTC = None,
+                 secrets_resolver: SecretsResolver = None,
+                 did_resolver: DIDResolver = None):
         pass
 
     async def unpack(self, msg: JSON) -> UnpackResult:

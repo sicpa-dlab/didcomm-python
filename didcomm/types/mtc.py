@@ -7,4 +7,3 @@ class MTC(NamedTuple):
     expect_anoncrypted: bool = False
     expect_signed_by_encrypter: bool = True
     expect_decrypt_by_all_keys: bool = False
-

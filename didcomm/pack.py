@@ -1,73 +1,45 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Optional
 
 from didcomm.interfaces.did_resolver import DIDResolver
 from didcomm.interfaces.secrets_resolver import SecretsResolver
-from didcomm.types.algorithms import EncAlgAnonCrypt, KWAlgAnonCrypt, EncAlgAuthCrypt, KWAlgAuthCrypt
+from didcomm.types.algorithms import AnonCryptAlg, AuthCryptAlg
 from didcomm.types.message import Message
-from didcomm.types.types import JSON, DID, KID
+from didcomm.types.types import JSON, DID, DID_OR_KID
 
 
 class Packer:
 
-    async def pack(self, msg: Message) -> JSON:
+    def __init__(self, secrets_resolver: SecretsResolver = None, did_resolver: DIDResolver = None):
+        pass
+
+    async def sign(self, msg: Message, frm: DID_OR_KID) -> JSON:
         return ""
 
+    async def anon_crypt(self, msg: Message, to_dids: List[DID], enc_alg: AnonCryptAlg) -> JSON:
+        return ""
 
-class PackBuilder:
+    async def auth_crypt(self, msg: Message, frm: DID_OR_KID, to_dids: List[DID],
+                         enc_alg: AuthCryptAlg = AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW) -> JSON:
+        return ""
 
-    def finalize(self) -> Packer:
-        return Packer()
+    async def anon_auth_crypt(self, msg: Message, frm: DID_OR_KID, to_dids: List[DID],
+                              enc_alg_anon: AnonCryptAlg,
+                              enc_alg_auth: AuthCryptAlg = AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW) -> JSON:
+        return ""
 
-    def did_resolver(self, did_resolver: DIDResolver) -> PackBuilder:
-        return self
+    async def anon_crypt_signed(self, msg: Message, frm: DID_OR_KID, to_dids: List[DID],
+                                enc_alg: AnonCryptAlg) -> JSON:
+        return ""
 
-    def secrets_resolver(self, secrets_resolver: SecretsResolver) -> PackBuilder:
-        return self
+    async def auth_crypt_signed(self, msg: Message, frm: DID_OR_KID, to_dids: List[DID],
+                                frm_sign: Optional[DID_OR_KID] = None,
+                                enc_alg_auth: AuthCryptAlg = AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW) -> JSON:
+        return ""
 
-    def sign(self, from_did: DID, from_kid: KID = None) -> _PackBuilderSigned:
-        return _PackBuilderSigned()
-
-    def anon_crypt(self, to_dids: List[DID],
-                   enc: EncAlgAnonCrypt,
-                   alg: KWAlgAnonCrypt = KWAlgAnonCrypt.ECDH_ES_A256KW) -> _PackBuilderAnonCrypted:
-        return _PackBuilderAnonCrypted()
-
-    def auth_crypt(self, from_did: DID, to_dids: List[DID],
-                   enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
-                   alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW,
-                   from_kid: KID = None) -> _PackBuilderAuthCrypted:
-        return _PackBuilderAuthCrypted()
-
-
-class _PackBuilderSigned:
-
-    def finalize(self) -> Packer:
-        return Packer()
-
-    def anon_crypt(self, to_dids: List[DID],
-                   enc: EncAlgAnonCrypt,
-                   alg: KWAlgAnonCrypt = KWAlgAnonCrypt.ECDH_ES_A256KW) -> _PackBuilderAnonCrypted:
-        return _PackBuilderAnonCrypted()
-
-    def auth_crypt(self, from_did: DID, to_dids: List[DID],
-                   enc: EncAlgAuthCrypt = EncAlgAuthCrypt.A256CBC_HS512,
-                   alg: KWAlgAuthCrypt = KWAlgAuthCrypt.ECDH_1PU_A256KW,
-                   from_kid: KID = None) -> _PackBuilderAuthCrypted:
-        return _PackBuilderAuthCrypted()
-
-
-class _PackBuilderAuthCrypted:
-    def finalize(self) -> Packer:
-        return Packer()
-
-    def anon_crypt(self, to_dids: List[DID],
-                   enc: EncAlgAnonCrypt,
-                   alg: KWAlgAnonCrypt = KWAlgAnonCrypt.ECDH_ES_A256KW) -> _PackBuilderAnonCrypted:
-        return _PackBuilderAnonCrypted()
-
-
-class _PackBuilderAnonCrypted:
-    def finalize(self) -> Packer:
-        return Packer()
+    async def anon_auth_crypt_signed(self, msg: Message, frm: DID_OR_KID, to_dids: List[DID],
+                                     enc_alg_anon: AnonCryptAlg,
+                                     frm_sign: Optional[DID_OR_KID] = None,
+                                     enc_alg_auth: AuthCryptAlg = AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW) -> JSON:
+        return ""

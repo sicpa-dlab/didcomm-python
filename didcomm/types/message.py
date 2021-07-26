@@ -1,6 +1,6 @@
 from typing import NamedTuple, Optional, List
 
-from didcomm.types.types import Payload, DID
+from didcomm.types.types import Payload, DID, JSON
 
 
 class Message(NamedTuple):
@@ -12,3 +12,11 @@ class Message(NamedTuple):
     to: Optional[List[DID]] = None
     created_time: Optional[int] = None
     expires_time: Optional[int] = None
+    attachments: Optional[JSON] = None
+
+    def to_json(self) -> JSON:
+        return ""
+
+
+class ForwardPayload(NamedTuple):
+    next: DID
