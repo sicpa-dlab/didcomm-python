@@ -15,7 +15,23 @@ CAROL_DID = "did:example:carol"
 
 @pytest.mark.asyncio
 async def test_demo_forward():
-    # ALICE
+    # 1. Sender ALICE: pack and Forward
+    (forwarded_bob_msg, forwarded_carol_msg) = await pack_and_forward_by_sender()
+
+    # 2. BOB Mediator: wraps the payload into additional Forward
+    forwarded_msg = await unpack_forwarded_and_forward_by_mediator(forwarded_bob_msg, to_did=BOB_DID)
+
+    # 3. BOB: unpack forward and payload
+    unpack_result_bob = unpack_forwarded_by_receiver(forwarded_msg)
+
+    # 4. Carol Mediator: sends the payload as-is
+    packed_msg_carol = unpack_forwarded_by_mediator(forwarded_carol_msg)
+
+    # 5. Carol: unpack just a payload
+    unpack_result_carol = unpack_by_receiver(packed_msg_carol)
+
+
+async def pack_and_forward_by_sender():
     payload = {"aaa": 1, "bbb": 2}
     msg = Message(payload=payload, id="1234567890", type="my-protocol/1.0",
                   frm=ALICE_DID, to=[BOB_DID, CAROL_DID],
@@ -36,22 +52,36 @@ async def test_demo_forward():
         enc_alg=AnonCryptAlg.XC20P_ECDH_ES_A256KW
     )
 
-    # BOB Mediator
+    return forwarded_bob_msg, forwarded_carol_msg
+
+
+async def unpack_forwarded_and_forward_by_mediator(forwarded_msg, to_did):
     unpacker_forward = Unpacker(mtc=Forwarder.create_forward_mtc(), did_resolver=TestDIDResolver(),
                                 secrets_resolver=TestSecretsResolver())
-    forward_bob_unpack_result = await unpacker_forward.unpack(forwarded_bob_msg)
-    packed_msg_bob = Forwarder.parse_forward_payload(forward_bob_unpack_result)
+    forward_unpack_result = await unpacker_forward.unpack(forwarded_msg)
 
-    # BOB
-    unpacker = Unpacker(mtc=MTC(), did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
-    unpack_result_bob = await unpacker.unpack(packed_msg_bob)
+    packed_msg = Forwarder.parse_forward_payload(forward_unpack_result)
 
-    # Carol Mediator
+    forwarder = Forwarder(did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
+    return await forwarder.forward(
+        packed_msg=packed_msg,
+        to_did=to_did,
+        enc_alg=AnonCryptAlg.XC20P_ECDH_ES_A256KW
+    )
+
+
+async def unpack_forwarded_by_mediator(forwarded_msg):
     unpacker_forward = Unpacker(mtc=Forwarder.create_forward_mtc(), did_resolver=TestDIDResolver(),
                                 secrets_resolver=TestSecretsResolver())
-    forward_carol_unpack_result = await unpacker_forward.unpack(forwarded_bob_msg)
-    packed_msg_bob = Forwarder.parse_forward_payload(forward_bob_unpack_result)
+    forward_unpack_result = await unpacker_forward.unpack(forwarded_msg)
+    return Forwarder.parse_forward_payload(forward_unpack_result)
 
-    # BOB
+
+async def unpack_by_receiver(packed_msg):
     unpacker = Unpacker(mtc=MTC(), did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
-    unpack_result_carol = await unpacker.unpack(packed_msg_bob)
+    return await unpacker.unpack(packed_msg)
+
+
+async def unpack_forwarded_by_receiver(forwarded_msg):
+    forwarder = Forwarder(did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
+    return (await forwarder.unpack_forward(forwarded_msg)).payload_unpack_result
