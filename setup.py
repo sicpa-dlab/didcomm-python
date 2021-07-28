@@ -7,7 +7,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="didcomm",
-    version="1.0.0",
+    version="0.1.0",
     description="DIDComm for Python",
     long_description=README,
     long_description_content_type="text/markdown",
