@@ -11,6 +11,10 @@ from didcomm.types.types import JSON, DID
 from didcomm.types.unpack_result import UnpackResult, Metadata
 
 
+class ForwardPayload(NamedTuple):
+    next: DID
+
+
 class ForwardUnpackResult(NamedTuple):
     forward_unpack_result: Optional[UnpackResult]
     payload_unpack_result: Optional[UnpackResult]

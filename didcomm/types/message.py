@@ -16,7 +16,3 @@ class Message(NamedTuple):
 
     def to_json(self) -> JSON:
         return ""
-
-
-class ForwardPayload(NamedTuple):
-    next: DID
