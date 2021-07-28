@@ -4,7 +4,7 @@ from didcomm.pack import Packer
 from didcomm.protocols.forward.forward import Forwarder
 from didcomm.types.algorithms import AnonCryptAlg
 from didcomm.types.message import Message
-from didcomm.types.mtc import MTC
+from didcomm.types.unpack_opt import UnpackOpts
 from didcomm.unpack import Unpacker
 from tests.common.interfaces_test import TestSecretsResolver, TestDIDResolver
 
@@ -56,7 +56,7 @@ async def pack_and_forward_by_sender():
 
 
 async def unpack_forwarded_and_forward_by_mediator(forwarded_msg, to_did):
-    unpacker_forward = Unpacker(mtc=Forwarder.create_forward_mtc(), did_resolver=TestDIDResolver(),
+    unpacker_forward = Unpacker(unpack_opts=Forwarder.create_forward_unpack_opts(), did_resolver=TestDIDResolver(),
                                 secrets_resolver=TestSecretsResolver())
     forward_unpack_result = await unpacker_forward.unpack(forwarded_msg)
 
@@ -71,14 +71,15 @@ async def unpack_forwarded_and_forward_by_mediator(forwarded_msg, to_did):
 
 
 async def unpack_forwarded_by_mediator(forwarded_msg):
-    unpacker_forward = Unpacker(mtc=Forwarder.create_forward_mtc(), did_resolver=TestDIDResolver(),
+    unpacker_forward = Unpacker(unpack_opts=Forwarder.create_forward_unpack_opts(), did_resolver=TestDIDResolver(),
                                 secrets_resolver=TestSecretsResolver())
     forward_unpack_result = await unpacker_forward.unpack(forwarded_msg)
     return Forwarder.parse_forward_payload(forward_unpack_result)
 
 
 async def unpack_by_receiver(packed_msg):
-    unpacker = Unpacker(mtc=MTC(), did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
+    unpacker = Unpacker(unpack_opts=UnpackOpts(), did_resolver=TestDIDResolver(),
+                        secrets_resolver=TestSecretsResolver())
     return await unpacker.unpack(packed_msg)
 
 

@@ -3,7 +3,7 @@ import pytest as pytest
 from didcomm.pack import Packer
 from didcomm.types.algorithms import AnonCryptAlg
 from didcomm.types.message import Message
-from didcomm.types.mtc import MTC
+from didcomm.types.unpack_opt import UnpackOpts
 from didcomm.unpack import Unpacker
 from tests.common.interfaces_test import TestSecretsResolver, TestDIDResolver
 
@@ -29,12 +29,12 @@ def packer():
 
 @pytest.fixture()
 def unpacker_bob():
-    return Unpacker(mtc=MTC(), did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
+    return Unpacker(unpack_opts=UnpackOpts(), did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
 
 
 @pytest.fixture()
 def unpacker_carol():
-    return Unpacker(mtc=MTC(), did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
+    return Unpacker(unpack_opts=UnpackOpts(), did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
 
 
 @pytest.mark.asyncio

@@ -2,7 +2,7 @@ import pytest as pytest
 
 from didcomm.pack import Packer
 from didcomm.types.message import Message
-from didcomm.types.mtc import MTC
+from didcomm.types.unpack_opt import UnpackOpts
 from didcomm.unpack import Unpacker
 from tests.common.interfaces_test import TestSecretsResolver, TestDIDResolver
 
@@ -23,9 +23,11 @@ async def test_demo_authcrypt():
     packed_msg = await packer.auth_crypt(msg=msg, frm=ALICE_DID, to_dids=[BOB_DID, CAROL_DID])
 
     # BOB
-    unpacker = Unpacker(mtc=MTC(), did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
+    unpacker = Unpacker(unpack_opts=UnpackOpts(), did_resolver=TestDIDResolver(),
+                        secrets_resolver=TestSecretsResolver())
     unpack_result_bob = await unpacker.unpack(packed_msg)
 
     # CAROL
-    unpacker = Unpacker(mtc=MTC(), did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
+    unpacker = Unpacker(unpack_opts=UnpackOpts(), did_resolver=TestDIDResolver(),
+                        secrets_resolver=TestSecretsResolver())
     unpack_result_carol = await unpacker.unpack(packed_msg)

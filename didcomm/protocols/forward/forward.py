@@ -6,8 +6,8 @@ from didcomm.interfaces.did_resolver import DIDResolver
 from didcomm.interfaces.secrets_resolver import SecretsResolver
 from didcomm.types.algorithms import AnonCryptAlg
 from didcomm.types.message import Message
-from didcomm.types.mtc import MTC
 from didcomm.types.types import JSON, DID
+from didcomm.types.unpack_opt import UnpackOpts
 from didcomm.types.unpack_result import UnpackResult, Metadata
 
 
@@ -49,9 +49,9 @@ class Forwarder:
         return ""
 
     @staticmethod
-    def create_forward_mtc() -> MTC:
-        return MTC(
-            expect_anoncrypted=True,
+    def create_forward_unpack_opts() -> UnpackOpts:
+        return UnpackOpts(
+            expect_encrypted=True,
+            expect_authenticated=False,
             expect_signed=False,
-            expect_authcrypted=False
         )
