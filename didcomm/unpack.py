@@ -1,22 +1,25 @@
 from didcomm.interfaces.did_resolver import DIDResolver
 from didcomm.interfaces.secrets_resolver import SecretsResolver
-from didcomm.types.message import Message
+from didcomm.types.plaintext import Plaintext
 from didcomm.types.types import JSON
 from didcomm.types.unpack_opt import UnpackOpts
 from didcomm.types.unpack_result import UnpackResult, Metadata
 
 
 class Unpacker:
+    """Unpacker of packed DIDComm messages."""
 
     def __init__(self,
-                 unpack_opts: UnpackOpts = None,
-                 secrets_resolver: SecretsResolver = None,
-                 did_resolver: DIDResolver = None):
+                 secrets_resolver: SecretsResolver,
+                 did_resolver: DIDResolver,
+                 unpack_opts: UnpackOpts = UnpackOpts()):
+        """Creates an Unpacker instance."""
         pass
 
-    async def unpack(self, msg: JSON) -> UnpackResult:
+    async def unpack(self, message: JSON) -> UnpackResult:
+        """Unpacks the packed DIDComm message."""
         return UnpackResult(
-            msg=Message(payload={}, id="", type=""),
+            plaintext=Plaintext(id="", type="", body={}),
             metadata=Metadata(),
-            signed_payload=None
+            signed_message=None
         )

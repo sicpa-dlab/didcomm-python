@@ -2,6 +2,7 @@ from typing import NamedTuple
 
 
 class UnpackOpts(NamedTuple):
+    """Message trust context for unpack operation."""
     expect_signed: bool = False
     expect_encrypted: bool = False
     expect_authenticated: bool = False

@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import Dict, Any, Union
 
-Payload = Dict[str, Any]
+Body = Dict[str, Any]
 JSON = str
 JWK = str
 JWS = str
+JWE = str
 DID = str
 KID = str
 DID_OR_KID = Union[DID, KID]

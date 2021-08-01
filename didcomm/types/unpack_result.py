@@ -1,25 +1,31 @@
 from enum import Enum, auto
 from typing import Optional, List, NamedTuple
 
-from didcomm.types.message import Message
-from didcomm.types.types import JWS, DID, DID_OR_KID
+from didcomm.types.plaintext import Plaintext
+from didcomm.types.types import JWS, DID, KID
 
 
 class EncType(Enum):
+    """Type of encryption of a DIDComm message."""
     NO_ENC = auto()
-    AUTH = auto()
     ANON = auto()
+    AUTH = auto()
     ANON_AUTH = auto()
 
 
 class Metadata(NamedTuple):
-    enc_from: Optional[DID_OR_KID] = None
-    enc_to: Optional[List[DID]] = None
-    enc_typ: EncType = EncType.NO_ENC
-    sign_from: Optional[DID_OR_KID] = None
+    """Metadata for an unpacked DIDComm message"""
+    enc_frm: Optional[KID] = None
+    enc_to: Optional[List[KID]] = None
+    enc_type: EncType = EncType.NO_ENC
+    sign_frm: Optional[KID] = None
 
 
 class UnpackResult(NamedTuple):
-    msg: Message
+    """Result of DIDComm message unpack operation.
+
+    signed_message is optional and used only when the DIDComm message is signed.
+    """
+    plaintext: Plaintext
     metadata: Metadata
-    signed_payload: Optional[JWS] = None
+    signed_message: Optional[JWS] = None

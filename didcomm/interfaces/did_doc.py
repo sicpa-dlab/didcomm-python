@@ -1,48 +1,42 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from didcomm.types.types import JWK
+from didcomm.types.types import JWK, KID, DID
 
 
-class DIDDocKeyAgreement(ABC):
-
-    @abstractmethod
-    def as_jwk(self) -> JWK:
-        pass
-
-
-class DIDDocAuthentication(ABC):
+class VerificationMethod(ABC):
+    """Verification method."""
 
     @abstractmethod
     def as_jwk(self) -> JWK:
-        pass
-
-
-class DIDDocRoutingKeys(ABC):
-
-    @abstractmethod
-    def as_jwk(self) -> JWK:
+        """Returns the JWK of this verification method."""
         pass
 
 
 class DIDDoc(ABC):
+    """DID Document."""
 
     @abstractmethod
-    def key_agreement(self, kid: str) -> DIDDocKeyAgreement:
+    def key_agreement(self, kid: KID) -> VerificationMethod:
+        """Gets keyAgreement verification method by the specified key ID."""
         pass
 
     @abstractmethod
-    def key_agreements(self, did: str) -> List[DIDDocKeyAgreement]:
+    def key_agreements(self) -> List[VerificationMethod]:
+        """Gets all keyAgreement verification methods from this DID document."""
         pass
 
     @abstractmethod
-    def authentication(self, kid: str) -> DIDDocAuthentication:
+    def authentication(self, kid: KID) -> VerificationMethod:
+        """Gets authentication verification method by the specified key ID."""
         pass
 
     @abstractmethod
-    def authentications(self, did: str) -> List[DIDDocAuthentication]:
+    def authentications(self) -> List[VerificationMethod]:
+        """Gets all keyAgreement verification methods from this DID document."""
         pass
 
     @abstractmethod
-    def routing_keys(self, did: str) -> List[DIDDocRoutingKeys]:
+    def routing_keys(self, did: DID) -> List[VerificationMethod]:
+        """Gets all routingKeys verification methods from this DID document."""
         pass
