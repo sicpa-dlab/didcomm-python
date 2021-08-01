@@ -5,7 +5,7 @@ from didcomm.types.types import Body, DID, JSON, JWS
 
 
 class Plaintext(NamedTuple):
-    """plaintext property of a DIDComm message."""
+    """Plaintext DIDComm message."""
     id: str
     type: str
     typ: Optional[str] = None

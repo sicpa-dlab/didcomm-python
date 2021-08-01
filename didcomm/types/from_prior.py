@@ -18,7 +18,7 @@ class FromPrior(NamedTuple):
         """Gets the signed JWT with this FromPrior information.
 
         :param sign_alg: the signature algorithm to use for signing the JWT
-        :param iss_kid: the specific key ID to sign the JWT
+        :param iss_kid: the specific key ID of the issuer to sign the JWT
         :returns: the JWS being the signed JWT with this FromPrior information
         """
         pass
