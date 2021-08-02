@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional, List
+from typing import NamedTuple, Optional, List, Dict, Any
 
 from didcomm.types.attachment import Attachment
 from didcomm.types.types import Body, DID, JSON, JWS
@@ -18,6 +18,7 @@ class Plaintext(NamedTuple):
     pthid: Optional[str] = None
     created_time: Optional[int] = None
     expires_time: Optional[int] = None
+    custom_headers: Dict[str, Any] = {}
     body: Optional[Body] = None
     attachments: Optional[List[Attachment]] = None
 

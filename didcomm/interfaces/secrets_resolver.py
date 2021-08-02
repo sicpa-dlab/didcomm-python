@@ -7,7 +7,7 @@ from didcomm.types.types import JWK, KID, DID
 class SecretsResolver(ABC):
     """Secrets resolver.
 
-    Retrieves JWKs with private keys for DIDs of key IDs.
+    Retrieves JWKs with private keys for DIDs and key IDs.
     """
 
     @abstractmethod
