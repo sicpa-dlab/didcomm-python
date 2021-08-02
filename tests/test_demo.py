@@ -1,9 +1,10 @@
 import pytest as pytest
 
+from didcomm.did_doc.did_resolver import register_default_did_resolver, DIDResolverChain
 from didcomm.pack import Packer
-from didcomm.types.message import Message
-from didcomm.types.unpack_opt import UnpackOpts
-from didcomm.unpack import Unpacker
+from didcomm.plaintext import Plaintext
+from didcomm.secrets.secrets_resolver import register_default_secrets_resolver
+from didcomm.unpack import Unpacker, UnpackOpts
 from tests.common.interfaces_test import TestSecretsResolver, TestDIDResolver
 
 ALICE_DID = "did:example:alice"
@@ -13,21 +14,27 @@ CAROL_DID = "did:example:carol"
 
 @pytest.mark.asyncio
 async def test_demo_authcrypt():
+    register_default_did_resolver(
+        DIDResolverChain([TestDIDResolver()])
+    )
+    register_default_secrets_resolver(TestSecretsResolver())
+
     # ALICE
-    payload = {"aaa": 1, "bbb": 2}
-    msg = Message(payload=payload, id="1234567890", type="my-protocol/1.0",
-                  frm=ALICE_DID, to=[BOB_DID, CAROL_DID],
-                  created_time=1516269022, expires_time=1516385931,
-                  typ="application/didcomm-plain+json")
-    packer = Packer(did_resolver=TestDIDResolver(), secrets_resolver=TestSecretsResolver())
-    packed_msg = await packer.auth_crypt(msg=msg, frm=ALICE_DID, to_dids=[BOB_DID, CAROL_DID])
+    msg = Plaintext(body={"aaa": 1, "bbb": 2}, id="1234567890", type="my-protocol/1.0",
+                    frm=ALICE_DID, to=[BOB_DID, CAROL_DID],
+                    created_time=1516269022, expires_time=1516385931,
+                    typ="application/didcomm-plain+json")
+    pack_result = await Packer().auth_crypt(msg=msg)
+    packed_msg = pack_result.packed_msg
+    print(packed_msg)
 
     # BOB
-    unpacker = Unpacker(unpack_opts=UnpackOpts(), did_resolver=TestDIDResolver(),
-                        secrets_resolver=TestSecretsResolver())
-    unpack_result_bob = await unpacker.unpack(packed_msg)
+    unpack_result_bob = await Unpacker().unpack(packed_msg)
+    print(unpack_result_bob.plaintext)
 
     # CAROL
-    unpacker = Unpacker(unpack_opts=UnpackOpts(), did_resolver=TestDIDResolver(),
+    unpacker = Unpacker(unpack_opts=UnpackOpts(expect_authenticated=True, expect_encrypted=True),
+                        did_resolver=TestDIDResolver(),
                         secrets_resolver=TestSecretsResolver())
     unpack_result_carol = await unpacker.unpack(packed_msg)
+    print(unpack_result_carol.plaintext)

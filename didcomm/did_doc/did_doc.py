@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
-from didcomm.types.types import JWK
+from didcomm.common.types import JWK
 
 
 class DIDDocKeyAgreement(ABC):
@@ -25,10 +25,21 @@ class DIDDocRoutingKeys(ABC):
         pass
 
 
+class DIDDocServiceEndpoint(ABC):
+
+    @abstractmethod
+    def service_endpoint(self) -> str:
+        pass
+
+    @abstractmethod
+    def routing_keys(self, did: str) -> List[DIDDocRoutingKeys]:
+        pass
+
+
 class DIDDoc(ABC):
 
     @abstractmethod
-    def key_agreement(self, kid: str) -> DIDDocKeyAgreement:
+    def key_agreement(self, kid: str) -> Optional[DIDDocKeyAgreement]:
         pass
 
     @abstractmethod
@@ -36,7 +47,7 @@ class DIDDoc(ABC):
         pass
 
     @abstractmethod
-    def authentication(self, kid: str) -> DIDDocAuthentication:
+    def authentication(self, kid: str) -> Optional[DIDDocAuthentication]:
         pass
 
     @abstractmethod
@@ -44,5 +55,5 @@ class DIDDoc(ABC):
         pass
 
     @abstractmethod
-    def routing_keys(self, did: str) -> List[DIDDocRoutingKeys]:
+    def service_endpoints(self, did: str) -> List[DIDDocServiceEndpoint]:
         pass

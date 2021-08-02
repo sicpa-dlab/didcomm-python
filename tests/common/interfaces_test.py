@@ -1,12 +1,15 @@
 from typing import List
 
-from didcomm.interfaces.did_doc import DIDDoc
-from didcomm.interfaces.did_resolver import DIDResolver
-from didcomm.interfaces.secrets_resolver import SecretsResolver
-from didcomm.types.types import JWK
+from didcomm.common.types import JWK
+from didcomm.did_doc.did_doc import DIDDoc, DIDDocServiceEndpoint
+from didcomm.did_doc.did_resolver import DIDResolver
+from didcomm.secrets.secrets_resolver import SecretsResolver
 
 
 class TestDIDDoc(DIDDoc):
+
+    def service_endpoints(self, did: str) -> List[DIDDocServiceEndpoint]:
+        pass
 
     def key_agreement(self, kid: str) -> JWK:
         pass
@@ -18,9 +21,6 @@ class TestDIDDoc(DIDDoc):
         pass
 
     def authentications(self, did: str) -> List[JWK]:
-        pass
-
-    def routing_keys(self, did: str) -> List[JWK]:
         pass
 
 
