@@ -67,9 +67,8 @@ async def test_demo_from_prior():
                           type="my-protocol/1.0",
                           typ="application/didcomm-plain+json",
                           frm=ALICE_DID_NEW,
-                          frm_prior=FromPrior(
-                              frm_prior.as_jws(secrets_resolver=TestSecretsResolver(),
-                                               sign_alg=SignAlg.EdDSA)),
+                          frm_prior=frm_prior.as_jws(secrets_resolver=TestSecretsResolver(),
+                                                     sign_alg=SignAlg.EdDSA),
                           to=[BOB_DID],
                           created_time=1516269022,
                           expires_time=1516385931)
