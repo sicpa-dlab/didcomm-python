@@ -54,10 +54,16 @@ class FromPrior:
                iss_kid: KID = None,
                did_resolver: Optional[DIDResolver] = None,
                secrets_resolver: Optional[SecretsResolver] = None) -> JWT:
-        """Gets the signed JWT with this FromPrior information.
-        :param secrets_resolver: the secrets resolver to use for signing the JWT
-        :param iss_kid: the specific key ID of the issuer to sign the JWT
-        :returns: the JWS being the signed JWT with this FromPrior information
+        """
+        Gets the signed JWT with this FromPrior information.
+
+        :param iss_kid: an optional key ID to be used for signing the JWT.
+        If not specified, then the first key for teh given `iss` DID is used which can be resolved by the secrets resolver.
+        :param secrets_resolver: an optional secrets resolver that can override a default secrets resolver
+        registered by 'register_default_secrets_resolver'
+        :param did_resolver: an optional DID Doc resolver that can override a default DID Doc resolver
+        registered by 'register_default_did_resolver'
+        :returns: the JWT with this FromPrior information
         """
 
     pass
@@ -75,9 +81,13 @@ class PlaintextHeaders:
     to: Optional[List[DID]] = None
     created_time: Optional[int] = None
     expires_time: Optional[int] = None
+    from_prior: Optional[JWT] = None
+    please_ack: Optional[bool] = None
+    ack: Optional[List[str]] = None
+    thid: Optional[str] = None
+    pthid: Optional[str] = None
     attachments: Optional[List[Attachment]] = None
     custom_headers: Optional[List[Header]] = None
-    from_prior: Optional[JWT] = None
 
 
 @dataclass(frozen=True)
