@@ -8,5 +8,6 @@ JWK = JSON
 JWT = JSON
 JWS = JSON
 DID = str
-KID = str
-DID_OR_KID = Union[DID, KID]
+DID_URL = str
+DID_OR_DID_URL = Union[DID, DID_URL]
+

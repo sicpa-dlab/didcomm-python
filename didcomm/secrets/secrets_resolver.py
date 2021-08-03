@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from didcomm.common.types import JWK
+from didcomm.common.types import JWK, DID_URL, DID
 
 
 class SecretsResolver(ABC):
     """Resolves secrets such as private keys to be used for signing and encryption."""
 
     @abstractmethod
-    async def get_key(self, kid: str) -> JWK:
+    async def get_key(self, kid: DID_URL) -> JWK:
         """
         A private key identified by the given key ID.
 
@@ -19,7 +19,7 @@ class SecretsResolver(ABC):
         pass
 
     @abstractmethod
-    async def get_keys(self, did: str) -> List[JWK]:
+    async def get_keys(self, did: DID) -> List[JWK]:
         """
         All private keys for the given DID
 

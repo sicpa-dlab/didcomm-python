@@ -15,6 +15,7 @@ setup(
     author="",
     author_email="",
     license="Apache-2.0",
+    python_requires=">=3.7",
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",

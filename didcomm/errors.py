@@ -42,7 +42,16 @@ class NoAuthenticationException(DIDDocException):
     pass
 
 
-class NoDIDCommMessagingServiceEndpoints(DIDDocException):
+# Pack exceptions
+class PackException(DIDCommException):
+    pass
+
+
+class FromEncryptNotSet(DIDCommException):
+    pass
+
+
+class FromSignNotSet(DIDCommException):
     pass
 
 
@@ -68,7 +77,7 @@ class SenderNotHiddenException(UnpackException):
     pass
 
 
-class NotSignedByEncrypyterException(UnpackException):
+class NotSignedByEncrypterException(UnpackException):
     pass
 
 
@@ -76,10 +85,3 @@ class NotDecryptedByAllKeysException(UnpackException):
     pass
 
 
-# Forward
-class ForwardException(DIDCommException):
-    pass
-
-
-class InvalidForwardPackException(ForwardException):
-    pass
