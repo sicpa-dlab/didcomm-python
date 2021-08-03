@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, List, Union, Dict
 
-from didcomm.common.types import JWS, JSON_DATA, DID, JSON, KID, JWT
+from didcomm.common.types import JSON_DATA, DID, JSON, KID, JWT
 from didcomm.did_doc.did_resolver import DIDResolver
 from didcomm.secrets.secrets_resolver import SecretsResolver
 
@@ -10,21 +10,21 @@ from didcomm.secrets.secrets_resolver import SecretsResolver
 class AttachmentDataLinks:
     links: List[str]
     hash: str
-    jws: Optional[JWS] = None
+    jws: Optional[JSON_DATA] = None
 
 
 @dataclass(frozen=True)
 class AttachmentDataBase64:
     base64: str
     hash: Optional[str] = None
-    jws: Optional[JWS] = None
+    jws: Optional[JSON_DATA] = None
 
 
 @dataclass(frozen=True)
 class AttachmentDataJson:
     json: JSON_DATA
     hash: Optional[str] = None
-    jws: Optional[JWS] = None
+    jws: Optional[JSON_DATA] = None
 
 
 @dataclass(frozen=True)
