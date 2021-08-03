@@ -83,5 +83,3 @@ class NotSignedByEncrypterException(UnpackException):
 
 class NotDecryptedByAllKeysException(UnpackException):
     pass
-
-

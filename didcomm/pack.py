@@ -29,10 +29,11 @@ class PackConfig:
     forward: bool = True
 
 
-async def pack(plaintext: Plaintext, pack_config: Optional[PackConfig] = None,
-         frm_enc: Optional[DID_OR_DID_URL] = None,
-         frm_sign: Optional[DID_OR_DID_URL] = None,
-         to: Optional[DID_OR_DID_URL] = None) -> PackResult:
+async def pack(plaintext: Plaintext,
+               pack_config: Optional[PackConfig] = None,
+               frm_enc: Optional[DID_OR_DID_URL] = None,
+               frm_sign: Optional[DID_OR_DID_URL] = None,
+               to: Optional[DID_OR_DID_URL] = None) -> PackResult:
     """
     Packs the message according to the given Pack Config.
 

@@ -10,4 +10,3 @@ JWS = JSON
 DID = str
 DID_URL = str
 DID_OR_DID_URL = Union[DID, DID_URL]
-
