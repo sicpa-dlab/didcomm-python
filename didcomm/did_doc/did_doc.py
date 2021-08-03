@@ -11,14 +11,14 @@ class VerificationMethod(ABC):
     """
 
     @abstractmethod
-    def public_key_jwk(self) -> JWK:
+    def as_jwk(self) -> JWK:
         """
         A public key in JWK format.
         If the method has 'publicKeyJwk' property, that is a public key is already in JWK format, it can be returned as-is.
         If a method has a public key in another format ('publicKeyHex', 'publicKeyBase58', 'publicKeyMultibase'),
         then it must be converted to JWK format.
 
-        :raises NoJWKKeyException: if there is no public key in the verification method, ot it can not be converted to JWK format.
+        :raises NoJWKKeyException: if there is no public key in the verification method, or it can not be converted to JWK format.
         :return: public key as JWK json string
         """
         pass
@@ -72,7 +72,7 @@ class DIDDoc(ABC):
 
         :raises NoKeyAgreementException:  if there is no 'keyAgreement' relationship in this DID DOC,
         or it has no verification methods.
-        :return: a list of verification method instances
+        :return: a possibly empty list of verification method instances
         """
         pass
 
