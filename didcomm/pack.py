@@ -12,12 +12,40 @@ from didcomm.secrets.secrets_resolver import SecretsResolver
 
 @dataclass(frozen=True)
 class PackResult:
+    """
+    Result of pack operation.
+
+    Attributes:
+        packed_msg (str): a packed message as a JSON string ready to be forwarded to the returned 'service_endpoint'
+        service_endpoint (str): an optional service endpoint to be used to transport the 'packed_msg'.
+    """
     packed_msg: JSON
     service_endpoint: Optional[str]
 
 
 @dataclass(frozen=True)
 class PackConfig:
+    """
+    Pack configuration.
+
+    Default config performs repudiable authentication encryption (auth_crypt)
+    and prepares a message ready to be forwarded to the returned endpoint (via Forward protocol).
+
+    Attributes:
+        secrets_resolver (SecretsResolver): an optional secrets resolver that can override a default secrets resolver
+        registered by 'register_default_secrets_resolver'
+        did_resolver (DIDResolver): an optional DID Doc resolver that can override a default DID Doc resolver
+        registered by 'register_default_did_resolver'
+        enc_alg_auth (AuthCryptAlg): the encryption algorithm to be used for authentication encryption (auth_crypt).
+        `A256CBC_HS512_ECDH_1PU_A256KW` by default.
+        enc_alg_anon (AnonCryptAlg): the encryption algorithm to be used for anonymous encryption (anon_crypt).
+        `XC20P_ECDH_ES_A256KW` by default.
+        encryption (bool): whether the plaintext needs to be encrypted. True by default.
+        authentication (bool): whether the plaintext needs to be authenticated. True by default.
+        anonymous_sender (bool): whether the sender ID needs to be protected. False by default.
+        forward (bool):  whether the packed messages need to be wrapped into Forward messages to be sent to Mediators
+        as defined by the Forward protocol. True by default.
+    """
     secrets_resolver: SecretsResolver = None
     did_resolver: DIDResolver = None
     enc_alg_auth: AuthCryptAlg = AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW
@@ -30,6 +58,13 @@ class PackConfig:
 
 @dataclass(frozen=True)
 class PackParameters:
+    """
+    Optional paraneters for pack.
+
+    Attributes:
+        forward_headers (PlaintextOptionalHeaders): if forward is enabled (true by default),
+        optional headers can be passed to the wrapping Forward messages.
+    """
     forward_headers: Optional[PlaintextOptionalHeaders] = None
 
 

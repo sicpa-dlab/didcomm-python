@@ -12,6 +12,7 @@ Header = Dict[str, Union[str, int, JSON_DATA]]
 
 @dataclass
 class PlaintextOptionalHeaders:
+    """Optional headers for any Plaintext message"""
     typ: Optional[str] = None
     frm: Optional[DID] = None
     to: Optional[List[DID]] = None
@@ -28,17 +29,20 @@ class PlaintextOptionalHeaders:
 
 @dataclass
 class PlaintextRequiredHeaders:
+    """Required headers for any Plaintext message"""
     id: str
     type: str
 
 
 @dataclass
 class PlaintextBody:
+    """Plaintext body as a application/protocol specific data"""
     body: JSON_DATA
 
 
 @dataclass
 class Plaintext(PlaintextOptionalHeaders, PlaintextRequiredHeaders, PlaintextBody):
+    """Plaintext message consisting of headers and application/protocol specific data (body)"""
 
     def to_json(self) -> JSON:
         return ""
@@ -46,7 +50,7 @@ class Plaintext(PlaintextOptionalHeaders, PlaintextRequiredHeaders, PlaintextBod
 
 @dataclass(frozen=True)
 class Attachment:
-    """attachments list element of a plaintext."""
+    """Plaintext attachment"""
     id: str
     data: Union[AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson]
     description: Optional[str] = None
