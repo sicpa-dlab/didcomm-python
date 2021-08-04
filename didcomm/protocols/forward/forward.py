@@ -3,20 +3,20 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Union, Optional
 
-from didcomm.common.types import JSON_DATA, JWK, JSON, DID_OR_DID_URL
+from didcomm.common.types import JSON_DATA, JSON, DID_OR_DID_URL
 from didcomm.did_doc.did_resolver import DIDResolver
-from didcomm.plaintext import Plaintext, PlaintextHeaders
+from didcomm.plaintext import PlaintextRequiredHeaders, PlaintextOptionalHeaders, Plaintext
 from didcomm.secrets.secrets_resolver import SecretsResolver
 
 
-@dataclass(frozen=True)
+@dataclass
 class ForwardBody:
     next: DID_OR_DID_URL
     forwarded_msg: JSON
 
 
-@dataclass(frozen=True)
-class ForwardPlaintext(PlaintextHeaders, ForwardBody):
+@dataclass
+class ForwardPlaintext(PlaintextOptionalHeaders, PlaintextRequiredHeaders, ForwardBody):
     type: str = "https://didcomm.org/routing/2.0/forward"
 
     def to_json(self) -> JSON:
@@ -29,15 +29,17 @@ class ForwardConfig:
     did_resolver: DIDResolver = None
 
 
-async def wrap_in_forward(packed_msg: Union[JSON_DATA, JSON], routing_keys: List[JWK],
+async def wrap_in_forward(packed_msg: Union[JSON_DATA, JSON], routing_key_ids: List[DID_OR_DID_URL],
+                          forward_headers: Optional[PlaintextOptionalHeaders] = None,
                           config: Optional[ForwardConfig] = None) -> JSON:
     """
-    Wraps the given packed message in Forward messages for evert routing key.
+    Wraps the given packed message in Forward messages for every routing key.
 
     :param packed_msg: the message to be wrapped in Forward messages
-    :param routing_keys: a list of routing keys in JWK format
+    :param routing_key_ids: a list of routing key IDs or DIDs
+    :param forward_headers: optional headers to be added to Forward messages
     :param config: configuration for forward. Default parameters are used if not specified.
-    :return: a top-level Forward message as JSON string
+    :return: a top-level packed Forward message as JSON string
     """
     return ""
 

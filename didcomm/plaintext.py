@@ -10,10 +10,8 @@ from didcomm.secrets.secrets_resolver import SecretsResolver
 Header = Dict[str, Union[str, int, JSON_DATA]]
 
 
-@dataclass(frozen=True)
-class PlaintextHeaders:
-    id: str
-    type: str
+@dataclass
+class PlaintextOptionalHeaders:
     typ: Optional[str] = None
     frm: Optional[DID] = None
     to: Optional[List[DID]] = None
@@ -28,13 +26,19 @@ class PlaintextHeaders:
     custom_headers: Optional[List[Header]] = None
 
 
-@dataclass(frozen=True)
+@dataclass
+class PlaintextRequiredHeaders:
+    id: str
+    type: str
+
+
+@dataclass
 class PlaintextBody:
     body: JSON_DATA
 
 
-@dataclass(frozen=True)
-class Plaintext(PlaintextHeaders, PlaintextBody):
+@dataclass
+class Plaintext(PlaintextOptionalHeaders, PlaintextRequiredHeaders, PlaintextBody):
 
     def to_json(self) -> JSON:
         return ""

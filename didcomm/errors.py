@@ -11,9 +11,16 @@ class UnknownSenderException(DIDCommException):
     pass
 
 
-class NoJWKKeyException(DIDCommException):
+class InvalidArgument(DIDCommException):
     pass
 
+
+class MissingArgument(DIDCommException):
+    pass
+
+
+class InvalidPlaintext(DIDCommException):
+    pass
 
 # Crypto
 class IncompatibleKeysException(DIDCommException):
@@ -42,16 +49,7 @@ class NoAuthenticationException(DIDDocException):
     pass
 
 
-# Pack exceptions
-class PackException(DIDCommException):
-    pass
-
-
-class FromEncryptNotSet(DIDCommException):
-    pass
-
-
-class FromSignNotSet(DIDCommException):
+class NoJWKKeyException(DIDCommException):
     pass
 
 

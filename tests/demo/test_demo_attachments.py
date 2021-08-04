@@ -25,12 +25,12 @@ async def test_demo_attachments():
                             ),
                             description="foo attachment",
                             mime_type="application/json")
-    plaintext = Plaintext(body={"aaa": 1, "bbb": 2}, id="1234567890", type="my-protocol/1.0",
+    plaintext = Plaintext(body={"aaa": 1, "bbb": 2},
+                          id="1234567890", type="my-protocol/1.0",
                           frm=ALICE_DID, to=[BOB_DID],
                           created_time=1516269022, expires_time=1516385931,
-                          typ="application/didcomm-plain+json",
                           attachments=[attachment])
-    pack_result = await pack(plaintext=plaintext)
+    pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
     print(pack_result.packed_msg)
 
     # BOB

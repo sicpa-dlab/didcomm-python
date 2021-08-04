@@ -6,7 +6,7 @@ from typing import Optional
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.common.types import JSON, DID_OR_DID_URL
 from didcomm.did_doc.did_resolver import DIDResolver
-from didcomm.plaintext import Plaintext
+from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders
 from didcomm.secrets.secrets_resolver import SecretsResolver
 
 
@@ -24,35 +24,48 @@ class PackConfig:
     enc_alg_anon: AnonCryptAlg = AnonCryptAlg.XC20P_ECDH_ES_A256KW
     encryption: bool = True
     authentication: bool = True
-    non_repudiation: bool = False
-    anonymous_sender: bool = True
+    anonymous_sender: bool = False
     forward: bool = True
 
 
-async def pack(plaintext: Plaintext,
-               pack_config: Optional[PackConfig] = None,
-               frm_enc: Optional[DID_OR_DID_URL] = None,
-               frm_sign: Optional[DID_OR_DID_URL] = None,
-               to: Optional[DID_OR_DID_URL] = None) -> PackResult:
-    """
-    Packs the message according to the given Pack Config.
+@dataclass(frozen=True)
+class PackParameters:
+    forward_headers: Optional[PlaintextOptionalHeaders] = None
 
-    :raises FromEncryptNotSet: if the message needs to be encrypted and the sender DID or keyID for encryption is set
-    in neither `frm_enc` argument nor `from` header in Plaintext
-    :raises FromSignNotSet: if the message needs to be signed (non-repudiation is required) and the sender DID or keyID
-    for signing is set in neither `frm_enc` argument nor `from` header in Plaintext
+
+async def pack(plaintext: Plaintext,
+               frm: DID_OR_DID_URL, to: DID_OR_DID_URL,
+               sign_frm: Optional[DID_OR_DID_URL] = None,
+               pack_config: Optional[PackConfig] = None,
+               pack_params: Optional[PackParameters] = None) -> PackResult:
+    """
+    Packs the message to the given recipient.
+
+    Pack is done according to the given Pack Config.
+    Default config performs repudiable authentication encryption (auth_crypt)
+    and prepares a message ready to be forwarded to the returned endpoint (via Forward protocol).
+
+    It's possible to add non-repudiation by providing `sign_frm` DID or key ID.
+
+    :raises InvalidArgument: if invalid input is provided.
+    For example, if `frm` argument doesn't match `from` header in Plaintext,
+    or `to` argument doesn't match any of `to` header values in Plaintext.
     :raises UnknownSenderException: if the sender DID or keyID can not be resolved
     :raises UnknownRecipientException: if the target DID or keyID can not be resolved
     :raises IncompatibleKeysException: if the sender and target keys are not compatible
 
+    :param plaintext: the plaintext message to be packed
+    :param frm: a DID or key ID the sender uses for authenticated encryption.
+    Must match `from` header in Plaintext if the header is set.
+    If authentication is not required by the provided 'pack_config', then any value can be passed to 'frm'.
+    :param to: a target DID or key ID the plaintext will be encrypted for.
+    Must match any of `to` header values in Plaintext if the header is set.
+    :param sign_frm: if non-repudiation is needed, a DID or key ID to be used for signing must be specified.
+    Not required by default as repudiation is expected in most of the cases.
     :param pack_config: configuration defining how pack needs to be done.
     If not specified - default configuration is used.
-    :param frm_enc: an optional sender's DID or keyID to be used for encryption.
-    If not specified, then `from` header in Plaintext is used.
-    :param frm_sign: an optional DID or keyID to be used for signing (non-repudiation).
-    If not specified, then `from` header in Plaintext is used.
-    :param to: an optional recipient DID. If not specified, then `to` header in Plaintext is used.
+    :param pack_params: optional parameters for pack
     :return: a pack result consisting of a packed message as a JSON string
-    and an optional service endpoint to be used in transport.
+    and an optional service endpoint to be used to transport teh packed message.
     """
     return PackResult(packed_msg="", service_endpoint="")

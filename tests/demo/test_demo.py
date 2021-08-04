@@ -2,8 +2,8 @@ import pytest as pytest
 
 from didcomm.common.algorithms import AnonCryptAlg
 from didcomm.did_doc.did_resolver import register_default_did_resolver, DIDResolverChain
-from didcomm.pack import pack, PackConfig
-from didcomm.plaintext import Plaintext
+from didcomm.pack import pack, PackConfig, PackParameters
+from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders
 from didcomm.secrets.secrets_resolver import register_default_secrets_resolver
 from didcomm.unpack import unpack, UnpackConfig
 from tests.common.interfaces_test import TestSecretsResolver, TestDIDResolver
@@ -20,11 +20,10 @@ async def test_demo_simple():
     register_default_secrets_resolver(TestSecretsResolver())
 
     # ALICE
-    plaintext = Plaintext(body={"aaa": 1, "bbb": 2}, id="1234567890", type="my-protocol/1.0",
-                          frm=ALICE_DID, to=[BOB_DID],
-                          created_time=1516269022, expires_time=1516385931,
-                          typ="application/didcomm-plain+json")
-    pack_result = await pack(plaintext=plaintext)
+    plaintext = Plaintext(body={"aaa": 1, "bbb": 2},
+                          id="1234567890", type="my-protocol/1.0",
+                          frm=ALICE_DID, to=[BOB_DID])
+    pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
     packed_msg = pack_result.packed_msg
     print(packed_msg)
 
@@ -41,22 +40,24 @@ async def test_demo_advanced():
     register_default_secrets_resolver(TestSecretsResolver())
 
     # ALICE
-    plaintext = Plaintext(body={"aaa": 1, "bbb": 2}, id="1234567890", type="my-protocol/1.0",
+    plaintext = Plaintext(body={"aaa": 1, "bbb": 2},
+                          id="1234567890", type="my-protocol/1.0",
                           frm=ALICE_DID, to=[BOB_DID],
-                          created_time=1516269022, expires_time=1516385931,
-                          typ="application/didcomm-plain+json")
+                          created_time=1516269022, expires_time=1516385931)
     pack_config = PackConfig(
         secrets_resolver=TestSecretsResolver(),
         did_resolver=TestDIDResolver(),
         encryption=True,
         authentication=True,
-        non_repudiation=True,
         anonymous_sender=True,
         forward=True,
         enc_alg_anon=AnonCryptAlg.A256GCM_ECDH_ES_A256KW
     )
-    pack_result = await pack(plaintext=plaintext, frm_enc="alice-key1", frm_sign="alice-key2", to="bob-ky1",
-                             pack_config=pack_config)
+    pack_parameters = PackParameters(
+        forward_headers=PlaintextOptionalHeaders(expires_time=99999)
+    )
+    pack_result = await pack(plaintext=plaintext, frm="alice-key1", to="bob-ky1", sign_frm="alice-DID-2",
+                             pack_config=pack_config, pack_params=pack_parameters)
     packed_msg = pack_result.packed_msg
     print(packed_msg)
 

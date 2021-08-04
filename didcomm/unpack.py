@@ -48,9 +48,10 @@ async def unpack(packed_msg: JSON, unpack_config: Optional[UnpackConfig] = None)
     exception will be raised.
 
     If 'unwrap_re_wrapping_forward' is set to True (which is default) in unpack options,
-    and the message is a plaintext Forward wrapping a plaintext packed for the given recipient,
-    then unpacked plaintext will be returned instead of Forward plaintext.
+    and the message is a Forward wrapping a plaintext packed for the given recipient,
+    then unpacked plaintext will be returned instead of unpacked Forward.
 
+    :raises InvalidPlaintext: if unpacked plaintext is invalid
     :raises UnknownSenderException: if the sender DID or keyID can not be resolved
     :raises UnknownRecipientException: if the target DID or keyID can not be resolved
 

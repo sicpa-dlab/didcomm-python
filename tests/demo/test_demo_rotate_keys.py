@@ -22,12 +22,12 @@ async def test_demo_attachments():
     # ALICE
     frm_prior = FromPrior(iss=ALICE_DID,
                           sub=ALICE_DID_NEW)
-    plaintext = Plaintext(body={"aaa": 1, "bbb": 2}, id="1234567890", type="my-protocol/1.0",
+    plaintext = Plaintext(body={"aaa": 1, "bbb": 2},
+                          id="1234567890", type="my-protocol/1.0",
                           frm=ALICE_DID, to=[BOB_DID],
                           created_time=1516269022, expires_time=1516385931,
-                          typ="application/didcomm-plain+json",
                           from_prior=frm_prior.as_jwt())
-    pack_result = await pack(plaintext=plaintext)
+    pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
     print(pack_result.packed_msg)
 
     # BOB
