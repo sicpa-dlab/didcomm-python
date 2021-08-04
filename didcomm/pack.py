@@ -34,15 +34,20 @@ class PackConfig:
     Attributes:
         secrets_resolver (SecretsResolver): an optional secrets resolver that can override a default secrets resolver
         registered by 'register_default_secrets_resolver'
+
         did_resolver (DIDResolver): an optional DID Doc resolver that can override a default DID Doc resolver
         registered by 'register_default_did_resolver'
+
         enc_alg_auth (AuthCryptAlg): the encryption algorithm to be used for authentication encryption (auth_crypt).
         `A256CBC_HS512_ECDH_1PU_A256KW` by default.
+
         enc_alg_anon (AnonCryptAlg): the encryption algorithm to be used for anonymous encryption (anon_crypt).
         `XC20P_ECDH_ES_A256KW` by default.
+
         encryption (bool): whether the plaintext needs to be encrypted. True by default.
         authentication (bool): whether the plaintext needs to be authenticated. True by default.
         anonymous_sender (bool): whether the sender ID needs to be protected. False by default.
+
         forward (bool):  whether the packed messages need to be wrapped into Forward messages to be sent to Mediators
         as defined by the Forward protocol. True by default.
     """

@@ -19,15 +19,16 @@ class UnpackConfig:
     Attributes:
         secrets_resolver (SecretsResolver): an optional secrets resolver that can override a default secrets resolver
         registered by 'register_default_secrets_resolver'
+
         did_resolver (DIDResolver): an optional DID Doc resolver that can override a default DID Doc resolver
         registered by 'register_default_did_resolver'
+
         expect_encrypted (bool): whether the plaintext must be encrypted by the sender. Not expected by default.
         expect_authenticated (bool): whether the plaintext must be authenticated by the sender. Not expected by default.
         expect_anonymous_sender (bool): whether the sender ID must be protected. Not expected by default.
         expect_non_repudiation (bool): whether the plaintext must be signed by the sender. Not expected by default.
         expect_signed_by_encrypter (bool): whether the same DID must be used for encryption and signing. True by default.
-        expect_decrypt_by_all_keys (bool): whether the plaintext must be decryptable
-        by all keys resolved by the secrets resolver. False by default.
+        expect_decrypt_by_all_keys (bool): whether the plaintext must be decryptable by all keys resolved by the secrets resolver. False by default.
         unwrap_re_wrapping_forward (bool): if True (default), and the packed message is a Forward
         wrapping a plaintext packed for the given recipient, then both Forward and packed plaintext are unpacked automatically,
         and the unpacked plaintext will be returned instead of unpacked Forward.
@@ -54,8 +55,7 @@ class Metadata:
         non_repudiation (bool): whether the plaintext has been signed
         anonymous_sender (bool): whether the sender ID was protected
         re_wrapped_in_forward (bool): whether the plaintext was re-wrapped in a forward message by a mediator
-        enc_from (DID_OR_DID_URL): DID or key ID of the sender used for authentication encryption
-        if the plaintext has been authenticated and encrypted
+        enc_from (DID_OR_DID_URL): DID or key ID of the sender used for authentication encryption if the plaintext has been authenticated and encrypted
         enc_to (List[DID_OR_DID_URL]): target DIDs or key IDS for encryption if the plaintext has been encrypted
         sign_from (DID_OR_DID_URL): DID or key ID used for signature if the plaintext has been signed
     """
@@ -76,8 +76,7 @@ class UnpackResult:
 
     Attributes:
         plaintext (Plaintext): unpacked plaintext consisting of headers and application/protocol specific data (body)
-        metadata (Metadata): metadata with details about the packed messaged.
-        Can be used for MTC (message trust context) analysis
+        metadata (Metadata): metadata with details about the packed messaged. Can be used for MTC (message trust context) analysis.
         signed_plaintext (JWS): if the plaintext has been signed, the JWS is returned for non-repudiation purposes
     """
     plaintext: Plaintext
