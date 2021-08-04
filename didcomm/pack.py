@@ -69,13 +69,16 @@ class PackParameters:
     Attributes:
         forward_headers (PlaintextOptionalHeaders): if forward is enabled (true by default),
         optional headers can be passed to the wrapping Forward messages.
+
+        sign_frm (DID_OR_DID_URL): if non-repudiation is needed, a DID or key ID to be used for signing must be specified.
+        Not required by default as repudiation is expected in most of the cases.
     """
     forward_headers: Optional[PlaintextOptionalHeaders] = None
+    sign_frm: Optional[DID_OR_DID_URL] = None
 
 
 async def pack(plaintext: Plaintext,
                frm: DID_OR_DID_URL, to: DID_OR_DID_URL,
-               sign_frm: Optional[DID_OR_DID_URL] = None,
                pack_config: Optional[PackConfig] = None,
                pack_params: Optional[PackParameters] = None) -> PackResult:
     """
@@ -100,8 +103,6 @@ async def pack(plaintext: Plaintext,
     If authentication is not required by the provided 'pack_config', then any value can be passed to 'frm'.
     :param to: a target DID or key ID the plaintext will be encrypted for.
     Must match any of `to` header values in Plaintext if the header is set.
-    :param sign_frm: if non-repudiation is needed, a DID or key ID to be used for signing must be specified.
-    Not required by default as repudiation is expected in most of the cases.
     :param pack_config: configuration defining how pack needs to be done.
     If not specified - default configuration is used.
     :param pack_params: optional parameters for pack

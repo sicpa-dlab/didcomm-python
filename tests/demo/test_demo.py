@@ -54,9 +54,10 @@ async def test_demo_advanced():
         enc_alg_anon=AnonCryptAlg.A256GCM_ECDH_ES_A256KW
     )
     pack_parameters = PackParameters(
-        forward_headers=PlaintextOptionalHeaders(expires_time=99999)
+        forward_headers=PlaintextOptionalHeaders(expires_time=99999),
+        sign_frm="alice-DID-2"
     )
-    pack_result = await pack(plaintext=plaintext, frm="alice-key1", to="bob-ky1", sign_frm="alice-DID-2",
+    pack_result = await pack(plaintext=plaintext, frm="alice-key1", to="bob-ky1",
                              pack_config=pack_config, pack_params=pack_parameters)
     packed_msg = pack_result.packed_msg
     print(packed_msg)
