@@ -88,7 +88,23 @@ async def pack(plaintext: Plaintext,
     Default config performs repudiable authentication encryption (auth_crypt)
     and prepares a message ready to be forwarded to the returned endpoint (via Forward protocol).
 
-    It's possible to add non-repudiation by providing `sign_frm` DID or key ID.
+    It's possible to add non-repudiation by providing `sign_frm` argument in `pack_params` (DID or key ID).
+
+    If encryption is needed (default):
+        - encryption is done via the keys from the `keyAgreement` verification relationship in the DID Doc
+        - if 'frm' is a DID, then the first sender's `keyAgreement` verification method is used for which
+        a private key in the secrets resolver is found
+        - if 'frm' is a key ID, then the sender's `keyAgreement` verification method identified by the given key ID is used.
+        - if 'to' is a DID, then multiplex encryption is done for all keys from the receiver's `keyAgreement` verification relationship
+        - if 'to' is a key ID, then encryption is done for the  receiver's `keyAgreement` verification method identified by the given key ID is used.
+
+    If non-repudiation (signing) is used by specifying a `sign_frm` argument in `pack_params` (disabled by default):
+        - signing is done via the keys from the `authentication` verification relationship in the DID Doc
+        for the DID to be used for signing
+        - encryption is done via the keys from the `keyAgreement` verification relationship in the DID Doc
+        - if 'sign_frm' is a DID, then the first sender's `authentication` verification method is used for which
+        a private key in the secrets resolver is found
+        - if 'sign_frm' is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
 
     :raises InvalidArgument: if invalid input is provided.
     For example, if `frm` argument doesn't match `from` header in Plaintext,
