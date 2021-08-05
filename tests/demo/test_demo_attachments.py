@@ -5,7 +5,7 @@ from didcomm.pack import pack
 from didcomm.plaintext import Plaintext, Attachment, AttachmentDataJson
 from didcomm.secrets.secrets_resolver import register_default_secrets_resolver
 from didcomm.unpack import unpack
-from tests.common.interfaces_test import TestSecretsResolver, TestDIDResolver
+from tests.common.example_resolvers import ExampleSecretsResolver, ExampleDIDResolver
 
 ALICE_DID = "did:example:alice"
 BOB_DID = "did:example:bob"
@@ -14,9 +14,9 @@ BOB_DID = "did:example:bob"
 @pytest.mark.asyncio
 async def test_demo_attachments():
     register_default_did_resolver(
-        DIDResolverChain([TestDIDResolver()])
+        DIDResolverChain([ExampleDIDResolver()])
     )
-    register_default_secrets_resolver(TestSecretsResolver())
+    register_default_secrets_resolver(ExampleSecretsResolver())
 
     # ALICE
     attachment = Attachment(id="123",

@@ -1,18 +1,7 @@
 from abc import ABC, abstractmethod
-from enum import Enum, auto
-from typing import List
+from typing import List, Optional
 
-from didcomm.common.types import JWK, DID_URL
-
-
-class VerificationMethodMode(Enum):
-    """
-    Verification method mode.
-    Internal means that a methods is either embedded or referenced withing the same DID Doc.
-    External means that a method references another DID Doc.
-    """
-    INTERNAL = auto()
-    EXTERNAL = auto()
+from didcomm.common.types import DID_URL, DID
 
 
 class VerificationMethod(ABC):
@@ -22,20 +11,9 @@ class VerificationMethod(ABC):
     """
 
     @abstractmethod
-    def mode(self) -> VerificationMethodMode:
-        """
-        Verification method mode.
-        Internal means that a method is either embedded or referenced withing the same DID Doc.
-        External means that a method references another DID Doc.
-        :return: verification method mode
-        """
-        pass
-
-    @abstractmethod
     def kid(self) -> str:
         """
         A key ID of the verification method.
-        If the verification method is External, that value can be used to resolve the corresponding DID Doc.
         :return: verification method `id` field
         """
         pass
@@ -43,24 +21,21 @@ class VerificationMethod(ABC):
     @abstractmethod
     def type(self) -> str:
         """
+        Verification method type.
         :return: verification method `type` field
         """
         pass
 
     @abstractmethod
-    def as_jwk(self) -> JWK:
+    def public_key(self) -> str:
         """
-        A public key of the method in JWK format. It should be called only if the mode is Internal.
+        A public key of the method.
 
-        It must return a key in JWK format if the method is embedded or if it's referenced withing the same DID Doc.
+        The value is type-specific.
+        For example, for 'JsonWebKey2020' type it will be the value of `publicKeyJwk` field as a JSON sting.
+        For 'X25519KeyAgreementKey2019' type it will be the value of `publicKeyBase58` field as a base58-encoded string.
 
-        If the method has 'publicKeyJwk' property, that is a public key is already in JWK format, it can be returned as-is.
-        If a method has a public key in another format ('publicKeyHex', 'publicKeyBase58', 'publicKeyMultibase'),
-        then it must be converted to JWK format.
-
-        :raises NoJWKKeyException: if there is no public key in the verification method, or it can not be converted to JWK format,
-        or it's an External Verification Method (DID URL referencing a methods from another DID Doc).
-        :return: public key as JWK json string
+        :return: type-specific value of the public key a string
         """
         pass
 
@@ -94,51 +69,45 @@ class DIDDoc(ABC):
     """DID DOC abstraction resolved for a DID"""
 
     @abstractmethod
-    def key_agreement(self, kid: DID_URL) -> VerificationMethod:
+    def did(self) -> DID:
         """
-        A verification method from the 'keyAgreement' verification relationship.
-        It must have 'id' equal to the  given key ID.
-
-        :raises NoKeyAgreementException: if there is no verification method with the given key ID in 'keyAgreement'
-        or there is no 'keyAgreement' relationship in this DID DOC.
-
-        :param kid: key ID identifying verification method
-        :return: verification method instance
+        :return: a DID for the given DID Doc
         """
         pass
 
     @abstractmethod
-    def key_agreements(self) -> List[VerificationMethod]:
+    def key_agreement_kids(self) -> List[DID_URL]:
         """
-        All verification methods from the 'keyAgreement' verification relationship in this DID DOC.
+        Key IDs of all verification methods from the 'keyAgreement' verification relationship in this DID DOC.
 
-        :return: a possibly empty list of verification method instances
-        """
-        pass
-
-    @abstractmethod
-    def authentication(self, kid: DID_URL) -> VerificationMethod:
-        """
-        A verification method from the 'authentication' verification relationship.
-        It must have 'id' equal to the  given key ID.
-
-        :raises NoAuthenticationException: if there is no verification method with the given key ID in 'authentication'
-        or there is no 'authentication' relationship in this DID DOC.
-
-        :param kid: key ID identifying verification method
-        :return: verification method instance
+        :return: a possibly empty list of key ID of all 'keyAgreement' verification methods
         """
         pass
 
     @abstractmethod
-    def authentications(self) -> List[VerificationMethod]:
+    def key_agreement_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
         """
-        All verification methods from the 'authentication' verification relationship in this DID DOC.
+        :param kid: key ID of the 'keyAgreement' verification method
+        :return: a 'keyAgreement' verification method identified by the given key ID
+        or None if there is no method with the given key ID.
+        """
+        pass
 
-        :raises NoAuthenticationException:  if there is no 'authentication' relationship in this DID DOC,
-        or it has no verification methods.
+    @abstractmethod
+    def authentication_kids(self) -> List[DID_URL]:
+        """
+        Key IDs of all verification methods from the 'authentication' verification relationship in this DID DOC.
 
-        :return: a list of verification method instances
+        :return: a possibly empty list of key ID of all 'authentication' verification methods
+        """
+        pass
+
+    @abstractmethod
+    def authentication_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
+        """
+        :param kid: key ID of the 'authentication' verification method
+        :return: an 'authentication' verification method identified by the given key ID
+        or None if there is no method with the given key ID.
         """
         pass
 
@@ -148,6 +117,6 @@ class DIDDoc(ABC):
         All service endpoints of 'DIDCommMessaging' type in this DID DOC.
         Empty list is returned if there are no service endpoints of 'DIDCommMessaging' type.
 
-        :return: a possibly empty list of verification method instances
+        :return: a possibly empty list of 'DIDCommMessaging' type service endpoints
         """
         pass

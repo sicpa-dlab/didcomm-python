@@ -22,6 +22,7 @@ class MissingArgument(DIDCommException):
 class InvalidPlaintext(DIDCommException):
     pass
 
+
 # Crypto
 class IncompatibleKeysException(DIDCommException):
     pass
@@ -32,24 +33,6 @@ class InvalidSignatureException(DIDCommException):
 
 
 class CanNotDecryptException(DIDCommException):
-    pass
-
-
-# DID Doc exceptions
-
-class DIDDocException(DIDCommException):
-    pass
-
-
-class NoKeyAgreementException(DIDDocException):
-    pass
-
-
-class NoAuthenticationException(DIDDocException):
-    pass
-
-
-class NoJWKKeyException(DIDCommException):
     pass
 
 

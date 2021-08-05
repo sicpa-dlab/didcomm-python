@@ -6,7 +6,7 @@ from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders
 from didcomm.protocols.forward.forward import unpack_forward, wrap_in_forward
 from didcomm.secrets.secrets_resolver import register_default_secrets_resolver
 from didcomm.unpack import unpack, UnpackConfig
-from tests.common.interfaces_test import TestSecretsResolver, TestDIDResolver
+from tests.common.example_resolvers import ExampleSecretsResolver, ExampleDIDResolver
 
 ALICE_DID = "did:example:alice"
 BOB_DID = "did:example:bob"
@@ -15,9 +15,9 @@ BOB_DID = "did:example:bob"
 @pytest.mark.asyncio
 async def test_demo_forward():
     register_default_did_resolver(
-        DIDResolverChain([TestDIDResolver()])
+        DIDResolverChain([ExampleDIDResolver()])
     )
-    register_default_secrets_resolver(TestSecretsResolver())
+    register_default_secrets_resolver(ExampleSecretsResolver())
 
     # ALICE
     plaintext = Plaintext(body={"aaa": 1, "bbb": 2},
@@ -39,9 +39,9 @@ async def test_demo_forward():
 @pytest.mark.asyncio
 async def test_demo_mediators_unknown_to_sender():
     register_default_did_resolver(
-        DIDResolverChain([TestDIDResolver()])
+        DIDResolverChain([ExampleDIDResolver()])
     )
-    register_default_secrets_resolver(TestSecretsResolver())
+    register_default_secrets_resolver(ExampleSecretsResolver())
 
     # ALICE
     plaintext = Plaintext(body={"aaa": 1, "bbb": 2},
@@ -70,9 +70,9 @@ async def test_demo_mediators_unknown_to_sender():
 @pytest.mark.asyncio
 async def test_demo_re_wrap_ro_receiver():
     register_default_did_resolver(
-        DIDResolverChain([TestDIDResolver()])
+        DIDResolverChain([ExampleDIDResolver()])
     )
-    register_default_secrets_resolver(TestSecretsResolver())
+    register_default_secrets_resolver(ExampleSecretsResolver())
 
     # ALICE
     plaintext = Plaintext(body={"aaa": 1, "bbb": 2},

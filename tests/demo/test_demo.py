@@ -6,7 +6,7 @@ from didcomm.pack import pack, PackConfig, PackParameters
 from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders
 from didcomm.secrets.secrets_resolver import register_default_secrets_resolver
 from didcomm.unpack import unpack, UnpackConfig
-from tests.common.interfaces_test import TestSecretsResolver, TestDIDResolver
+from tests.common.example_resolvers import ExampleDIDResolver, ExampleSecretsResolver
 
 ALICE_DID = "did:example:alice"
 BOB_DID = "did:example:bob"
@@ -15,9 +15,9 @@ BOB_DID = "did:example:bob"
 @pytest.mark.asyncio
 async def test_demo_simple():
     register_default_did_resolver(
-        DIDResolverChain([TestDIDResolver()])
+        DIDResolverChain([ExampleDIDResolver()])
     )
-    register_default_secrets_resolver(TestSecretsResolver())
+    register_default_secrets_resolver(ExampleSecretsResolver())
 
     # ALICE
     plaintext = Plaintext(body={"aaa": 1, "bbb": 2},
@@ -35,9 +35,9 @@ async def test_demo_simple():
 @pytest.mark.asyncio
 async def test_demo_advanced():
     register_default_did_resolver(
-        DIDResolverChain([TestDIDResolver()])
+        DIDResolverChain([ExampleDIDResolver()])
     )
-    register_default_secrets_resolver(TestSecretsResolver())
+    register_default_secrets_resolver(ExampleSecretsResolver())
 
     # ALICE
     plaintext = Plaintext(body={"aaa": 1, "bbb": 2},
@@ -45,8 +45,8 @@ async def test_demo_advanced():
                           frm=ALICE_DID, to=[BOB_DID],
                           created_time=1516269022, expires_time=1516385931)
     pack_config = PackConfig(
-        secrets_resolver=TestSecretsResolver(),
-        did_resolver=TestDIDResolver(),
+        secrets_resolver=ExampleSecretsResolver(),
+        did_resolver=ExampleDIDResolver(),
         encryption=True,
         authentication=True,
         anonymous_sender=True,
@@ -64,8 +64,8 @@ async def test_demo_advanced():
 
     # BOB
     unpack_config = UnpackConfig(
-        secrets_resolver=TestSecretsResolver(),
-        did_resolver=TestDIDResolver(),
+        secrets_resolver=ExampleSecretsResolver(),
+        did_resolver=ExampleDIDResolver(),
         expect_encrypted=True,
         expect_authenticated=True,
         expect_non_repudiation=True,
