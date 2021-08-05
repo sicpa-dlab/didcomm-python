@@ -40,9 +40,9 @@ class VerificationMethod(ABC):
         pass
 
 
-class DIDDocServiceEndpoint(ABC):
+class DIDDocService(ABC):
     """
-    DID DOC Service Endpoint of 'DIDCommMessaging' type.
+    DID DOC Service of 'DIDCommMessaging' type.
     """
 
     @abstractmethod
@@ -106,11 +106,11 @@ class DIDDoc(ABC):
         pass
 
     @abstractmethod
-    def service_endpoints(self) -> List[DIDDocServiceEndpoint]:
+    def services(self) -> List[DIDDocService]:
         """
-        All service endpoints of 'DIDCommMessaging' type in this DID DOC.
-        Empty list is returned if there are no service endpoints of 'DIDCommMessaging' type.
+        All services of 'DIDCommMessaging' type in this DID DOC.
+        Empty list is returned if there are no services of 'DIDCommMessaging' type.
 
-        :return: a possibly empty list of 'DIDCommMessaging' type service endpoints
+        :return: a possibly empty list of 'DIDCommMessaging' type services
         """
         pass

@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from didcomm.common.types import DID_URL, DID
-from didcomm.did_doc.did_doc import DIDDoc, VerificationMethod
+from didcomm.did_doc.did_doc import DIDDoc, VerificationMethod, DIDDocService
 from didcomm.did_doc.did_resolver import DIDResolver
 from didcomm.secrets.secrets_resolver import SecretsResolver, Secret
 
@@ -18,6 +18,9 @@ class ExampleDIDDoc(DIDDoc):
         pass
 
     def verification_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
+        pass
+
+    def services(self) -> List[DIDDocService]:
         pass
 
 
