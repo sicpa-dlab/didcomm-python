@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from didcomm.common.types import DID_URL, DID
-from didcomm.did_doc.did_doc import DIDDoc, DIDDocServiceEndpoint, VerificationMethod
+from didcomm.did_doc.did_doc import DIDDoc, VerificationMethod
 from didcomm.did_doc.did_resolver import DIDResolver
 from didcomm.secrets.secrets_resolver import SecretsResolver, Secret
 
@@ -14,16 +14,10 @@ class ExampleDIDDoc(DIDDoc):
     def key_agreement_kids(self) -> List[DID_URL]:
         pass
 
-    def key_agreement_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
-        pass
-
     def authentication_kids(self) -> List[DID_URL]:
         pass
 
-    def authentication_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
-        pass
-
-    def service_endpoints(self) -> List[DIDDocServiceEndpoint]:
+    def verification_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
         pass
 
 

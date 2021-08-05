@@ -85,15 +85,6 @@ class DIDDoc(ABC):
         pass
 
     @abstractmethod
-    def key_agreement_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
-        """
-        :param kid: key ID of the 'keyAgreement' verification method
-        :return: a 'keyAgreement' verification method identified by the given key ID
-        or None if there is no method with the given key ID.
-        """
-        pass
-
-    @abstractmethod
     def authentication_kids(self) -> List[DID_URL]:
         """
         Key IDs of all verification methods from the 'authentication' verification relationship in this DID DOC.
@@ -103,10 +94,13 @@ class DIDDoc(ABC):
         pass
 
     @abstractmethod
-    def authentication_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
+    def verification_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
         """
-        :param kid: key ID of the 'authentication' verification method
-        :return: an 'authentication' verification method identified by the given key ID
+        A verification method with the given 'id' (key ID).
+        In most of the cases it will be a verification method from 'authentication' or 'keyAgreement' verification relationship.
+
+        :param kid: key ID of a verification method
+        :return: a verification method identified by the given key ID
         or None if there is no method with the given key ID.
         """
         pass
