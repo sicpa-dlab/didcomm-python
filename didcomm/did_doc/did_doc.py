@@ -8,6 +8,7 @@ class VerificationMethod(ABC):
     """
     DID DOC Verification method.
     It can be used in such verification relationships as Authentication, KeyAgreement, etc.
+    See https://www.w3.org/TR/did-core/#verification-methods.
     """
 
     @abstractmethod
@@ -43,6 +44,8 @@ class VerificationMethod(ABC):
 class DIDDocService(ABC):
     """
     DID DOC Service of 'DIDCommMessaging' type.
+    See https://www.w3.org/TR/did-core/#services and
+    https://identity.foundation/didcomm-messaging/spec/#did-document-service-endpoint.
     """
 
     @abstractmethod
@@ -66,7 +69,7 @@ class DIDDocService(ABC):
 
 
 class DIDDoc(ABC):
-    """DID DOC abstraction resolved for a DID"""
+    """DID DOC abstraction (https://www.w3.org/TR/did-core/#dfn-did-documents)"""
 
     @abstractmethod
     def did(self) -> DID:
@@ -78,7 +81,8 @@ class DIDDoc(ABC):
     @abstractmethod
     def key_agreement_kids(self) -> List[DID_URL]:
         """
-        Key IDs of all verification methods from the 'keyAgreement' verification relationship in this DID DOC.
+        Key IDs (DID URLs) of all verification methods from the 'keyAgreement' verification relationship in this DID DOC.
+        See https://www.w3.org/TR/did-core/#verification-methods.
 
         :return: a possibly empty list of key ID of all 'keyAgreement' verification methods
         """
@@ -87,7 +91,8 @@ class DIDDoc(ABC):
     @abstractmethod
     def authentication_kids(self) -> List[DID_URL]:
         """
-        Key IDs of all verification methods from the 'authentication' verification relationship in this DID DOC.
+        Key IDs (DID URLs) of all verification methods from the 'authentication' verification relationship in this DID DOC.
+        See https://www.w3.org/TR/did-core/#authentication.
 
         :return: a possibly empty list of key ID of all 'authentication' verification methods
         """
@@ -97,6 +102,7 @@ class DIDDoc(ABC):
     def verification_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
         """
         A verification method with the given 'id' (key ID).
+        See https://www.w3.org/TR/did-core/#verification-methods.
         In most of the cases it will be a verification method from 'authentication' or 'keyAgreement' verification relationship.
 
         :param kid: key ID of a verification method
@@ -110,6 +116,7 @@ class DIDDoc(ABC):
         """
         All services of 'DIDCommMessaging' type in this DID DOC.
         Empty list is returned if there are no services of 'DIDCommMessaging' type.
+        See https://www.w3.org/TR/did-core/#services and https://identity.foundation/didcomm-messaging/spec/#did-document-service-endpoint.
 
         :return: a possibly empty list of 'DIDCommMessaging' type services
         """
