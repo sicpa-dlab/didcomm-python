@@ -41,12 +41,19 @@ class VerificationMethod(ABC):
         pass
 
 
-class DIDDocService(ABC):
+class DIDCommService(ABC):
     """
     DID DOC Service of 'DIDCommMessaging' type.
     See https://www.w3.org/TR/did-core/#services and
     https://identity.foundation/didcomm-messaging/spec/#did-document-service-endpoint.
     """
+
+    @abstractmethod
+    def id(self) -> str:
+        """
+        :return: service's 'id' field
+        """
+        pass
 
     @abstractmethod
     def service_endpoint(self) -> str:
@@ -112,7 +119,7 @@ class DIDDoc(ABC):
         pass
 
     @abstractmethod
-    def services(self) -> List[DIDDocService]:
+    def services(self) -> List[DIDCommService]:
         """
         All services of 'DIDCommMessaging' type in this DID DOC.
         Empty list is returned if there are no services of 'DIDCommMessaging' type.

@@ -2,7 +2,7 @@ import pytest as pytest
 
 from didcomm.common.algorithms import AnonCryptAlg
 from didcomm.did_doc.did_resolver import register_default_did_resolver, DIDResolverChain
-from didcomm.pack import pack, PackConfig, PackParameters, AuthMode
+from didcomm.pack import pack, PackConfig, PackParameters
 from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders
 from didcomm.secrets.secrets_resolver import register_default_secrets_resolver
 from didcomm.unpack import unpack, UnpackConfig
@@ -13,7 +13,7 @@ BOB_DID = "did:example:bob"
 
 
 @pytest.mark.asyncio
-async def test_demo_simple():
+async def test_demo_simple_auth_crypt():
     register_default_did_resolver(
         DIDResolverChain([ExampleDIDResolver()])
     )
@@ -24,6 +24,26 @@ async def test_demo_simple():
                           id="1234567890", type="my-protocol/1.0",
                           frm=ALICE_DID, to=[BOB_DID])
     pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
+    packed_msg = pack_result.packed_msg
+    print(packed_msg)
+
+    # BOB
+    unpack_result_bob = await unpack(packed_msg)
+    print(unpack_result_bob.plaintext)
+
+
+@pytest.mark.asyncio
+async def test_demo_simple_anon_crypt():
+    register_default_did_resolver(
+        DIDResolverChain([ExampleDIDResolver()])
+    )
+    register_default_secrets_resolver(ExampleSecretsResolver())
+
+    # ALICE
+    plaintext = Plaintext(body={"aaa": 1, "bbb": 2},
+                          id="1234567890", type="my-protocol/1.0",
+                          frm=ALICE_DID, to=[BOB_DID])
+    pack_result = await pack(plaintext=plaintext, to=BOB_DID)
     packed_msg = pack_result.packed_msg
     print(packed_msg)
 
@@ -47,13 +67,14 @@ async def test_demo_advanced():
     pack_config = PackConfig(
         secrets_resolver=ExampleSecretsResolver(),
         did_resolver=ExampleDIDResolver(),
-        auth_mode=AuthMode.AUTH_PROTECTED_SENDER,
+        protect_sender_id=True,
         forward=True,
         enc_alg_anon=AnonCryptAlg.A256GCM_ECDH_ES_A256KW
     )
     pack_parameters = PackParameters(
+        sign_frm="alice-DID-2",
         forward_headers=PlaintextOptionalHeaders(expires_time=99999),
-        sign_frm="alice-DID-2"
+        forward_service_id="service-id"
     )
     pack_result = await pack(plaintext=plaintext, frm="alice-key1", to="bob-ky1",
                              pack_config=pack_config, pack_params=pack_parameters)
