@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum, auto
 from typing import Optional
 
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
@@ -21,6 +22,12 @@ class PackResult:
     """
     packed_msg: JSON
     service_endpoint: Optional[str]
+
+
+class AuthMode(Enum):
+    AUTH_UNPROTECTED_SENDER = auto()
+    AUTH_PROTECTED_SENDER = auto()
+    NO_AUTH = auto()
 
 
 @dataclass(frozen=True)
@@ -44,9 +51,9 @@ class PackConfig:
         enc_alg_anon (AnonCryptAlg): the encryption algorithm to be used for anonymous encryption (anon_crypt).
         `XC20P_ECDH_ES_A256KW` by default.
 
-        encryption (bool): whether the plaintext needs to be encrypted. True by default.
-        authentication (bool): whether the plaintext needs to be authenticated. True by default.
-        anonymous_sender (bool): whether the sender ID needs to be protected. False by default.
+        auth_mode (AuthMode): how authentication should be done: no authentication (NO_AUTH) to perform anon crypt,
+        authentication with unprotected sender (AUTH_UNPROTECTED_SENDER) or
+        authentication with protected sender (AUTH_PROTECTED_SENDER).
 
         forward (bool):  whether the packed messages need to be wrapped into Forward messages to be sent to Mediators
         as defined by the Forward protocol. True by default.
@@ -55,16 +62,14 @@ class PackConfig:
     did_resolver: DIDResolver = None
     enc_alg_auth: AuthCryptAlg = AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW
     enc_alg_anon: AnonCryptAlg = AnonCryptAlg.XC20P_ECDH_ES_A256KW
-    encryption: bool = True
-    authentication: bool = True
-    anonymous_sender: bool = False
+    auth_mode: AuthMode = AuthMode.AUTH_UNPROTECTED_SENDER
     forward: bool = True
 
 
 @dataclass(frozen=True)
 class PackParameters:
     """
-    Optional paraneters for pack.
+    Optional parameters for pack.
 
     Attributes:
         forward_headers (PlaintextOptionalHeaders): if forward is enabled (true by default),
@@ -90,7 +95,7 @@ async def pack(plaintext: Plaintext,
 
     It's possible to add non-repudiation by providing `sign_frm` argument in `pack_params` (DID or key ID).
 
-    If encryption is needed (default):
+    Encryption is done as following:
         - encryption is done via the keys from the `keyAgreement` verification relationship in the DID Doc
         - if 'frm' is a DID, then the first sender's `keyAgreement` verification method is used for which
         a private key in the secrets resolver is found
@@ -101,7 +106,6 @@ async def pack(plaintext: Plaintext,
     If non-repudiation (signing) is used by specifying a `sign_frm` argument in `pack_params` (disabled by default):
         - signing is done via the keys from the `authentication` verification relationship in the DID Doc
         for the DID to be used for signing
-        - encryption is done via the keys from the `keyAgreement` verification relationship in the DID Doc
         - if 'sign_frm' is a DID, then the first sender's `authentication` verification method is used for which
         a private key in the secrets resolver is found
         - if 'sign_frm' is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
@@ -116,7 +120,8 @@ async def pack(plaintext: Plaintext,
     :param plaintext: the plaintext message to be packed
     :param frm: a DID or key ID the sender uses for authenticated encryption.
     Must match `from` header in Plaintext if the header is set.
-    If authentication is not required by the provided 'pack_config', then any value can be passed to 'frm'.
+    If authentication is not required by the provided 'pack_config' (auth_mode=AuthMode.NO_AUTH),
+    then any value can be passed to 'frm'.
     :param to: a target DID or key ID the plaintext will be encrypted for.
     Must match any of `to` header values in Plaintext if the header is set.
     :param pack_config: configuration defining how pack needs to be done.

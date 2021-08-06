@@ -2,7 +2,7 @@ import pytest as pytest
 
 from didcomm.common.algorithms import AnonCryptAlg
 from didcomm.did_doc.did_resolver import register_default_did_resolver, DIDResolverChain
-from didcomm.pack import pack, PackConfig, PackParameters
+from didcomm.pack import pack, PackConfig, PackParameters, AuthMode
 from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders
 from didcomm.secrets.secrets_resolver import register_default_secrets_resolver
 from didcomm.unpack import unpack, UnpackConfig
@@ -47,9 +47,7 @@ async def test_demo_advanced():
     pack_config = PackConfig(
         secrets_resolver=ExampleSecretsResolver(),
         did_resolver=ExampleDIDResolver(),
-        encryption=True,
-        authentication=True,
-        anonymous_sender=True,
+        auth_mode=AuthMode.AUTH_PROTECTED_SENDER,
         forward=True,
         enc_alg_anon=AnonCryptAlg.A256GCM_ECDH_ES_A256KW
     )
