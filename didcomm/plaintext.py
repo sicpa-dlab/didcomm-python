@@ -3,17 +3,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List, Union, Dict
 
+from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON_DATA, DID, JSON, JWT, DID_URL
-from didcomm.did_doc.did_resolver import DIDResolver
-from didcomm.secrets.secrets_resolver import SecretsResolver
 
 Header = Dict[str, Union[str, int, JSON_DATA]]
+SignedPlaintext = JSON_DATA
 
 
 @dataclass
 class PlaintextOptionalHeaders:
     """Optional headers for any Plaintext message"""
-    typ: Optional[str] = None
+    typ: str = "application/didcomm-plain+json"
     frm: Optional[DID] = None
     to: Optional[List[DID]] = None
     created_time: Optional[int] = None
@@ -43,6 +43,14 @@ class PlaintextBody:
 @dataclass
 class Plaintext(PlaintextOptionalHeaders, PlaintextRequiredHeaders, PlaintextBody):
     """Plaintext message consisting of headers and application/protocol specific data (body)"""
+
+    def to_json(self) -> JSON:
+        return ""
+
+
+@dataclass
+class SignedPlaintext:
+    data: JSON_DATA
 
     def to_json(self) -> JSON:
         return ""
@@ -94,17 +102,14 @@ class FromPrior:
 
     def as_jwt(self,
                iss_kid: DID_URL = None,
-               did_resolver: Optional[DIDResolver] = None,
-               secrets_resolver: Optional[SecretsResolver] = None) -> JWT:
+               resolvers_config: Optional[ResolversConfig] = None) -> JWT:
         """
         Gets the signed JWT with this FromPrior information.
 
         :param iss_kid: an optional key ID to be used for signing the JWT.
         If not specified, then the first key for teh given `iss` DID is used which can be resolved by the secrets resolver.
-        :param secrets_resolver: an optional secrets resolver that can override a default secrets resolver
-        registered by 'register_default_secrets_resolver'
-        :param did_resolver: an optional DID Doc resolver that can override a default DID Doc resolver
-        registered by 'register_default_did_resolver'
+        :param resolvers_config: optional resolvers that can override a default resolvers
+        registered by 'register_default_secrets_resolver' and 'register_default_did_resolver'
         :returns: the JWT with this FromPrior information
         """
 

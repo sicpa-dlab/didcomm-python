@@ -49,12 +49,3 @@ class SecretsResolver(ABC):
         :return: a possible empty list of all private key keyIDs of for the given DID
         """
         pass
-
-
-def register_default_secrets_resolver(secrets_resolver: SecretsResolver):
-    """
-    Registers a Secrets Resolver that can be used in all pack/unpack operations by default.
-
-    :param secrets_resolver: a default secrets resolver to be registered.
-    """
-    pass

@@ -1,23 +1,22 @@
 import pytest as pytest
 
-from didcomm.did_doc.did_resolver import register_default_did_resolver, DIDResolverChain
+from didcomm.common.resolvers import ResolversConfig
 from didcomm.pack import pack
 from didcomm.plaintext import Plaintext, Attachment, AttachmentDataJson
-from didcomm.secrets.secrets_resolver import register_default_secrets_resolver
 from didcomm.unpack import unpack
 from tests.common.example_resolvers import ExampleSecretsResolver, ExampleDIDResolver
 
 ALICE_DID = "did:example:alice"
 BOB_DID = "did:example:bob"
 
+resolvers_config = ResolversConfig(
+    secrets_resolver=ExampleSecretsResolver(),
+    did_resolver=ExampleDIDResolver()
+)
+
 
 @pytest.mark.asyncio
 async def test_demo_attachments():
-    register_default_did_resolver(
-        DIDResolverChain([ExampleDIDResolver()])
-    )
-    register_default_secrets_resolver(ExampleSecretsResolver())
-
     # ALICE
     attachment = Attachment(id="123",
                             data=AttachmentDataJson(
@@ -30,9 +29,11 @@ async def test_demo_attachments():
                           frm=ALICE_DID, to=[BOB_DID],
                           created_time=1516269022, expires_time=1516385931,
                           attachments=[attachment])
-    pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
+    pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID,
+                             resolvers_config=resolvers_config)
     print(pack_result.packed_msg)
 
     # BOB
-    unpack_result_bob = await unpack(pack_result.packed_msg)
+    unpack_result_bob = await unpack(pack_result.packed_msg,
+                                     resolvers_config=resolvers_config)
     print(unpack_result_bob.plaintext)

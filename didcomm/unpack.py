@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional, List
 
+from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JWS, JSON, DID_OR_DID_URL
-from didcomm.did_doc.did_resolver import DIDResolver
 from didcomm.plaintext import Plaintext
-from didcomm.secrets.secrets_resolver import SecretsResolver
 
 
 @dataclass(frozen=True)
@@ -17,12 +16,6 @@ class UnpackConfig:
     exception will be raised.
 
     Attributes:
-        secrets_resolver (SecretsResolver): an optional secrets resolver that can override a default secrets resolver
-        registered by 'register_default_secrets_resolver'
-
-        did_resolver (DIDResolver): an optional DID Doc resolver that can override a default DID Doc resolver
-        registered by 'register_default_did_resolver'
-
         expect_encrypted (bool): whether the plaintext must be encrypted by the sender. Not expected by default.
         expect_authenticated (bool): whether the plaintext must be authenticated by the sender. Not expected by default.
         expect_anonymous_sender (bool): whether the sender ID must be protected. Not expected by default.
@@ -33,8 +26,6 @@ class UnpackConfig:
         wrapping a plaintext packed for the given recipient, then both Forward and packed plaintext are unpacked automatically,
         and the unpacked plaintext will be returned instead of unpacked Forward.
     """
-    secrets_resolver: SecretsResolver = None
-    did_resolver: DIDResolver = None
     expect_non_repudiation: bool = False
     expect_encrypted: bool = False
     expect_authenticated: bool = False
@@ -84,7 +75,9 @@ class UnpackResult:
     signed_plaintext: Optional[JWS] = None
 
 
-async def unpack(packed_msg: JSON, unpack_config: Optional[UnpackConfig] = None) -> UnpackResult:
+async def unpack(packed_msg: JSON,
+                 unpack_config: Optional[UnpackConfig] = None,
+                 resolvers_config: Optional[ResolversConfig] = None) -> UnpackResult:
     """
     Unpacks the packed message by doing decryption and verifying the signatures.
 
@@ -111,6 +104,8 @@ async def unpack(packed_msg: JSON, unpack_config: Optional[UnpackConfig] = None)
 
     :param packed_msg: the message as JSON string to be unpacked
     :param unpack_config: configuration for unpack. Default parameters are used if not specified.
+    :param resolvers_config: optional resolvers that can override a default resolvers
+    registered by 'register_default_secrets_resolver' and 'register_default_did_resolver'
     :return: the plaintext, metadata, and optionally a JWS if the plaintext has been signed.
     """
     return UnpackResult(

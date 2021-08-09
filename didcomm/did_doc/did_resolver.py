@@ -46,12 +46,3 @@ class DIDResolverChain(DIDResolver):
             if did_doc is not None:
                 return did_doc
         return None
-
-
-def register_default_did_resolver(did_resolver: DIDResolver):
-    """
-    Registers a DID Resolver that can be used in all pack/unpack operations by default.
-
-    :param did_resolver: a default DID resolver to be registered.
-    """
-    pass

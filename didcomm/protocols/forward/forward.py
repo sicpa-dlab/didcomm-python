@@ -3,10 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Union, Optional
 
+from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON_DATA, JSON, DID_OR_DID_URL
-from didcomm.did_doc.did_resolver import DIDResolver
 from didcomm.plaintext import PlaintextRequiredHeaders, PlaintextOptionalHeaders, Plaintext
-from didcomm.secrets.secrets_resolver import SecretsResolver
 
 
 @dataclass
@@ -23,28 +22,24 @@ class ForwardPlaintext(PlaintextOptionalHeaders, PlaintextRequiredHeaders, Forwa
         return ""
 
 
-@dataclass(frozen=True)
-class ForwardConfig:
-    secrets_resolver: SecretsResolver = None
-    did_resolver: DIDResolver = None
-
-
 async def wrap_in_forward(packed_msg: Union[JSON_DATA, JSON], routing_key_ids: List[DID_OR_DID_URL],
                           forward_headers: Optional[PlaintextOptionalHeaders] = None,
-                          config: Optional[ForwardConfig] = None) -> JSON:
+                          resolvers_config: Optional[ResolversConfig] = None) -> JSON:
     """
     Wraps the given packed message in Forward messages for every routing key.
 
     :param packed_msg: the message to be wrapped in Forward messages
     :param routing_key_ids: a list of routing key IDs or DIDs
-    :param forward_headers: optional headers to be added to Forward messages
-    :param config: configuration for forward. Default parameters are used if not specified.
+    :param forward_headers: optional headers for Forward message
+    :param resolvers_config: optional resolvers that can override a default resolvers
+    registered by 'register_default_secrets_resolver' and 'register_default_did_resolver'
     :return: a top-level packed Forward message as JSON string
     """
     return ""
 
 
-async def unpack_forward(packed_msg: JSON, config: Optional[ForwardConfig] = None) -> ForwardPlaintext:
+async def unpack_forward(packed_msg: JSON,
+                         resolvers_config: Optional[ResolversConfig] = None) -> ForwardPlaintext:
     """
     Can be called by a Mediator who expects a Forward message to be unpacked
 
@@ -55,7 +50,8 @@ async def unpack_forward(packed_msg: JSON, config: Optional[ForwardConfig] = Non
     :raises InvalidForwardPackException: if the message is not packed for Forwarding properly
 
     :param packed_msg: a Forward message as JSON string to be unpacked
-    :param config: configuration for forward. Default parameters are used if not specified.
+    :param resolvers_config: optional resolvers that can override a default resolvers
+    registered by 'register_default_secrets_resolver' and 'register_default_did_resolver'
     :return: Forward plaintext
     """
     return ForwardPlaintext(
