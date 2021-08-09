@@ -102,11 +102,12 @@ async def pack(plaintext: Plaintext,
     Encryption is done as following:
         - encryption is done via the keys from the `keyAgreement` verification relationship in the DID Doc
         - if `frm` is None, then anonymous encryption is done (anoncrypt). Otherwise authenticated encryption is done (authcrypt).
-        - if 'frm' is a DID, then the first sender's `keyAgreement` verification method is used for which
-        a private key in the secrets resolver is found
+        - if 'frm' is a DID, then the first sender's `keyAgreement` verification method is used
+        which can be resolved via secrets resolver and has the same type as any of recipient keys
         - if 'frm' is a key ID, then the sender's `keyAgreement` verification method identified by the given key ID is used.
         - if 'to' is a DID, then multiplex encryption is done for all keys from the receiver's `keyAgreement` verification relationship
-        - if 'to' is a key ID, then encryption is done for the  receiver's `keyAgreement` verification method identified by the given key ID.
+        which have the same type as the sender's key
+        - if 'to' is a key ID, then encryption is done for the receiver's `keyAgreement` verification method identified by the given key ID.
 
     If non-repudiation (signing) is used by specifying a `sign_frm` argument in `pack_params` (disabled by default):
         - signing is done via the keys from the `authentication` verification relationship in the DID Doc
