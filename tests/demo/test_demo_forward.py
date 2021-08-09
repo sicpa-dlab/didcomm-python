@@ -25,7 +25,7 @@ async def test_demo_forward():
                           frm=ALICE_DID, to=[BOB_DID],
                           created_time=1516269022, expires_time=1516385931)
     pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
-    print(f"Sending ${pack_result.packed_msg} to ${pack_result.service_endpoint}")
+    print(f"Sending ${pack_result.packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB MEDIATOR
     forward_bob = await unpack_forward(packed_msg=pack_result.packed_msg)
@@ -49,7 +49,7 @@ async def test_demo_mediators_unknown_to_sender():
                           frm=ALICE_DID, to=[BOB_DID],
                           created_time=1516269022, expires_time=1516385931)
     pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
-    print(f"Sending ${pack_result.packed_msg} to ${pack_result.service_endpoint}")
+    print(f"Sending ${pack_result.packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB MEDIATOR 1: re-wrap to a new mediator
     forward_bob_1 = await unpack_forward(pack_result.packed_msg)
@@ -80,7 +80,7 @@ async def test_demo_re_wrap_ro_receiver():
                           frm=ALICE_DID, to=[BOB_DID],
                           created_time=1516269022, expires_time=1516385931)
     pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
-    print(f"Sending ${pack_result.packed_msg} to ${pack_result.service_endpoint}")
+    print(f"Sending ${pack_result.packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB MEDIATOR 1: re-wrap to Bob
     old_forward_bob = await unpack_forward(pack_result.packed_msg)

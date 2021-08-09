@@ -54,11 +54,6 @@ async def test_demo_simple_anon_crypt():
 
 @pytest.mark.asyncio
 async def test_demo_advanced():
-    register_default_did_resolver(
-        DIDResolverChain([ExampleDIDResolver()])
-    )
-    register_default_secrets_resolver(ExampleSecretsResolver())
-
     # ALICE
     plaintext = Plaintext(body={"aaa": 1, "bbb": 2},
                           id="1234567890", type="my-protocol/1.0",

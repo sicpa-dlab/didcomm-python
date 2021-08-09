@@ -11,16 +11,23 @@ from didcomm.secrets.secrets_resolver import SecretsResolver
 
 
 @dataclass(frozen=True)
+class ServiceMetadata:
+    id: str
+    service_endpoint: str
+
+
+@dataclass(frozen=True)
 class PackResult:
     """
     Result of pack operation.
 
     Attributes:
         packed_msg (str): a packed message as a JSON string ready to be forwarded to the returned 'service_endpoint'
-        service_endpoint (str): an optional service endpoint to be used to transport the 'packed_msg'.
+        service_metadata (ServiceMetadata): an optional service metadata which contains a service endpoint
+        to be used to transport the 'packed_msg'.
     """
     packed_msg: JSON
-    service_endpoint: Optional[str]
+    service_metadata: Optional[ServiceMetadata]
 
 
 @dataclass(frozen=True)
@@ -87,7 +94,7 @@ async def pack(plaintext: Plaintext,
     Packs the message to the given recipient.
 
     Pack is done according to the given Pack Config.
-    Default config performs repudiable authentication encryption (auth_crypt)
+    Default config performs repudiable encryption (auth_crypt if 'frm' is set and anon_crypt otherwise)
     and prepares a message ready to be forwarded to the returned endpoint (via Forward protocol).
 
     It's possible to add non-repudiation by providing `sign_frm` argument in `pack_params` (DID or key ID).
@@ -116,15 +123,15 @@ async def pack(plaintext: Plaintext,
     :raises IncompatibleKeysException: if the sender and target keys are not compatible
 
     :param plaintext: the plaintext message to be packed
+    :param to: a target DID or key ID the plaintext will be encrypted for.
+    Must match any of `to` header values in Plaintext if the header is set.
     :param frm: a DID or key ID the sender uses for authenticated encryption.
     Must match `from` header in Plaintext if the header is set.
     If not provided - then anonymous encryption is performed.
-    :param to: a target DID or key ID the plaintext will be encrypted for.
-    Must match any of `to` header values in Plaintext if the header is set.
     :param pack_config: configuration defining how pack needs to be done.
     If not specified - default configuration is used.
     :param pack_params: optional parameters for pack
     :return: a pack result consisting of a packed message as a JSON string
-    and an optional service endpoint to be used to transport teh packed message.
+    and an optional service metadata with an endpoint to be used to transport the packed message.
     """
-    return PackResult(packed_msg="", service_endpoint="")
+    return PackResult(packed_msg="", service_metadata=ServiceMetadata("", ""))
