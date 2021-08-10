@@ -110,6 +110,10 @@ class FromPrior:
                         If not specified, then the first key for teh given `iss` DID is used which can be resolved by the secrets resolver.
         :param resolvers_config: Optional resolvers that can override a default resolvers registered by
                                  'register_default_secrets_resolver' and 'register_default_did_resolver'
+
+        :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
+        :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
+
         :returns: the JWT with this FromPrior information
         """
 

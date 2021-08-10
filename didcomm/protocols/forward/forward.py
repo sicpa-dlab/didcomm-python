@@ -33,6 +33,10 @@ async def wrap_in_forward(packed_msg: Union[JSON_DATA, JSON], routing_key_ids: L
     :param forward_headers: optional headers for Forward message
     :param resolvers_config: Optional resolvers that can override a default resolvers registered by
                              'register_default_secrets_resolver' and 'register_default_did_resolver'
+
+    :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
+    :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
+
     :return: a top-level packed Forward message as JSON string
     """
     return ""
@@ -43,15 +47,16 @@ async def unpack_forward(packed_msg: JSON,
     """
     Can be called by a Mediator who expects a Forward message to be unpacked
 
-    :raises NotForwardTypeException: if unpacked plaintext is not a Forward message
-    :raises UnknownRecipientException: if the target DID or keyID can not be resolved
-    :raises IncompatibleKeysException: if the sender and target keys are not compatible
-    :raises CanNotDecryptException: if the message can not be decrypted by the given recipient
-    :raises InvalidForwardPackException: if the message is not packed for Forwarding properly
-
     :param packed_msg: a Forward message as JSON string to be unpacked
     :param resolvers_config: Optional resolvers that can override a default resolvers registered by
                              'register_default_secrets_resolver' and 'register_default_did_resolver'
+
+    :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
+    :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
+    :raises MalformedMessageError: if the message is invalid (can not be decrypted, signature is invalid, the plaintext is invalid, etc.)
+    :raises UnexpectedPackError: if UnpackOpts expect the message to be packed in a particular way (for example encrypted and signed),
+                                   but the message is not
+
     :return: Forward plaintext
     """
     return ForwardPlaintext(
@@ -64,7 +69,7 @@ def parse_forward(plaintext: Plaintext) -> ForwardPlaintext:
     """
     Convert the given plaintext into a Forward message.
 
-    :raises NotForwardTypeException: if unpacked plaintext is not a Forward message
+    :raises MalformedMessageError: if unpacked plaintext is not a Forward message
 
     :param plaintext: the plaintext message to be converted
     :return: a Forward message instance

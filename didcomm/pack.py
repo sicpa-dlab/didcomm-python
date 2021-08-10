@@ -104,10 +104,10 @@ async def pack(plaintext: Union[Plaintext, SignedPlaintext],
     :param resolvers_config: Optional resolvers that can override a default resolvers registered by
                              'register_default_secrets_resolver' and 'register_default_did_resolver'
 
-    :raises InvalidArgument: If invalid input is provided. For example, if `frm` argument doesn't match `from` header in Plaintext,
-                             or `to` argument doesn't match any of `to` header values in Plaintext.
-    :raises UnknownSenderException: If the sender DID or keyID can not be resolved
-    :raises UnknownRecipientException: If the target DID or keyID can not be resolved
+    :raises ValueError: If invalid input is provided. For example, if `frm` argument doesn't match `from` header in Plaintext,
+                        or `to` argument doesn't match any of `to` header values in Plaintext.
+    :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
+    :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
     :raises IncompatibleKeysException: If the sender and target keys are not compatible
 
     :return: A pack result consisting of a packed message as a JSON string
@@ -132,7 +132,8 @@ async def sign(plaintext: Plaintext, frm: DID_OR_DID_URL,
     :param resolvers_config: Optional resolvers that can override a default resolvers registered by
                              'register_default_secrets_resolver' and 'register_default_did_resolver'
 
-    :raises UnknownSenderException: if the sender DID or keyID can not be resolved
+    :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
+    :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
 
     :return: a signed plaintext
     """

@@ -89,29 +89,19 @@ async def unpack(packed_msg: JSON,
     """
     Unpacks the packed message by doing decryption and verifying the signatures.
 
-    If unpack config expects a particular property (for example that a message is encrypted)
-    and the packed message doesn't meet the criteria (it's not encrypted), then a corresponding
-    exception will be raised.
+    If unpack config expects the message to be packed in a particular way (for example that a message is encrypted)
+    and the packed message doesn't meet the criteria (it's not encrypted), then `UnexpectedPackError` will be raised.
 
     :param packed_msg: the message as JSON string to be unpacked
     :param unpack_config: configuration for unpack. Default parameters are used if not specified.
     :param resolvers_config: Optional resolvers that can override a default resolvers registered by
                              'register_default_secrets_resolver' and 'register_default_did_resolver'
 
-    :raises InvalidPlaintext: if unpacked plaintext is invalid
-    :raises UnknownSenderException: if the sender DID or keyID can not be resolved
-    :raises UnknownRecipientException: if the target DID or keyID can not be resolved
-    :raises IncompatibleKeysException: if the sender and target keys are not compatible
-    :raises InvalidSignatureException: if the signature is present and invalid
-    :raises CanNotDecryptException: if the message is encrypted but can not be decrypted by the given recipient
-    :raises NotSignedException: if UnpackOpts expect the message to be signed, but it's not
-    :raises NotEncryptedException: if UnpackOpts expect the message to be encrypted, but it's not
-    :raises NotAuthenticatedException: if UnpackOpts expect the message to be authenticated, but it's not
-    :raises SenderNotHiddenException: if UnpackOpts expect the message to hide the sender, but the sender was disclosed
-    :raises NotSignedByEncrypterException: if UnpackOpts expect the message to be signed by the same DID who encrypted it,
-                                           but it was signed by another DID
-    :raises NotDecryptedByAllKeysException: if UnpackOpts expect the message to be decryptable by all keys resolved by the secrets resolver,
-                                            but there were keys resolved for which decryption wasn't successful
+    :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
+    :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
+    :raises MalformedMessageError: if the message is invalid (can not be decrypted, signature is invalid, the plaintext is invalid, etc.)
+    :raises UnexpectedPackError: if UnpackOpts expect the message to be packed in a particular way (for example encrypted and signed),
+                                   but the message is not
 
     :return: the plaintext, metadata, and optionally a JWS if the plaintext has been signed.
     """

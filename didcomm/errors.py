@@ -1,66 +1,45 @@
-class DIDCommException(Exception):
+from enum import Enum
+
+
+# TODO: finalize exceptions during development
+
+class DIDCommError(Exception):
     pass
 
 
-# Common
-class UnknownRecipientException(DIDCommException):
+class DIDNotResolvedError(DIDCommError):
     pass
 
 
-class UnknownSenderException(DIDCommException):
+class SecretNotResolvedError(DIDCommError):
     pass
 
 
-class InvalidArgument(DIDCommException):
+class IncompatibleKeysError(DIDCommError):
     pass
 
 
-class MissingArgument(DIDCommException):
-    pass
+class MalformedMessageCode(Enum):
+    CAN_NOT_DECRYPT = 1
+    INVALID_SIGNATURE = 2
+    INVALID_PLAINTEXT = 3
 
 
-class InvalidPlaintext(DIDCommException):
-    pass
+class MalformedMessageError(DIDCommError):
+
+    def __init__(self, code: MalformedMessageCode):
+        self.code = code
 
 
-# Crypto
-class IncompatibleKeysException(DIDCommException):
-    pass
+class UnexpectedPackCode(Enum):
+    NOT_ENCRYPTED = 1
+    NOT_AUTHENTICATED = 2
+    NOT_SIGNED = 3
+    SENDER_NOT_PROTECTED = 4
+    NOT_SIGNED_BY_ENCRYPTER = 5
+    NOT_DECRYPTED_BY_ALL_KEYS = 6
 
 
-class InvalidSignatureException(DIDCommException):
-    pass
-
-
-class CanNotDecryptException(DIDCommException):
-    pass
-
-
-# Unpack exceptions
-
-class UnpackException(DIDCommException):
-    pass
-
-
-class NotSignedException(UnpackException):
-    pass
-
-
-class NotEncryptedException(UnpackException):
-    pass
-
-
-class NotAuthenticatedException(UnpackException):
-    pass
-
-
-class SenderNotHiddenException(UnpackException):
-    pass
-
-
-class NotSignedByEncrypterException(UnpackException):
-    pass
-
-
-class NotDecryptedByAllKeysException(UnpackException):
-    pass
+class UnexpectedPackError(DIDCommError):
+    def __init__(self, code: UnexpectedPackCode):
+        self.code = code
