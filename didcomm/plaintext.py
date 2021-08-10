@@ -106,10 +106,10 @@ class FromPrior:
         """
         Gets the signed JWT with this FromPrior information.
 
-        :param iss_kid: an optional key ID to be used for signing the JWT.
-        If not specified, then the first key for teh given `iss` DID is used which can be resolved by the secrets resolver.
-        :param resolvers_config: optional resolvers that can override a default resolvers
-        registered by 'register_default_secrets_resolver' and 'register_default_did_resolver'
+        :param iss_kid: An optional key ID to be used for signing the JWT.
+                        If not specified, then the first key for teh given `iss` DID is used which can be resolved by the secrets resolver.
+        :param resolvers_config: Optional resolvers that can override a default resolvers registered by
+                                 'register_default_secrets_resolver' and 'register_default_did_resolver'
         :returns: the JWT with this FromPrior information
         """
 

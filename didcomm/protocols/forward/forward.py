@@ -31,8 +31,8 @@ async def wrap_in_forward(packed_msg: Union[JSON_DATA, JSON], routing_key_ids: L
     :param packed_msg: the message to be wrapped in Forward messages
     :param routing_key_ids: a list of routing key IDs or DIDs
     :param forward_headers: optional headers for Forward message
-    :param resolvers_config: optional resolvers that can override a default resolvers
-    registered by 'register_default_secrets_resolver' and 'register_default_did_resolver'
+    :param resolvers_config: Optional resolvers that can override a default resolvers registered by
+                             'register_default_secrets_resolver' and 'register_default_did_resolver'
     :return: a top-level packed Forward message as JSON string
     """
     return ""
@@ -50,8 +50,8 @@ async def unpack_forward(packed_msg: JSON,
     :raises InvalidForwardPackException: if the message is not packed for Forwarding properly
 
     :param packed_msg: a Forward message as JSON string to be unpacked
-    :param resolvers_config: optional resolvers that can override a default resolvers
-    registered by 'register_default_secrets_resolver' and 'register_default_did_resolver'
+    :param resolvers_config: Optional resolvers that can override a default resolvers registered by
+                             'register_default_secrets_resolver' and 'register_default_did_resolver'
     :return: Forward plaintext
     """
     return ForwardPlaintext(

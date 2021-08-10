@@ -64,6 +64,7 @@ async def test_demo_signed():
     # BOB
     unpack_result_bob = await unpack(packed_msg)
     print(unpack_result_bob.plaintext)
+    print(unpack_result_bob.metadata.signed_plaintext)
 
 
 @pytest.mark.asyncio
@@ -100,6 +101,7 @@ async def test_demo_signed_then_encrypted():
     # BOB
     unpack_result_bob = await unpack(packed_msg)
     print(unpack_result_bob.plaintext)
+    print(unpack_result_bob.metadata.signed_plaintext)
 
 
 @pytest.mark.asyncio
