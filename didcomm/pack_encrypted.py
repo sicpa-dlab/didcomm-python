@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JSON, DID_OR_DID_URL, ServiceMetadata
+from didcomm.common.types import JSON, DID_OR_DID_URL
 from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders
 
 
 @dataclass(frozen=True)
-class PackResult:
+class PackEncryptedResult:
     """
     Result of pack operation.
 
@@ -18,13 +18,27 @@ class PackResult:
         packed_msg (str): A packed message as a JSON string ready to be forwarded to the returned 'service_endpoint'
         service_metadata (ServiceMetadata): An optional service metadata which contains a service endpoint
                                             to be used to transport the 'packed_msg'.
+        to_kid (DID_OR_DID_URL): Identifiers (DID URLs) of recipient keys used for message encryption.
+        from_kid (DID_OR_DID_URL): Identifier (DID URL) of sender key used for message encryption.
+                                   None if anonymous (non-authenticated) encryption is used.
+        sign_from_kid (DID_OR_DID_URL): Identifier (DID URL) of sender key used for message signing.
+                                        None if there is no signature.
     """
     packed_msg: JSON
     service_metadata: Optional[ServiceMetadata]
+    to_kids: List[DID_OR_DID_URL]
+    from_kid: Optional[DID_OR_DID_URL]
+    sign_from_kid: Optional[DID_OR_DID_URL]
 
 
 @dataclass(frozen=True)
-class PackConfig:
+class ServiceMetadata:
+    id: str
+    service_endpoint: str
+
+
+@dataclass(frozen=True)
+class PackEncryptedConfig:
     """
     Pack configuration.
 
@@ -47,7 +61,7 @@ class PackConfig:
 
 
 @dataclass(frozen=True)
-class PackParameters:
+class PackEncryptedParameters:
     """
     Optional parameters for pack.
 
@@ -66,11 +80,20 @@ async def pack_encrypted(plaintext: Plaintext,
                          to: DID_OR_DID_URL,
                          frm: Optional[DID_OR_DID_URL] = None,
                          sign_frm: Optional[DID_OR_DID_URL] = None,
-                         pack_config: Optional[PackConfig] = None,
-                         pack_params: Optional[PackParameters] = None,
-                         resolvers_config: Optional[ResolversConfig] = None) -> PackResult:
+                         pack_config: Optional[PackEncryptedConfig] = None,
+                         pack_params: Optional[PackEncryptedParameters] = None,
+                         resolvers_config: Optional[ResolversConfig] = None) -> PackEncryptedResult:
     """
-    Packs (encrypts and optionally authenticates) the message to the given recipient.
+    Produces `DIDComm Encrypted Message`
+    https://identity.foundation/didcomm-messaging/spec/#didcomm-encrypted-message.
+
+    The method encrypts and optionally authenticates the message to the given recipient.
+
+    A DIDComm encrypted message is an encrypted JWM (JSON Web Messages) and
+    hides its content from all but authorized recipients, discloses (optionally) and proves
+    the sender to exactly and only those recipients, and provides integrity guarantees.
+    It is important in privacy-preserving routing. It is what normally moves over network
+    transports in DIDComm applications, and is the safest format for storing DIDComm data at rest.
 
     Pack is done according to the given Pack Config.
     Default config performs repudiable encryption (auth_crypt if `frm` is set and anon_crypt otherwise)
@@ -119,57 +142,11 @@ async def pack_encrypted(plaintext: Plaintext,
                         or `to` argument doesn't match any of `to` header values in Plaintext.
     :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
     :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
-    :raises IncompatibleKeysException: If the sender and target keys are not compatible
+    :raises IncompatibleCryptoError: If the sender and target crypto is not compatible
+                                     (for example, there are no compatible keys for key agreement)
 
     :return: A pack result consisting of a packed message as a JSON string
              and an optional service metadata with an endpoint to be used to transport the packed message.
     """
-    return PackResult(packed_msg="", service_metadata=ServiceMetadata("", ""))
-
-
-async def pack_signed(plaintext: Plaintext,
-                      sign_frm: DID_OR_DID_URL,
-                      resolvers_config: Optional[ResolversConfig] = None) -> JSON:
-    """
-    Packs a signed (non-repudiation added) but unencrypted message that can be publicly published.
-
-    Signed messages are only necessary when the origin of plaintext must be provable
-    to third parties, or when the sender can’t be proven to the recipient by authenticated encryption because
-    the recipient is not known in advance (e.g., in a broadcast scenario).
-    Adding a signature when one is not needed can degrade rather than enhance security because
-    it relinquishes the sender’s ability to speak off the record.
-
-    Signing is done as following:
-        - Signing is done via the keys from the `authentication` verification relationship in the DID Doc
-          for the DID to be used for signing
-        - If `sign_frm` is a DID, then the first sender's `authentication` verification method is used for which
-          a private key in the secrets resolver is found
-        - If `sign_frm` is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
-
-    :param plaintext: The plaintext to be packed
-    :param sign_frm: DID or key ID the sender uses for signing.
-    :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             `register_default_secrets_resolver` and `register_default_did_resolver`
-
-    :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
-    :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
-
-    :return: A packed message as a JSON string.
-    """
-    return ""
-
-
-async def pack_plaintext(plaintext: Plaintext, resolvers_config: Optional[ResolversConfig] = None) -> JSON:
-    """
-    Packs the message as a plaintext. The message is not signed and not encrypted.
-
-    :param plaintext: The plaintext to be packed
-    :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             `register_default_secrets_resolver` and `register_default_did_resolver`
-
-    :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
-    :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
-
-    :return: A packed message as a JSON string.
-    """
-    return ""
+    return PackEncryptedResult(packed_msg="", service_metadata=ServiceMetadata("", ""),
+                               from_kid="", sign_from_kid="", to_kids=[])

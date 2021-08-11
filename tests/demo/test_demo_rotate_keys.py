@@ -1,7 +1,7 @@
 import pytest as pytest
 
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.pack import pack_encrypted
+from didcomm.pack_encrypted import pack_encrypted
 from didcomm.plaintext import Plaintext, FromPrior
 from didcomm.unpack import unpack
 from tests.common.example_resolvers import ExampleSecretsResolver, ExampleDIDResolver

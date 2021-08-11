@@ -15,7 +15,7 @@ class SecretNotResolvedError(DIDCommError):
     pass
 
 
-class IncompatibleKeysError(DIDCommError):
+class IncompatibleCryptoError(DIDCommError):
     pass
 
 

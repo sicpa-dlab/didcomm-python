@@ -2,7 +2,7 @@ import pytest as pytest
 
 from didcomm.common.algorithms import AnonCryptAlg
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.pack import PackConfig, PackParameters, pack_encrypted
+from didcomm.pack_encrypted import PackEncryptedConfig, PackEncryptedParameters, pack_encrypted
 from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders
 from didcomm.unpack import unpack, UnpackConfig
 from tests.common.example_resolvers import ExampleDIDResolver, ExampleSecretsResolver
@@ -19,12 +19,12 @@ async def test_demo_advanced_parameters():
     )
 
     # ALICE
-    pack_config = PackConfig(
+    pack_config = PackEncryptedConfig(
         protect_sender_id=True,
         forward=True,
         enc_alg_anon=AnonCryptAlg.A256GCM_ECDH_ES_A256KW
     )
-    pack_parameters = PackParameters(
+    pack_parameters = PackEncryptedParameters(
         forward_headers=PlaintextOptionalHeaders(expires_time=99999),
         forward_service_id="service-id"
     )

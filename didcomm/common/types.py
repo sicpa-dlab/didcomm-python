@@ -13,7 +13,3 @@ DID_URL = str
 DID_OR_DID_URL = Union[DID, DID_URL]
 
 
-@dataclass(frozen=True)
-class ServiceMetadata:
-    id: str
-    service_endpoint: str

@@ -2,7 +2,7 @@ import pytest as pytest
 
 from didcomm.common.resolvers import register_default_did_resolver, register_default_secrets_resolver, ResolversConfig
 from didcomm.did_doc.did_resolver import DIDResolverChain
-from didcomm.pack import pack_encrypted
+from didcomm.pack_encrypted import pack_encrypted
 from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders
 from didcomm.protocols.forward.forward import unpack_forward, wrap_in_forward
 from didcomm.unpack import unpack, UnpackConfig
