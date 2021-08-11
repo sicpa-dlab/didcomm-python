@@ -95,7 +95,7 @@ async def unpack(packed_msg: JSON,
     :param packed_msg: the message as JSON string to be unpacked
     :param unpack_config: configuration for unpack. Default parameters are used if not specified.
     :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             'register_default_secrets_resolver' and 'register_default_did_resolver'
+                             `register_default_secrets_resolver` and `register_default_did_resolver`
 
     :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
     :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)

@@ -1,18 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional
 
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JSON, DID_OR_DID_URL
-from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders, SignedPlaintext
-
-
-@dataclass(frozen=True)
-class ServiceMetadata:
-    id: str
-    service_endpoint: str
+from didcomm.common.types import JSON, DID_OR_DID_URL, ServiceMetadata
+from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders
 
 
 @dataclass(frozen=True)
@@ -68,41 +62,53 @@ class PackParameters:
     forward_service_id: Optional[str] = None
 
 
-async def pack(plaintext: Union[Plaintext, SignedPlaintext],
+async def pack(plaintext: Plaintext,
                to: DID_OR_DID_URL,
                frm: Optional[DID_OR_DID_URL] = None,
+               sign_frm: Optional[DID_OR_DID_URL] = None,
                pack_config: Optional[PackConfig] = None,
                pack_params: Optional[PackParameters] = None,
                resolvers_config: Optional[ResolversConfig] = None) -> PackResult:
     """
-    Packs the message to the given recipient.
+    Packs (encrypts and optionally authenticates) the message to the given recipient.
 
     Pack is done according to the given Pack Config.
-    Default config performs repudiable encryption (auth_crypt if 'frm' is set and anon_crypt otherwise)
+    Default config performs repudiable encryption (auth_crypt if `frm` is set and anon_crypt otherwise)
     and prepares a message ready to be forwarded to the returned endpoint (via Forward protocol).
+
+    It's possible to add non-repudiation by providing `sign_frm` argument (DID or key ID).
 
     Encryption is done as following:
         - encryption is done via the keys from the `keyAgreement` verification relationship in the DID Doc
         - if `frm` is None, then anonymous encryption is done (anoncrypt).
           Otherwise authenticated encryption is done (authcrypt).
-        - if 'frm' is a DID, then the first sender's `keyAgreement` verification method is used which can be resolved
+        - if `frm` is a DID, then the first sender's `keyAgreement` verification method is used which can be resolved
           via secrets resolver and has the same type as any of recipient keys
-        - if 'frm' is a key ID, then the sender's `keyAgreement` verification method identified by the given key ID is used.
-        - if 'to' is a DID, then multiplex encryption is done for all keys from the receiver's `keyAgreement`
+        - if `frm` is a key ID, then the sender's `keyAgreement` verification method identified by the given key ID is used.
+        - if `to` frm a DID, then multiplex encryption is done for all keys from the receiver's `keyAgreement`
           verification relationship which have the same type as the sender's key
-        - if 'to' is a key ID, then encryption is done for the receiver's `keyAgreement` verification method identified by the given key ID.
+        - if `to` is a key ID, then encryption is done for the receiver's `keyAgreement` verification method identified by the given key ID.
 
-    :param plaintext: The plaintext or signed plaintext message to be packed
+    If non-repudiation (signing) is added by specifying a `sign_frm` argument:
+        - Signing is done via the keys from the `authentication` verification relationship in the DID Doc
+          for the DID to be used for signing
+        - If `sign_frm` is a DID, then the first sender's `authentication` verification method is used for which
+          a private key in the secrets resolver is found
+        - If `sign_frm` is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
+
+    :param plaintext: The plaintext to be packed
     :param to: A target DID or key ID the plaintext will be encrypted for.
                Must match any of `to` header values in Plaintext if the header is set.
     :param frm: A DID or key ID the sender uses for authenticated encryption.
                 Must match `from` header in Plaintext if the header is set.
                 If not provided - then anonymous encryption is performed.
+    :param sign_frm: An optional DID or key ID the sender uses for signing.
+                     If not provided - then the message will be repudiable and no signature will be added.
     :param pack_config: Configuration defining how pack needs to be done.
                         If not specified - default configuration is used.
     :param pack_params: Optional parameters for pack
     :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             'register_default_secrets_resolver' and 'register_default_did_resolver'
+                             `register_default_secrets_resolver` and `register_default_did_resolver`
 
     :raises ValueError: If invalid input is provided. For example, if `frm` argument doesn't match `from` header in Plaintext,
                         or `to` argument doesn't match any of `to` header values in Plaintext.
@@ -116,25 +122,29 @@ async def pack(plaintext: Union[Plaintext, SignedPlaintext],
     return PackResult(packed_msg="", service_metadata=ServiceMetadata("", ""))
 
 
-async def sign(plaintext: Plaintext, frm: DID_OR_DID_URL,
-               resolvers_config: Optional[ResolversConfig] = None) -> SignedPlaintext:
+async def pack_public(plaintext: Plaintext,
+                      sign_frm: Optional[DID_OR_DID_URL] = None,
+                      resolvers_config: Optional[ResolversConfig] = None) -> JSON:
     """
-    Signs the plaintext.
+    Packs the message that can be publicly published.
+    The message will not be encrypted, but can be optionally signed (non-repudiation added).
 
-    Signing is done via the keys from the `authentication` verification relationship in the DID Doc
-    for the DID to be used for signing
-    If 'frm' is a DID, then the first sender's `authentication` verification method is used for which
-    a private key in the secrets resolver is found
-    If 'frm' is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
+    If non-repudiation (signing) is added by specifying a `sign_frm` argument:
+        - Signing is done via the keys from the `authentication` verification relationship in the DID Doc
+          for the DID to be used for signing
+        - If `sign_frm` is a DID, then the first sender's `authentication` verification method is used for which
+          a private key in the secrets resolver is found
+        - If `sign_frm` is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
 
-    :param plaintext: the plaintext message to be signed
-    :param frm: a DID or key ID the sender uses for signing
+    :param plaintext: The plaintext to be packed
+    :param sign_frm: An optional DID or key ID the sender uses for signing.
+                     If not provided - then the message will be repudiable and no signature will be added.
     :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             'register_default_secrets_resolver' and 'register_default_did_resolver'
+                             `register_default_secrets_resolver` and `register_default_did_resolver`
 
     :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
     :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
 
-    :return: a signed plaintext
+    :return: A packed message as a JSON string.
     """
-    return SignedPlaintext(data={})
+    return ""

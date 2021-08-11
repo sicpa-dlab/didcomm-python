@@ -18,9 +18,6 @@ class ForwardBody:
 class ForwardPlaintext(PlaintextOptionalHeaders, PlaintextRequiredHeaders, ForwardBody):
     type: str = "https://didcomm.org/routing/2.0/forward"
 
-    def to_json(self) -> JSON:
-        return ""
-
 
 async def wrap_in_forward(packed_msg: Union[JSON_DATA, JSON], routing_key_ids: List[DID_OR_DID_URL],
                           forward_headers: Optional[PlaintextOptionalHeaders] = None,
@@ -32,7 +29,7 @@ async def wrap_in_forward(packed_msg: Union[JSON_DATA, JSON], routing_key_ids: L
     :param routing_key_ids: a list of routing key IDs or DIDs
     :param forward_headers: optional headers for Forward message
     :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             'register_default_secrets_resolver' and 'register_default_did_resolver'
+                             `register_default_secrets_resolver` and `register_default_did_resolver`
 
     :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
     :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)

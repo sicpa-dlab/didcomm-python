@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Optional, List, Union, Dict
 
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JSON_DATA, DID, JSON, JWT, DID_URL
+from didcomm.common.types import JSON_DATA, DID, JWT, DID_URL
 
 Header = Dict[str, Union[str, int, JSON_DATA]]
 SignedPlaintext = JSON_DATA
@@ -43,17 +43,7 @@ class PlaintextBody:
 @dataclass
 class Plaintext(PlaintextOptionalHeaders, PlaintextRequiredHeaders, PlaintextBody):
     """Plaintext message consisting of headers and application/protocol specific data (body)"""
-
-    def to_json(self) -> JSON:
-        return ""
-
-
-@dataclass
-class SignedPlaintext:
-    data: JSON_DATA
-
-    def to_json(self) -> JSON:
-        return ""
+    pass
 
 
 @dataclass(frozen=True)
