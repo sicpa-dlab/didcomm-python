@@ -1,7 +1,7 @@
 import pytest as pytest
 
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.pack import pack
+from didcomm.pack import pack_encrypted
 from didcomm.plaintext import Plaintext, FromPrior
 from didcomm.unpack import unpack
 from tests.common.example_resolvers import ExampleSecretsResolver, ExampleDIDResolver
@@ -25,9 +25,9 @@ async def test_demo_attachments():
                           id="1234567890", type="my-protocol/1.0",
                           frm=ALICE_DID, to=[BOB_DID],
                           created_time=1516269022, expires_time=1516385931,
-                          from_prior=frm_prior.as_jwt())
-    pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID,
-                             resolvers_config=resolvers_config)
+                          from_prior=frm_prior)
+    pack_result = await pack_encrypted(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID,
+                                       resolvers_config=resolvers_config)
     print(pack_result.packed_msg)
 
     # BOB

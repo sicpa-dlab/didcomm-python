@@ -2,7 +2,7 @@ import pytest as pytest
 
 from didcomm.common.resolvers import register_default_did_resolver, register_default_secrets_resolver, ResolversConfig
 from didcomm.did_doc.did_resolver import DIDResolverChain
-from didcomm.pack import pack
+from didcomm.pack import pack_encrypted
 from didcomm.plaintext import Plaintext, PlaintextOptionalHeaders
 from didcomm.protocols.forward.forward import unpack_forward, wrap_in_forward
 from didcomm.unpack import unpack, UnpackConfig
@@ -24,8 +24,8 @@ async def test_demo_mediator():
                           id="1234567890", type="my-protocol/1.0",
                           frm=ALICE_DID, to=[BOB_DID],
                           created_time=1516269022, expires_time=1516385931)
-    pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID,
-                             resolvers_config=resolvers_config)
+    pack_result = await pack_encrypted(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID,
+                                       resolvers_config=resolvers_config)
     print(f"Sending ${pack_result.packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB MEDIATOR
@@ -49,7 +49,7 @@ async def test_demo_mediators_unknown_to_sender():
                           id="1234567890", type="my-protocol/1.0",
                           frm=ALICE_DID, to=[BOB_DID],
                           created_time=1516269022, expires_time=1516385931)
-    pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
+    pack_result = await pack_encrypted(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
     print(f"Sending ${pack_result.packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB MEDIATOR 1: re-wrap to a new mediator
@@ -81,7 +81,7 @@ async def test_demo_re_wrap_ro_receiver():
                           id="1234567890", type="my-protocol/1.0",
                           frm=ALICE_DID, to=[BOB_DID],
                           created_time=1516269022, expires_time=1516385931)
-    pack_result = await pack(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
+    pack_result = await pack_encrypted(plaintext=plaintext, frm=ALICE_DID, to=BOB_DID)
     print(f"Sending ${pack_result.packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB MEDIATOR 1: re-wrap to Bob

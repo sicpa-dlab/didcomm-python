@@ -3,8 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List, Union, Dict
 
-from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JSON_DATA, DID, JWT, DID_URL
+from didcomm.common.types import JSON_DATA, DID, DID_URL
 
 Header = Dict[str, Union[str, int, JSON_DATA]]
 SignedPlaintext = JSON_DATA
@@ -13,12 +12,11 @@ SignedPlaintext = JSON_DATA
 @dataclass
 class PlaintextOptionalHeaders:
     """Optional headers for any Plaintext message"""
-    typ: str = "application/didcomm-plain+json"
     frm: Optional[DID] = None
     to: Optional[List[DID]] = None
     created_time: Optional[int] = None
     expires_time: Optional[int] = None
-    from_prior: Optional[JWT] = None
+    from_prior: Optional[FromPrior] = None
     please_ack: Optional[bool] = None
     ack: Optional[List[str]] = None
     thid: Optional[str] = None
@@ -32,6 +30,7 @@ class PlaintextRequiredHeaders:
     """Required headers for any Plaintext message"""
     id: str
     type: str
+    typ: str = "application/didcomm-plain+json"
 
 
 @dataclass
@@ -89,22 +88,4 @@ class FromPrior:
     nbf: Optional[int] = None
     iat: Optional[int] = None
     jti: Optional[str] = None
-
-    def as_jwt(self,
-               iss_kid: DID_URL = None,
-               resolvers_config: Optional[ResolversConfig] = None) -> JWT:
-        """
-        Gets the signed JWT with this FromPrior information.
-
-        :param iss_kid: An optional key ID to be used for signing the JWT.
-                        If not specified, then the first key for teh given `iss` DID is used which can be resolved by the secrets resolver.
-        :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                                 'register_default_secrets_resolver' and 'register_default_did_resolver'
-
-        :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
-        :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
-
-        :returns: the JWT with this FromPrior information
-        """
-
-    pass
+    iss_kid: DID_URL = None
