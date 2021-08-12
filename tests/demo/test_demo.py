@@ -1,7 +1,7 @@
 import pytest as pytest
 
 from didcomm.common.resolvers import register_default_did_resolver, register_default_secrets_resolver
-from didcomm.did_doc.did_resolver import DIDResolverChain
+from didcomm.did_doc.did_resolver import ChainedDIDResolver
 from didcomm.pack_encrypted import pack_encrypted
 from didcomm.pack_plaintext import pack_plaintext
 from didcomm.pack_signed import pack_signed
@@ -15,7 +15,7 @@ BOB_DID = "did:example:bob"
 
 @pytest.mark.asyncio
 async def test_demo_repudiable_authentication_encryption():
-    register_default_did_resolver(DIDResolverChain([ExampleDIDResolver()]))
+    register_default_did_resolver(ChainedDIDResolver([ExampleDIDResolver()]))
     register_default_secrets_resolver(ExampleSecretsResolver())
 
     # ALICE
@@ -33,7 +33,7 @@ async def test_demo_repudiable_authentication_encryption():
 
 @pytest.mark.asyncio
 async def test_demo_repudiable_non_authenticated_encryption():
-    register_default_did_resolver(DIDResolverChain([ExampleDIDResolver()]))
+    register_default_did_resolver(ChainedDIDResolver([ExampleDIDResolver()]))
     register_default_secrets_resolver(ExampleSecretsResolver())
 
     # ALICE
@@ -51,7 +51,7 @@ async def test_demo_repudiable_non_authenticated_encryption():
 
 @pytest.mark.asyncio
 async def test_demo_non_repudiable_encryption():
-    register_default_did_resolver(DIDResolverChain([ExampleDIDResolver()]))
+    register_default_did_resolver(ChainedDIDResolver([ExampleDIDResolver()]))
     register_default_secrets_resolver(ExampleSecretsResolver())
 
     # ALICE
@@ -70,7 +70,7 @@ async def test_demo_non_repudiable_encryption():
 
 @pytest.mark.asyncio
 async def test_demo_signed_unencrypted():
-    register_default_did_resolver(DIDResolverChain([ExampleDIDResolver()]))
+    register_default_did_resolver(ChainedDIDResolver([ExampleDIDResolver()]))
     register_default_secrets_resolver(ExampleSecretsResolver())
 
     # ALICE
@@ -88,7 +88,7 @@ async def test_demo_signed_unencrypted():
 
 @pytest.mark.asyncio
 async def test_demo_plaintext():
-    register_default_did_resolver(DIDResolverChain([ExampleDIDResolver()]))
+    register_default_did_resolver(ChainedDIDResolver([ExampleDIDResolver()]))
     register_default_secrets_resolver(ExampleSecretsResolver())
 
     # ALICE

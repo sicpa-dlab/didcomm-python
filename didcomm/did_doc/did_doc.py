@@ -12,9 +12,9 @@ class VerificationMethod(ABC):
     """
 
     @abstractmethod
-    def kid(self) -> str:
+    def id(self) -> str:
         """
-        A key ID of the verification method.
+        An ID of the verification method.
         :return: verification method `id` field
         """
         pass
@@ -24,6 +24,14 @@ class VerificationMethod(ABC):
         """
         Verification method type.
         :return: verification method `type` field
+        """
+        pass
+
+    @abstractmethod
+    def controller(self) -> str:
+        """
+        Verification method controller.
+        :return: verification method `controller` field
         """
         pass
 

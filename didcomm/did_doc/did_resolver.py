@@ -19,7 +19,7 @@ class DIDResolver(ABC):
         pass
 
 
-class DIDResolverChain(DIDResolver):
+class ChainedDIDResolver(DIDResolver):
     """
     A sample implementation of a DID Resolver.
 
