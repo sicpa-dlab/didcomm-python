@@ -22,24 +22,27 @@ async def pack_encrypted(message: Message,
 
     The method encrypts and optionally authenticates the message to the given recipient.
 
-    A DIDComm encrypted message is an encrypted JWM (JSON Web Messages) and
-    hides its content from all but authorized recipients, discloses (optionally) and proves
-    the sender to exactly and only those recipients, and provides integrity guarantees.
-    It is important in privacy-preserving routing. It is what normally moves over network
-    transports in DIDComm applications, and is the safest format for storing DIDComm data at rest.
+    A DIDComm encrypted message is an encrypted JWM (JSON Web Messages) that
+      - hides its content from all but authorized recipients
+      - (optionally) discloses and proves the sender to only those recipients
+      - provides message integrity guarantees
+
+    It is important in privacy-preserving routing. It is what normally moves over network transports in DIDComm
+    applications, and is the safest format for storing DIDComm data at rest.
 
     Pack is done according to the given Pack Config.
-    Default config performs repudiable encryption (auth_crypt if `frm` is set and anon_crypt otherwise)
-    and prepares a message ready to be forwarded to the returned endpoint (via Forward protocol).
+    The default config performs repudiable encryption (auth_crypt if `frm` is set and anon_crypt otherwise)
+    and prepares a message for forwarding to the returned endpoint (via Forward protocol).
 
-    It's possible to add non-repudiation by providing `sign_frm` argument (DID or key ID).
-    Signed messages are only necessary when the origin of plaintext must be provable
-    to third parties, or when the sender can’t be proven to the recipient by authenticated encryption because
-    the recipient is not known in advance (e.g., in a broadcast scenario).
-    Adding a signature when one is not needed can degrade rather than enhance security because
-    it relinquishes the sender’s ability to speak off the record.
+    It's possible to add non-repudiation by providing `sign_frm` argument (DID or key ID). Signed messages are only necessary when
+        - the origin of plaintext must be provable to third parties
+        - or the sender can’t be proven to the recipient by authenticated encryption because the recipient
+          is not known in advance (e.g., in a broadcast scenario).
 
-    Encryption is done as following:
+    Adding a signature when one is not needed can degrade rather than enhance security because it
+    relinquishes the sender’s ability to speak off the record.
+
+    Encryption is done as follows:
         - encryption is done via the keys from the `keyAgreement` verification relationship in the DID Doc
         - if `frm` is None, then anonymous encryption is done (anoncrypt).
           Otherwise authenticated encryption is done (authcrypt).
@@ -57,7 +60,7 @@ async def pack_encrypted(message: Message,
           a private key in the secrets resolver is found
         - If `sign_frm` is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
 
-    :param message: The message to be packed into a DID Comm message
+    :param message: The message to be packed into a DIDComm message
     :param to: A target DID or key ID the message will be encrypted for.
                Must match any of `to` header values in Message if the header is set.
     :param frm: A DID or key ID the sender uses for authenticated encryption.

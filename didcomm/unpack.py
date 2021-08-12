@@ -13,12 +13,12 @@ async def unpack(packed_msg: JSON,
                  unpack_config: Optional[UnpackConfig] = None,
                  resolvers_config: Optional[ResolversConfig] = None) -> UnpackResult:
     """
-    Unpacks the packed DID Comm message by doing decryption and verifying the signatures.
+    Unpacks the packed DIDComm message by doing decryption and verifying the signatures.
 
     If unpack config expects the message to be packed in a particular way (for example that a message is encrypted)
     and the packed message doesn't meet the criteria (it's not encrypted), then `UnsatisfiedConstraintError` will be raised.
 
-    :param packed_msg: packed DID Comm message as JSON string to be unpacked
+    :param packed_msg: packed DIDComm message as JSON string to be unpacked
     :param unpack_config: configuration for unpack. Default parameters are used if not specified.
     :param resolvers_config: Optional resolvers that can override a default resolvers registered by
                              `register_default_secrets_resolver` and `register_default_did_resolver`

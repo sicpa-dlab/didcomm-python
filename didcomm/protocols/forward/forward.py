@@ -23,7 +23,7 @@ async def wrap_in_forward(packed_msg: Union[JSON_DATA, JSON], routing_key_ids: L
                           forward_headers: Optional[MessageOptionalHeaders] = None,
                           resolvers_config: Optional[ResolversConfig] = None) -> JSON:
     """
-    Wraps the given packed DID Comm message in Forward messages for every routing key.
+    Wraps the given packed DIDComm message in Forward messages for every routing key.
 
     :param packed_msg: the message to be wrapped in Forward messages
     :param routing_key_ids: a list of routing key IDs or DIDs

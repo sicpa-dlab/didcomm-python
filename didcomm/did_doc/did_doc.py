@@ -11,6 +11,7 @@ from didcomm.common.types import DID_URL, DID
 class DIDDoc(ABC):
     """DID DOC abstraction (https://www.w3.org/TR/did-core/#dfn-did-documents)"""
 
+    @property
     @abstractmethod
     def did(self) -> DID:
         """
@@ -18,6 +19,7 @@ class DIDDoc(ABC):
         """
         pass
 
+    @property
     @abstractmethod
     def key_agreement_kids(self) -> List[DID_URL]:
         """
@@ -28,6 +30,7 @@ class DIDDoc(ABC):
         """
         pass
 
+    @property
     @abstractmethod
     def authentication_kids(self) -> List[DID_URL]:
         """
@@ -38,6 +41,7 @@ class DIDDoc(ABC):
         """
         pass
 
+    @property
     @abstractmethod
     def verification_methods(self) -> List[VerificationMethod]:
         """
@@ -48,6 +52,7 @@ class DIDDoc(ABC):
         """
         pass
 
+    @property
     @abstractmethod
     def didcomm_services(self) -> List[DIDCommService]:
         """
@@ -67,6 +72,7 @@ class VerificationMethod(ABC):
     See https://www.w3.org/TR/did-core/#verification-methods.
     """
 
+    @property
     @abstractmethod
     def id(self) -> str:
         """
@@ -75,6 +81,7 @@ class VerificationMethod(ABC):
         """
         pass
 
+    @property
     @abstractmethod
     def type(self) -> str:
         """
@@ -83,6 +90,7 @@ class VerificationMethod(ABC):
         """
         pass
 
+    @property
     @abstractmethod
     def controller(self) -> str:
         """
@@ -91,8 +99,9 @@ class VerificationMethod(ABC):
         """
         pass
 
+    @property
     @abstractmethod
-    def public_key(self) -> VerificationMaterial:
+    def verification_material(self) -> VerificationMaterial:
         """
         A verification material representing a public key.
         Material consists of an encoding type (JWK, base58, etc.) and encoded value.
@@ -121,6 +130,7 @@ class DIDCommService(ABC):
     https://identity.foundation/didcomm-messaging/spec/#did-document-service-endpoint.
     """
 
+    @property
     @abstractmethod
     def id(self) -> str:
         """
@@ -128,6 +138,7 @@ class DIDCommService(ABC):
         """
         pass
 
+    @property
     @abstractmethod
     def service_endpoint(self) -> str:
         """
@@ -138,6 +149,7 @@ class DIDCommService(ABC):
         """
         pass
 
+    @property
     @abstractmethod
     def routing_keys(self) -> List[DID_URL]:
         """
