@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional
 
-from didcomm.common.types import DID_URL, DID
+from didcomm.common.types import DID_URL
 
 
 @dataclass
@@ -33,7 +33,7 @@ class SecretsResolver(ABC):
     @abstractmethod
     async def get_key(self, kid: DID_URL) -> Optional[Secret]:
         """
-        A private key identified by the given key ID.
+        Finds d private key identified by the given key ID.
 
         :param kid: the key ID identifying a private key
         :return: a private key or None of there is no key for the given key ID
@@ -41,11 +41,12 @@ class SecretsResolver(ABC):
         pass
 
     @abstractmethod
-    async def get_keys(self, did: DID) -> List[DID_URL]:
+    async def get_keys(self, kids: List[DID_URL]) -> List[DID_URL]:
         """
-        Key IDs of all private keys for the given DID.
+        Find all private keys that have one of the given key IDs.
+        Return keys only for key IDs for which a key is present.
 
-        :param did: the DID get all private key IDs  for
-        :return: a possible empty list of all private key keyIDs of for the given DID
+        :param kids: the key IDs find private keys for
+        :return: a possible empty list of all private keys that have one of the given keyIDs.
         """
         pass

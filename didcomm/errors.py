@@ -7,11 +7,15 @@ class DIDCommError(Exception):
     pass
 
 
-class DIDNotResolvedError(DIDCommError):
+class DIDDocNotResolvedError(DIDCommError):
     pass
 
 
-class SecretNotResolvedError(DIDCommError):
+class DIDUrlNotFoundError(DIDCommError):
+    pass
+
+
+class SecretNotFoundError(DIDCommError):
     pass
 
 
@@ -31,7 +35,7 @@ class MalformedMessageError(DIDCommError):
         self.code = code
 
 
-class UnexpectedPackCode(Enum):
+class UnsatisfiedConstraintCode(Enum):
     NOT_ENCRYPTED = 1
     NOT_AUTHENTICATED = 2
     NOT_SIGNED = 3
@@ -40,6 +44,6 @@ class UnexpectedPackCode(Enum):
     NOT_DECRYPTED_BY_ALL_KEYS = 6
 
 
-class UnexpectedPackError(DIDCommError):
-    def __init__(self, code: UnexpectedPackCode):
+class UnsatisfiedConstraintError(DIDCommError):
+    def __init__(self, code: UnsatisfiedConstraintCode):
         self.code = code

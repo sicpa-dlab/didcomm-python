@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Dict, Any, Union, List
 
 JSON_DATA = Union[Dict[str, Any], List[Any]]
@@ -11,5 +10,3 @@ JWS = JSON
 DID = str
 DID_URL = str
 DID_OR_DID_URL = Union[DID, DID_URL]
-
-

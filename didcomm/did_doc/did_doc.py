@@ -1,7 +1,63 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from dataclasses import dataclass
+from enum import Enum
+from typing import List
 
 from didcomm.common.types import DID_URL, DID
+
+
+class DIDDoc(ABC):
+    """DID DOC abstraction (https://www.w3.org/TR/did-core/#dfn-did-documents)"""
+
+    @abstractmethod
+    def did(self) -> DID:
+        """
+        :return: a DID for the given DID Doc
+        """
+        pass
+
+    @abstractmethod
+    def key_agreement_kids(self) -> List[DID_URL]:
+        """
+        Key IDs (DID URLs) of all verification methods from the 'keyAgreement' verification relationship in this DID DOC.
+        See https://www.w3.org/TR/did-core/#verification-methods.
+
+        :return: a possibly empty list of key ID of all 'keyAgreement' verification methods
+        """
+        pass
+
+    @abstractmethod
+    def authentication_kids(self) -> List[DID_URL]:
+        """
+        Key IDs (DID URLs) of all verification methods from the 'authentication' verification relationship in this DID DOC.
+        See https://www.w3.org/TR/did-core/#authentication.
+
+        :return: a possibly empty list of key ID of all 'authentication' verification methods
+        """
+        pass
+
+    @abstractmethod
+    def verification_methods(self) -> List[VerificationMethod]:
+        """
+        Returns all local verification methods including embedded to key agreement and authentication sections.
+        See https://www.w3.org/TR/did-core/#verification-methods.
+
+        :return: a list of verification method instances
+        """
+        pass
+
+    @abstractmethod
+    def didcomm_services(self) -> List[DIDCommService]:
+        """
+        All services of 'DIDCommMessaging' type in this DID DOC.
+        Empty list is returned if there are no services of 'DIDCommMessaging' type.
+        See https://www.w3.org/TR/did-core/#services and https://identity.foundation/didcomm-messaging/spec/#did-document-service-endpoint.
+
+        :return: a possibly empty list of 'DIDCommMessaging' type services
+        """
+        pass
 
 
 class VerificationMethod(ABC):
@@ -36,17 +92,26 @@ class VerificationMethod(ABC):
         pass
 
     @abstractmethod
-    def public_key(self) -> str:
+    def public_key(self) -> VerificationMaterial:
         """
-        A public key of the method.
+        A verification material representing a public key.
+        Material consists of an encoding type (JWK, base58, etc.) and encoded value.
 
-        The value is type-specific.
-        For example, for 'JsonWebKey2020' type it will be the value of `publicKeyJwk` field as a JSON sting.
-        For 'X25519KeyAgreementKey2019' type it will be the value of `publicKeyBase58` field as a base58-encoded string.
-
-        :return: type-specific value of the public key a string
+        :return: verification material instance
         """
         pass
+
+
+@dataclass
+class VerificationMaterial:
+    type: EncodingType
+    encoded_value: str
+
+
+class EncodingType(Enum):
+    JWK = 1
+    BASE58 = 2
+    OTHER = 1000
 
 
 class DIDCommService(ABC):
@@ -79,60 +144,5 @@ class DIDCommService(ABC):
         A possibly empty ordered array of strings referencing keys to be used when preparing the message for transmission.
 
         :return: a possibly empty list of key IDs
-        """
-        pass
-
-
-class DIDDoc(ABC):
-    """DID DOC abstraction (https://www.w3.org/TR/did-core/#dfn-did-documents)"""
-
-    @abstractmethod
-    def did(self) -> DID:
-        """
-        :return: a DID for the given DID Doc
-        """
-        pass
-
-    @abstractmethod
-    def key_agreement_kids(self) -> List[DID_URL]:
-        """
-        Key IDs (DID URLs) of all verification methods from the 'keyAgreement' verification relationship in this DID DOC.
-        See https://www.w3.org/TR/did-core/#verification-methods.
-
-        :return: a possibly empty list of key ID of all 'keyAgreement' verification methods
-        """
-        pass
-
-    @abstractmethod
-    def authentication_kids(self) -> List[DID_URL]:
-        """
-        Key IDs (DID URLs) of all verification methods from the 'authentication' verification relationship in this DID DOC.
-        See https://www.w3.org/TR/did-core/#authentication.
-
-        :return: a possibly empty list of key ID of all 'authentication' verification methods
-        """
-        pass
-
-    @abstractmethod
-    def verification_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
-        """
-        A verification method with the given 'id' (key ID).
-        See https://www.w3.org/TR/did-core/#verification-methods.
-        In most of the cases it will be a verification method from 'authentication' or 'keyAgreement' verification relationship.
-
-        :param kid: key ID of a verification method
-        :return: a verification method identified by the given key ID
-        or None if there is no method with the given key ID.
-        """
-        pass
-
-    @abstractmethod
-    def services(self) -> List[DIDCommService]:
-        """
-        All services of 'DIDCommMessaging' type in this DID DOC.
-        Empty list is returned if there are no services of 'DIDCommMessaging' type.
-        See https://www.w3.org/TR/did-core/#services and https://identity.foundation/didcomm-messaging/spec/#did-document-service-endpoint.
-
-        :return: a possibly empty list of 'DIDCommMessaging' type services
         """
         pass

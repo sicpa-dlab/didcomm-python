@@ -6,12 +6,11 @@ from typing import Optional, List, Union, Dict
 from didcomm.common.types import JSON_DATA, DID, DID_URL
 
 Header = Dict[str, Union[str, int, JSON_DATA]]
-SignedPlaintext = JSON_DATA
 
 
 @dataclass
-class PlaintextOptionalHeaders:
-    """Optional headers for any Plaintext message"""
+class MessageOptionalHeaders:
+    """Optional headers for a message"""
     frm: Optional[DID] = None
     to: Optional[List[DID]] = None
     created_time: Optional[int] = None
@@ -26,22 +25,28 @@ class PlaintextOptionalHeaders:
 
 
 @dataclass
-class PlaintextRequiredHeaders:
-    """Required headers for any Plaintext message"""
+class MessageRequiredHeaders:
+    """Required headers for a message"""
     id: str
     type: str
     typ: str = "application/didcomm-plain+json"
 
 
 @dataclass
-class PlaintextBody:
-    """Plaintext body as a application/protocol specific data"""
+class MessageBody:
+    """Message body as a application/protocol specific data"""
     body: JSON_DATA
 
 
 @dataclass
-class Plaintext(PlaintextOptionalHeaders, PlaintextRequiredHeaders, PlaintextBody):
-    """Plaintext message consisting of headers and application/protocol specific data (body)"""
+class Message(MessageOptionalHeaders, MessageRequiredHeaders, MessageBody):
+    """
+    Message consisting of headers and application/protocol specific data (body).
+    In order to convert a message to a DIDComm message for further transporting, call one of the following:
+    - `pack_encrypted` to build an Encrypted DIDComm message
+    - `pack_signed` to build a signed DIDComm message
+    - `pack_plaintext` to build a Plaintext DIDComm message
+    """
     pass
 
 

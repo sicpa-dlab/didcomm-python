@@ -5,23 +5,10 @@ from typing import Optional
 
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON, DID_OR_DID_URL
-from didcomm.plaintext import Plaintext
+from didcomm.message import Message
 
 
-@dataclass(frozen=True)
-class PackSignedResult:
-    """
-    Result of pack operation.
-
-    Attributes:
-        packed_msg (str): A packed message as a JSON string
-        sign_from_kid (DID_OR_DID_URL): Identifier (DID URL) of sender key used for message signing
-    """
-    packed_msg: JSON
-    sign_from_kid: DID_OR_DID_URL
-
-
-async def pack_signed(plaintext: Plaintext,
+async def pack_signed(message: Message,
                       sign_frm: DID_OR_DID_URL,
                       resolvers_config: Optional[ResolversConfig] = None) -> PackSignedResult:
     """
@@ -43,14 +30,28 @@ async def pack_signed(plaintext: Plaintext,
           a private key in the secrets resolver is found
         - If `sign_frm` is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
 
-    :param plaintext: The plaintext to be packed
+    :param message: The message to be packed into a DID Comm message
     :param sign_frm: DID or key ID the sender uses for signing.
     :param resolvers_config: Optional resolvers that can override a default resolvers registered by
                              `register_default_secrets_resolver` and `register_default_did_resolver`
 
-    :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
-    :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
+    :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
+    :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc
+    :raises SecretNotFoundError: If there is no secret for the given DID or DID URL (key ID)
 
     :return: A packed message as a JSON string.
     """
     return PackSignedResult("", "")
+
+
+@dataclass(frozen=True)
+class PackSignedResult:
+    """
+    Result of pack operation.
+
+    Attributes:
+        packed_msg (str): A packed message as a JSON string
+        sign_from_kid (DID_OR_DID_URL): Identifier (DID URL) of sender key used for message signing
+    """
+    packed_msg: JSON
+    sign_from_kid: DID_OR_DID_URL

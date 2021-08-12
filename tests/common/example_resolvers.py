@@ -17,16 +17,16 @@ class ExampleDIDDoc(DIDDoc):
     def authentication_kids(self) -> List[DID_URL]:
         pass
 
-    def verification_method(self, kid: DID_URL) -> Optional[VerificationMethod]:
+    def verification_methods(self) -> List[VerificationMethod]:
         pass
 
-    def services(self) -> List[DIDCommService]:
+    def didcomm_services(self) -> List[DIDCommService]:
         pass
 
 
 class ExampleDIDResolver(DIDResolver):
 
-    async def resolve(self, did: str) -> DIDDoc:
+    async def resolve(self, did: DID) -> Optional[DIDDoc]:
         return ExampleDIDDoc()
 
 
@@ -35,5 +35,5 @@ class ExampleSecretsResolver(SecretsResolver):
     async def get_key(self, kid: DID_URL) -> Optional[Secret]:
         pass
 
-    async def get_keys(self, did: DID) -> List[DID_URL]:
+    async def get_keys(self, kids: List[DID_URL]) -> List[DID_URL]:
         pass
