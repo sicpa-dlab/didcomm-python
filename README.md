@@ -8,6 +8,17 @@ Requires Python >= 3.7.
 
 See [demo scripts](tests/demo) for details.
 
+A general usage of the API is the following:
+- Sender Side:
+  - Build a `Message` (plaintext, payload).
+  - Convert a message to a DIDComm Message for further transporting by calling one of the following:
+     - `pack_encrypted` to build an Encrypted DIDComm message
+     - `pack_signed` to build a Signed DIDComm message
+     - `pack_plaintext` to build a Plaintext DIDComm message
+- Receiver side:
+  - Call `unpack` on receiver side that will decrypt the message, verify signature if needed
+  and return a `Message` for further processing on the application level.
+
 ### 1. Build an Encrypted DID Comm message for the given recipient
 
 This is most common DID Comm message to be used in most of the applications.
