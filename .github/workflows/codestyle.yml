@@ -1,0 +1,28 @@
+name: codestyle
+
+on:
+  pull_request:
+    paths:
+      - '**.py'
+
+jobs:
+  flake8_py3:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        python-version: [ 3.7, 3.8, 3.9 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 --ignore=E501,F841,E203,W503,W504 .
