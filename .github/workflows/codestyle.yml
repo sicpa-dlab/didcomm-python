@@ -1,7 +1,7 @@
 name: codestyle
 
 on:
-  push:
+  pull_request:
     paths:
       - '**.py'
 
