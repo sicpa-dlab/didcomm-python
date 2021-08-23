@@ -7,7 +7,6 @@ from didcomm.secrets.secrets_resolver import SecretsResolver, Secret
 
 
 class ExampleDIDDoc(DIDDoc):
-
     def did(self) -> DID:
         pass
 
@@ -25,13 +24,11 @@ class ExampleDIDDoc(DIDDoc):
 
 
 class ExampleDIDResolver(DIDResolver):
-
     async def resolve(self, did: DID) -> Optional[DIDDoc]:
         return ExampleDIDDoc()
 
 
 class ExampleSecretsResolver(SecretsResolver):
-
     async def get_key(self, kid: DID_URL) -> Optional[Secret]:
         pass
 

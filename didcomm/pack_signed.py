@@ -8,9 +8,11 @@ from didcomm.common.types import JSON, DID_OR_DID_URL
 from didcomm.message import Message
 
 
-async def pack_signed(message: Message,
-                      sign_frm: DID_OR_DID_URL,
-                      resolvers_config: Optional[ResolversConfig] = None) -> PackSignedResult:
+async def pack_signed(
+    message: Message,
+    sign_frm: DID_OR_DID_URL,
+    resolvers_config: Optional[ResolversConfig] = None,
+) -> PackSignedResult:
     """
     Produces `DIDComm Signed Message`
     https://identity.foundation/didcomm-messaging/spec/#didcomm-signed-message.
@@ -55,5 +57,6 @@ class PackSignedResult:
         packed_msg (str): A packed message as a JSON string
         sign_from_kid (DID_OR_DID_URL): Identifier (DID URL) of sender key used for message signing
     """
+
     packed_msg: JSON
     sign_from_kid: DID_OR_DID_URL

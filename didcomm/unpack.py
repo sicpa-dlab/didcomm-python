@@ -9,9 +9,11 @@ from didcomm.common.types import JWS, JSON, DID_URL
 from didcomm.message import Message
 
 
-async def unpack(packed_msg: JSON,
-                 unpack_config: Optional[UnpackConfig] = None,
-                 resolvers_config: Optional[ResolversConfig] = None) -> UnpackResult:
+async def unpack(
+    packed_msg: JSON,
+    unpack_config: Optional[UnpackConfig] = None,
+    resolvers_config: Optional[ResolversConfig] = None,
+) -> UnpackResult:
     """
     Unpacks the packed DIDComm message by doing decryption and verifying the signatures.
 
@@ -34,8 +36,13 @@ async def unpack(packed_msg: JSON,
     """
     return UnpackResult(
         message=Message(body={}, id="", type=""),
-        metadata=Metadata(encrypted=True, authenticated=True, non_repudiation=False, anonymous_sender=False,
-                          signed_message=None)
+        metadata=Metadata(
+            encrypted=True,
+            authenticated=True,
+            non_repudiation=False,
+            anonymous_sender=False,
+            signed_message=None,
+        ),
     )
 
 
@@ -48,6 +55,7 @@ class UnpackResult:
         message (Message): unpacked message consisting of headers and application/protocol specific data (body)
         metadata (Metadata): metadata with details about the packed messaged. Can be used for MTC (message trust context) analysis.
     """
+
     message: Message
     metadata: Metadata
 
@@ -71,6 +79,7 @@ class Metadata:
         sign_alg (SignAlg): signature algorithm in case of non-repudiation
         signed_message (JWS): if the message has been signed, the JWS is returned for non-repudiation purposes
     """
+
     encrypted: bool
     authenticated: bool
     non_repudiation: bool
@@ -106,6 +115,7 @@ class UnpackConfig:
                                            then both Forward and packed messages are unpacked automatically,
                                            and the unpacked message will be returned instead of unpacked Forward.
     """
+
     expect_non_repudiation: bool = False
     expect_encrypted: bool = False
     expect_authenticated: bool = False

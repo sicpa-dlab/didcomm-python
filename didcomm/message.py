@@ -11,6 +11,7 @@ Header = Dict[str, Union[str, int, JSON_DATA]]
 @dataclass
 class MessageOptionalHeaders:
     """Optional headers for a message"""
+
     frm: Optional[DID] = None
     to: Optional[List[DID]] = None
     created_time: Optional[int] = None
@@ -27,6 +28,7 @@ class MessageOptionalHeaders:
 @dataclass
 class MessageRequiredHeaders:
     """Required headers for a message"""
+
     id: str
     type: str
     typ: str = "application/didcomm-plain+json"
@@ -35,6 +37,7 @@ class MessageRequiredHeaders:
 @dataclass
 class MessageBody:
     """Message body as a application/protocol specific data"""
+
     body: JSON_DATA
 
 
@@ -47,12 +50,14 @@ class Message(MessageOptionalHeaders, MessageRequiredHeaders, MessageBody):
     - `pack_signed` to build a signed DIDComm message
     - `pack_plaintext` to build a Plaintext DIDComm message
     """
+
     pass
 
 
 @dataclass(frozen=True)
 class Attachment:
     """Plaintext attachment"""
+
     id: str
     data: Union[AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson]
     description: Optional[str] = None

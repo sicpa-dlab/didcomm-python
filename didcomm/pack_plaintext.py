@@ -7,7 +7,9 @@ from didcomm.common.types import JSON
 from didcomm.message import Message
 
 
-async def pack_plaintext(message: Message, resolvers_config: Optional[ResolversConfig] = None) -> JSON:
+async def pack_plaintext(
+    message: Message, resolvers_config: Optional[ResolversConfig] = None
+) -> JSON:
     """
     Produces `DIDComm Plaintext Messages`
     https://identity.foundation/didcomm-messaging/spec/#didcomm-plaintext-messages.
