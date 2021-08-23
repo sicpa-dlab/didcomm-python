@@ -23,5 +23,6 @@ setup(
     ],
     packages=["didcomm"],
     install_requires=[],
+    extras_require={"test": ["pytest", "pytest-asyncio"]},
     test_requires=["pytest", "pytest-asyncio"],
 )
