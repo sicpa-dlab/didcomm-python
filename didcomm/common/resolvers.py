@@ -7,6 +7,7 @@ from didcomm.secrets.secrets_resolver import SecretsResolver
 # TODO: Decide if we want to provide a possiblity to register default resolvers,
 # or it's better to always pass ResolversConfig explicitly to every pack/sign/unpack/etc. methods.
 
+
 def register_default_did_resolver(did_resolver: DIDResolver):
     """
     Registers a DID Resolver that can be used in all pack/unpack operations by default.
@@ -37,5 +38,6 @@ class ResolversConfig:
         did_resolver (DIDResolver): an optional DID Doc resolver that can override a default DID Doc resolver
         registered by 'register_default_did_resolver'
     """
+
     secrets_resolver: SecretsResolver = None
     did_resolver: DIDResolver = None

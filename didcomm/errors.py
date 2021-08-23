@@ -3,6 +3,7 @@ from enum import Enum
 
 # TODO: finalize exceptions during development
 
+
 class DIDCommError(Exception):
     pass
 
@@ -30,7 +31,6 @@ class MalformedMessageCode(Enum):
 
 
 class MalformedMessageError(DIDCommError):
-
     def __init__(self, code: MalformedMessageCode):
         self.code = code
 

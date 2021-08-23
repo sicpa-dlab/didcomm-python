@@ -19,9 +19,12 @@ class ForwardMessage(MessageOptionalHeaders, MessageRequiredHeaders, ForwardBody
     type: str = "https://didcomm.org/routing/2.0/forward"
 
 
-async def wrap_in_forward(packed_msg: Union[JSON_DATA, JSON], routing_key_ids: List[DID_OR_DID_URL],
-                          forward_headers: Optional[MessageOptionalHeaders] = None,
-                          resolvers_config: Optional[ResolversConfig] = None) -> JSON:
+async def wrap_in_forward(
+    packed_msg: Union[JSON_DATA, JSON],
+    routing_key_ids: List[DID_OR_DID_URL],
+    forward_headers: Optional[MessageOptionalHeaders] = None,
+    resolvers_config: Optional[ResolversConfig] = None,
+) -> JSON:
     """
     Wraps the given packed DIDComm message in Forward messages for every routing key.
 
@@ -40,8 +43,9 @@ async def wrap_in_forward(packed_msg: Union[JSON_DATA, JSON], routing_key_ids: L
     return ""
 
 
-async def unpack_forward(packed_msg: JSON,
-                         resolvers_config: Optional[ResolversConfig] = None) -> ForwardMessage:
+async def unpack_forward(
+    packed_msg: JSON, resolvers_config: Optional[ResolversConfig] = None
+) -> ForwardMessage:
     """
     Can be called by a Mediator who expects a Forward message to be unpacked
 
@@ -58,10 +62,7 @@ async def unpack_forward(packed_msg: JSON,
 
     :return: Forward plaintext
     """
-    return ForwardMessage(
-        next="",
-        forwarded_msg="",
-        id="", type="")
+    return ForwardMessage(next="", forwarded_msg="", id="", type="")
 
 
 def parse_forward(message: Message) -> ForwardMessage:
@@ -73,10 +74,7 @@ def parse_forward(message: Message) -> ForwardMessage:
     :param message: the message to be converted
     :return: a Forward message instance
     """
-    return ForwardMessage(
-        next="",
-        forwarded_msg="",
-        id="", type="")
+    return ForwardMessage(next="", forwarded_msg="", id="", type="")
 
 
 def is_forward(message: Message) -> bool:

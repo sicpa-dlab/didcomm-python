@@ -1,0 +1,36 @@
+name: codestyle
+
+on:
+  pull_request:
+    paths:
+      - '**.py'
+
+jobs:
+  format:
+    name: Formatting (with black)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install black
+        run: |
+          pip install black
+      - name: Black Format Check
+        run: |
+          black --check .
+  flake8_py3:
+    needs: format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 --ignore=E501,F841,E203,W503,W504 .

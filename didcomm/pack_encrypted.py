@@ -9,13 +9,15 @@ from didcomm.common.types import JSON, DID_OR_DID_URL
 from didcomm.message import MessageOptionalHeaders, Message
 
 
-async def pack_encrypted(message: Message,
-                         to: DID_OR_DID_URL,
-                         frm: Optional[DID_OR_DID_URL] = None,
-                         sign_frm: Optional[DID_OR_DID_URL] = None,
-                         pack_config: Optional[PackEncryptedConfig] = None,
-                         pack_params: Optional[PackEncryptedParameters] = None,
-                         resolvers_config: Optional[ResolversConfig] = None) -> PackEncryptedResult:
+async def pack_encrypted(
+    message: Message,
+    to: DID_OR_DID_URL,
+    frm: Optional[DID_OR_DID_URL] = None,
+    sign_frm: Optional[DID_OR_DID_URL] = None,
+    pack_config: Optional[PackEncryptedConfig] = None,
+    pack_params: Optional[PackEncryptedParameters] = None,
+    resolvers_config: Optional[ResolversConfig] = None,
+) -> PackEncryptedResult:
     """
     Produces `DIDComm Encrypted Message`
     https://identity.foundation/didcomm-messaging/spec/#didcomm-encrypted-message.
@@ -85,8 +87,13 @@ async def pack_encrypted(message: Message,
     :return: A pack result consisting of a packed message as a JSON string
              and an optional service metadata with an endpoint to be used to transport the packed message.
     """
-    return PackEncryptedResult(packed_msg="", service_metadata=ServiceMetadata("", ""),
-                               from_kid="", sign_from_kid="", to_kids=[])
+    return PackEncryptedResult(
+        packed_msg="",
+        service_metadata=ServiceMetadata("", ""),
+        from_kid="",
+        sign_from_kid="",
+        to_kids=[],
+    )
 
 
 @dataclass(frozen=True)
@@ -104,6 +111,7 @@ class PackEncryptedResult:
         sign_from_kid (DID_OR_DID_URL): Identifier (DID URL) of sender key used for message signing.
                                         None if there is no signature.
     """
+
     packed_msg: JSON
     service_metadata: Optional[ServiceMetadata]
     to_kids: List[DID_OR_DID_URL]
@@ -134,6 +142,7 @@ class PackEncryptedConfig:
         forward (bool): Whether the packed messages need to be wrapped into Forward messages to be sent to Mediators
                         as defined by the Forward protocol. True by default.
     """
+
     enc_alg_auth: AuthCryptAlg = AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW
     enc_alg_anon: AnonCryptAlg = AnonCryptAlg.XC20P_ECDH_ES_A256KW
     protect_sender_id: bool = False
@@ -152,5 +161,6 @@ class PackEncryptedParameters:
                                   optional service ID from recipient's DID Doc to be used for Forwarding.
 
     """
+
     forward_headers: Optional[MessageOptionalHeaders] = None
     forward_service_id: Optional[str] = None

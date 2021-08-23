@@ -22,6 +22,7 @@ class Secret:
         For example, for 'JsonWebKey2020' type it will be a JWK JSON string.
         For 'X25519KeyAgreementKey2019' type it will be a base58-encoded string.
     """
+
     kid: DID_URL
     type: str
     value: str
