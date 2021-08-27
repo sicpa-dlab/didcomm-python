@@ -18,7 +18,6 @@ class Secret:
           Must have the same value, as type ('type' field as VerificationMethodType enum) of the corresponding method in DID Doc containing a public key.
 
         verification_material (VerificationMaterial): A verification material representing a private key.
-          Material consists of an encoding type (JWK, base58, etc.) and encoded value.
     """
 
     kid: DID_URL

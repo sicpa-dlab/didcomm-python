@@ -80,8 +80,7 @@ class VerificationMethod:
         id (str): verification method `id` field
         type (VerificationMethodType): verification method `type` field as VerificationMethodType enum
         controller (str): verification method `controller` field
-        verification_material (VerificationMaterial): A verification material representing a public key.
-          Material consists of an encoding type (JWK, base58, etc.) and encoded value.
+        verification_material (VerificationMaterial): A verification material representing a public key
     """
 
     id: str

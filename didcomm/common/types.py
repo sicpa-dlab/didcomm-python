@@ -22,7 +22,7 @@ class VerificationMethodType(Enum):
     OTHER = 1000
 
 
-class EncodingType(Enum):
+class VerificationMaterialFormat(Enum):
     JWK = 1
     BASE58 = 2
     OTHER = 1000
@@ -30,5 +30,5 @@ class EncodingType(Enum):
 
 @dataclass
 class VerificationMaterial:
-    type: EncodingType
-    encoded_value: str
+    format: VerificationMaterialFormat
+    value: str
