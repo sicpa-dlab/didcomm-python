@@ -3,9 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List, Union, Dict
 
-from didcomm.common.types import JSON_DATA, DID, DID_URL, JSON_OBJ
+from didcomm.common.types import JSON_VALUE, DID, DID_URL, JSON_OBJ
 
-Header = Dict[str, JSON_DATA]
+Header = Dict[str, JSON_VALUE]
 
 
 @dataclass
@@ -38,7 +38,7 @@ class MessageRequiredHeaders:
 class MessageBody:
     """Message body as a application/protocol specific data"""
 
-    body: JSON_DATA
+    body: JSON_VALUE
 
 
 @dataclass
@@ -84,7 +84,7 @@ class AttachmentDataBase64:
 
 @dataclass(frozen=True)
 class AttachmentDataJson:
-    json: JSON_DATA
+    json: JSON_VALUE
     hash: Optional[str] = None
     jws: Optional[JSON_OBJ] = None
 

@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Dict, Any, Union, List
 
 JSON_OBJ = Dict[str, Any]
-JSON_DATA = Union[JSON_OBJ, None, str, int, bool, float, List[Any]]
+JSON_VALUE = Union[JSON_OBJ, None, str, int, bool, float, List[Any]]
 JSON = str
 JWK = JSON
 JWT = JSON
