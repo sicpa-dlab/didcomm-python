@@ -4,7 +4,12 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List
 
-from didcomm.common.types import DID_URL, DID, VerificationMaterial, VerificationMethodType
+from didcomm.common.types import (
+    DID_URL,
+    DID,
+    VerificationMaterial,
+    VerificationMethodType,
+)
 
 
 class DIDDoc(ABC):

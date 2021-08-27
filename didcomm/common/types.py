@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Any, Union, List
 
-JSON_DATA = Union[str, int, bool, Dict[str, Any], List[Any]]
+JSON_DATA = Union[str, int, bool, float, Dict[str, Any], List[Any]]
 JSON = str
 JWK = JSON
 JWT = JSON
