@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List, Union, Dict
 
-from didcomm.common.types import JSON_DATA, DID, DID_URL
+from didcomm.common.types import JSON_DATA, DID, DID_URL, JSON_OBJ
 
 Header = Dict[str, JSON_DATA]
 
@@ -72,21 +72,21 @@ class Attachment:
 class AttachmentDataLinks:
     links: List[str]
     hash: str
-    jws: Optional[JSON_DATA] = None
+    jws: Optional[JSON_OBJ] = None
 
 
 @dataclass(frozen=True)
 class AttachmentDataBase64:
     base64: str
     hash: Optional[str] = None
-    jws: Optional[JSON_DATA] = None
+    jws: Optional[JSON_OBJ] = None
 
 
 @dataclass(frozen=True)
 class AttachmentDataJson:
     json: JSON_DATA
     hash: Optional[str] = None
-    jws: Optional[JSON_DATA] = None
+    jws: Optional[JSON_OBJ] = None
 
 
 @dataclass(frozen=True)
