@@ -5,7 +5,7 @@ from typing import Optional, List, Union, Dict
 
 from didcomm.common.types import JSON_DATA, DID, DID_URL
 
-Header = Dict[str, Union[str, int, JSON_DATA]]
+Header = Dict[str, JSON_DATA]
 
 
 @dataclass

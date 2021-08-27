@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional
 
-from didcomm.common.types import DID_URL
+from didcomm.common.types import DID_URL, VerificationMethodType, VerificationMaterial
 
 
 @dataclass
@@ -12,20 +12,18 @@ class Secret:
 
     Attributes:
         kid (str): a key ID identifying a secret (private key).
-        Must have the same value, as key ID ('id' field) of the corresponding method in DID Doc containing a public key.
+          Must have the same value, as key ID ('id' field) of the corresponding method in DID Doc containing a public key.
 
-        type (str): secret (private key) type.
-        Must have the same value, as type ('type' field) of the corresponding method in DID Doc containing a public key.
+        type (VerificationMethodType): secret (private key) type.
+          Must have the same value, as type ('type' field as VerificationMethodType enum) of the corresponding method in DID Doc containing a public key.
 
-        value (str): value of the secret (private key) as a string.
-        The value is type-specific, and has the same format as the corresponding public key value from the DID Doc.
-        For example, for 'JsonWebKey2020' type it will be a JWK JSON string.
-        For 'X25519KeyAgreementKey2019' type it will be a base58-encoded string.
+        verification_material (VerificationMaterial): A verification material representing a private key.
+          Material consists of an encoding type (JWK, base58, etc.) and encoded value.
     """
 
     kid: DID_URL
-    type: str
-    value: str
+    type: VerificationMethodType
+    verification_material: VerificationMaterial
 
 
 class SecretsResolver(ABC):
