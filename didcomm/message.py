@@ -38,7 +38,7 @@ class MessageRequiredHeaders:
 class MessageBody:
     """Message body as a application/protocol specific data"""
 
-    body: JSON_VALUE
+    body: JSON_OBJ
 
 
 @dataclass
