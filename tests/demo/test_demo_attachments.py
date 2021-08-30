@@ -21,7 +21,7 @@ async def test_demo_attachments():
         id="123",
         data=AttachmentDataJson(json={"foo": "bar"}),
         description="foo attachment",
-        mime_type="application/json",
+        media_type="application/didcomm-encrypted+json",
     )
     message = Message(
         body={"aaa": 1, "bbb": 2},

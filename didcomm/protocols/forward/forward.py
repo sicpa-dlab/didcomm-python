@@ -4,14 +4,13 @@ from dataclasses import dataclass
 from typing import List, Union, Optional
 
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JSON_VALUE, JSON, DID_OR_DID_URL
+from didcomm.common.types import JSON, DID_OR_DID_URL, JSON_OBJ
 from didcomm.message import MessageRequiredHeaders, MessageOptionalHeaders, Message
 
 
 @dataclass
 class ForwardBody:
     next: DID_OR_DID_URL
-    forwarded_msg: JSON
 
 
 @dataclass
@@ -19,8 +18,14 @@ class ForwardMessage(MessageOptionalHeaders, MessageRequiredHeaders, ForwardBody
     type: str = "https://didcomm.org/routing/2.0/forward"
 
 
+@dataclass
+class ForwardResult:
+    forward_msg: ForwardMessage
+    forwarded_msg: JSON
+
+
 async def wrap_in_forward(
-    packed_msg: Union[JSON_VALUE, JSON],
+    packed_msg: Union[JSON_OBJ, JSON],
     routing_key_ids: List[DID_OR_DID_URL],
     forward_headers: Optional[MessageOptionalHeaders] = None,
     resolvers_config: Optional[ResolversConfig] = None,
@@ -45,7 +50,7 @@ async def wrap_in_forward(
 
 async def unpack_forward(
     packed_msg: JSON, resolvers_config: Optional[ResolversConfig] = None
-) -> ForwardMessage:
+) -> ForwardResult:
     """
     Can be called by a Mediator who expects a Forward message to be unpacked
 
@@ -62,10 +67,10 @@ async def unpack_forward(
 
     :return: Forward plaintext
     """
-    return ForwardMessage(next="", forwarded_msg="", id="", type="")
+    return ForwardResult(forward_msg=ForwardMessage(next="", id=""), forwarded_msg="")
 
 
-def parse_forward(message: Message) -> ForwardMessage:
+def parse_forward(message: Message) -> ForwardResult:
     """
     Convert the given message into a Forward message.
 
@@ -74,7 +79,7 @@ def parse_forward(message: Message) -> ForwardMessage:
     :param message: the message to be converted
     :return: a Forward message instance
     """
-    return ForwardMessage(next="", forwarded_msg="", id="", type="")
+    return ForwardResult(forward_msg=ForwardMessage(next="", id=""), forwarded_msg="")
 
 
 def is_forward(message: Message) -> bool:

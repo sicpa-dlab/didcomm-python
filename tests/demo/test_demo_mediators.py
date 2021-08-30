@@ -121,7 +121,7 @@ async def test_demo_re_wrap_ro_receiver():
     )
     new_packed_forward_bob = await wrap_in_forward(
         packed_msg=old_forward_bob.forwarded_msg,
-        routing_key_ids=[old_forward_bob.next],
+        routing_key_ids=[old_forward_bob.forward_msg.next],
         forward_headers=MessageOptionalHeaders(expires_time=99999),
         resolvers_config=resolvers_config,
     )

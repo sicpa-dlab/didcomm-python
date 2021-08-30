@@ -38,7 +38,7 @@ class MessageRequiredHeaders:
 class MessageBody:
     """Message body as a application/protocol specific data"""
 
-    body: JSON_VALUE
+    body: JSON_OBJ
 
 
 @dataclass
@@ -62,7 +62,7 @@ class Attachment:
     data: Union[AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson]
     description: Optional[str] = None
     filename: Optional[str] = None
-    mime_type: Optional[str] = None
+    media_type: Optional[str] = None
     format: Optional[str] = None
     lastmod_time: Optional[int] = None
     byte_count: Optional[int] = None
