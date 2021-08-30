@@ -69,7 +69,7 @@ class Metadata:
         encrypted (bool): whether the message has been encrypted
         authenticated (bool): whether the message has been authenticated by using authcrypt
         non_repudiation (bool): whether the message has been signed
-        anonymous_sender (bool): whether the sender ID was protected
+        anonymous_sender (bool): whether the sender ID was hidden or protected
         re_wrapped_in_forward (bool): whether the message was re-wrapped in a forward message by a mediator
         encrypted_from (DID_URL): key ID of the sender used for authentication encryption if the message has been authenticated and encrypted
         encrypted_to (List[DID_URL]): target key IDS for encryption if the message has been encrypted
@@ -106,7 +106,7 @@ class UnpackConfig:
     Attributes:
         expect_encrypted (bool): Whether the message must be encrypted by the sender. Not expected by default.
         expect_authenticated (bool): Whether the message must be authenticated by the sender via authcrypt. Not expected by default.
-        expect_anonymous_sender (bool): Whether the sender ID must be protected. Not expected by default.
+        expect_anonymous_sender (bool): Whether the sender ID must be hidden or protected. Not expected by default.
         expect_non_repudiation (bool): Whether the message must be signed by the sender. Not expected by default.
         expect_signed_by_encrypter (bool): Whether the same DID must be used for encryption and signing. True by default.
         expect_decrypt_by_all_keys (bool): Whether the message must be decryptable by all keys resolved by the secrets resolver. False by default.
