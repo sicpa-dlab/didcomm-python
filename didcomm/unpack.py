@@ -109,7 +109,7 @@ class UnpackConfig:
         expect_anonymous_sender (bool): Whether the sender ID must be hidden or protected. Not expected by default.
         expect_non_repudiation (bool): Whether the message must be signed by the sender. Not expected by default.
         expect_signed_by_encrypter (bool): Whether the same DID must be used for encryption and signing. True by default.
-        expect_decrypt_by_all_keys (bool): Whether the message must be decryptable by all keys resolved by the secrets resolver. False by default.
+        expect_decrypt_by_all_keys (bool): Whether the message must be decryptable by all keys resolved by the _secrets resolver. False by default.
         unwrap_re_wrapping_forward (bool): If True (default), and the packed message is a Forward
                                            wrapping a message packed for the given recipient,
                                            then both Forward and packed messages are unpacked automatically,

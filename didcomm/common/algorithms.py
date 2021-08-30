@@ -38,11 +38,11 @@ class SignAlg(Enum):
     Algorithms for signature (non-repudiation)
 
     Attributes:
-        ED_DSA: Elliptic curve digital signature with edwards curves Ed25519 and SHA-512
+        ED25519: Elliptic curve digital signature with edwards curves Ed25519 and SHA-512
         ES256: Elliptic curve digital signature with NIST p-256 curve and SHA-256
         ES256K: Elliptic curve digital signature with Secp256k1 keys
     """
 
-    ED25519 = auto()
-    ES256 = auto()
-    ES256K = auto()
+    ED25519 = 'EdDSA'
+    ES256 = 'ES256'
+    ES256K = 'ES256K'

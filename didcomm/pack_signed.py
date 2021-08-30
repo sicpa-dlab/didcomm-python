@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass
 from typing import Optional
 
+from authlib.common.encoding import json_dumps
+from authlib.jose import JsonWebSignature
+
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON, DID_OR_DID_URL, DID_URL
+from didcomm.common.utils import extract_key, extract_sign_alg
+from didcomm.errors import DIDDocNotResolvedError, SecretNotFoundError, DIDUrlNotFoundError
 from didcomm.message import Message
 
 
@@ -31,7 +37,7 @@ async def pack_signed(
         - Signing is done via the keys from the `authentication` verification relationship in the DID Doc
           for the DID to be used for signing
         - If `sign_frm` is a DID, then the first sender's `authentication` verification method is used for which
-          a private key in the secrets resolver is found
+          a private key in the _secrets resolver is found
         - If `sign_frm` is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
 
     :param message: The message to be packed into a DIDComm message
@@ -45,7 +51,43 @@ async def pack_signed(
 
     :return: A packed message as a JSON string.
     """
-    return PackSignedResult("", "")
+    if '#' in sign_frm:
+        sign_frm_kid = sign_frm
+    else:
+        signer_did_doc = await resolvers_config.did_resolver.resolve(sign_frm)
+        if signer_did_doc is None:
+            raise DIDDocNotResolvedError()
+        if not signer_did_doc.authentication_kids():
+            raise DIDUrlNotFoundError()
+        sign_frm_kid = signer_did_doc.authentication_kids()[0]
+
+    secret = await resolvers_config.secrets_resolver.get_key(sign_frm_kid)
+    if secret is None:
+        raise SecretNotFoundError()
+
+    private_key = extract_key(secret)
+
+    sign_alg = extract_sign_alg(secret)
+
+    protected = {
+        "typ": "application/didcomm-signed+json",
+        "alg": sign_alg.value
+    }
+
+    header = {
+        "kid": sign_frm_kid
+    }
+
+    header_objs = [{
+        "protected": protected,
+        "header": header
+    }]
+
+    jws = JsonWebSignature()
+
+    res = jws.serialize_json(header_objs, dataclasses.asdict(message), private_key)
+
+    return PackSignedResult(json_dumps(res), sign_frm_kid)
 
 
 @dataclass(frozen=True)

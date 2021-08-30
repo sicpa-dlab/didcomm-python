@@ -26,7 +26,7 @@ class Secret:
 
 
 class SecretsResolver(ABC):
-    """Resolves secrets such as private keys to be used for signing and encryption."""
+    """Resolves _secrets such as private keys to be used for signing and encryption."""
 
     @abstractmethod
     async def get_key(self, kid: DID_URL) -> Optional[Secret]:

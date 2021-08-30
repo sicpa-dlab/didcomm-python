@@ -49,7 +49,7 @@ async def pack_encrypted(
         - if `frm` is None, then anonymous encryption is done (anoncrypt).
           Otherwise authenticated encryption is done (authcrypt).
         - if `frm` is a DID, then the first sender's `keyAgreement` verification method is used which can be resolved
-          via secrets resolver and has the same type as any of recipient keys
+          via _secrets resolver and has the same type as any of recipient keys
         - if `frm` is a key ID, then the sender's `keyAgreement` verification method identified by the given key ID is used.
         - if `to` frm a DID, then multiplex encryption is done for all keys from the receiver's `keyAgreement`
           verification relationship which have the same type as the sender's key
@@ -59,7 +59,7 @@ async def pack_encrypted(
         - Signing is done via the keys from the `authentication` verification relationship in the DID Doc
           for the DID to be used for signing
         - If `sign_frm` is a DID, then the first sender's `authentication` verification method is used for which
-          a private key in the secrets resolver is found
+          a private key in the _secrets resolver is found
         - If `sign_frm` is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
 
     :param message: The message to be packed into a DIDComm message
