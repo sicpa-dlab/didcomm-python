@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List, Union, Optional
 
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JSON_DATA, JSON, DID_OR_DID_URL
+from didcomm.common.types import JSON_VALUE, JSON, DID_OR_DID_URL
 from didcomm.message import MessageRequiredHeaders, MessageOptionalHeaders, Message
 
 
@@ -20,7 +20,7 @@ class ForwardMessage(MessageOptionalHeaders, MessageRequiredHeaders, ForwardBody
 
 
 async def wrap_in_forward(
-    packed_msg: Union[JSON_DATA, JSON],
+    packed_msg: Union[JSON_VALUE, JSON],
     routing_key_ids: List[DID_OR_DID_URL],
     forward_headers: Optional[MessageOptionalHeaders] = None,
     resolvers_config: Optional[ResolversConfig] = None,

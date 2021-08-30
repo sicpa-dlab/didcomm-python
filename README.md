@@ -114,3 +114,11 @@ print(f"Publishing ${packed_msg}")
 unpack_result = await unpack(packed_msg)
 print(f"Got ${unpack_result.plaintext} message")
 ```
+
+## Contribution
+PRs are welcome!
+
+The following CI checks are run against every PR:
+- all tests must pass
+- [flake8](https://github.com/PyCQA/flake8) checks must pass
+- code must be formatted by [Black](https://github.com/psf/black)

@@ -2,10 +2,14 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
 from typing import List
 
-from didcomm.common.types import DID_URL, DID
+from didcomm.common.types import (
+    DID_URL,
+    DID,
+    VerificationMaterial,
+    VerificationMethodType,
+)
 
 
 class DIDDoc(ABC):
@@ -65,96 +69,45 @@ class DIDDoc(ABC):
         pass
 
 
-class VerificationMethod(ABC):
+@dataclass
+class VerificationMethod:
     """
     DID DOC Verification method.
     It can be used in such verification relationships as Authentication, KeyAgreement, etc.
     See https://www.w3.org/TR/did-core/#verification-methods.
+
+    Attributes:
+        id (str): verification method `id` field
+        type (VerificationMethodType): verification method `type` field as VerificationMethodType enum
+        controller (str): verification method `controller` field
+        verification_material (VerificationMaterial): A verification material representing a public key
     """
 
-    @property
-    @abstractmethod
-    def id(self) -> str:
-        """
-        An ID of the verification method.
-        :return: verification method `id` field
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def type(self) -> str:
-        """
-        Verification method type.
-        :return: verification method `type` field
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def controller(self) -> str:
-        """
-        Verification method controller.
-        :return: verification method `controller` field
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def verification_material(self) -> VerificationMaterial:
-        """
-        A verification material representing a public key.
-        Material consists of an encoding type (JWK, base58, etc.) and encoded value.
-
-        :return: verification material instance
-        """
-        pass
+    id: str
+    type: VerificationMethodType
+    controller: str
+    verification_material: VerificationMaterial
 
 
 @dataclass
-class VerificationMaterial:
-    type: EncodingType
-    encoded_value: str
-
-
-class EncodingType(Enum):
-    JWK = 1
-    BASE58 = 2
-    OTHER = 1000
-
-
-class DIDCommService(ABC):
+class DIDCommService:
     """
     DID DOC Service of 'DIDCommMessaging' type.
-    See https://www.w3.org/TR/did-core/#services and
-    https://identity.foundation/didcomm-messaging/spec/#did-document-service-endpoint.
+    See https://www.w3.org/TR/did-core/#services,
+    https://identity.foundation/didcomm-messaging/spec/#did-document-service-endpoint
+    and https://www.w3.org/TR/did-spec-registries/#didcommmessaging
+
+    Attributes:
+        id (str): service's 'id' field
+        service_endpoint (str): `serviceEndpoint` field of DIDCommMessaging service.
+           It can be either a URI to be used for transport or a mediator's DID in case of alternative endpoints.
+        routing_keys (List[DID_URL]): `routingKeys` field of DIDCommMessaging service.
+           A possibly empty ordered array of strings referencing keys to be used when preparing the message for transmission.
+        accept (List[str]): `accept` field of DIDCommMessaging service.
+           A possibly empty ordered array of strings representing accepted didcomm specification versions.
     """
 
-    @property
-    @abstractmethod
-    def id(self) -> str:
-        """
-        :return: service's 'id' field
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def service_endpoint(self) -> str:
-        """
-        A service endpoint. It can be either a URI to be used for transport
-        or a mediator's DID in case of alternative endpoints.
-
-        :return: service endpoint string
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def routing_keys(self) -> List[DID_URL]:
-        """
-        A possibly empty ordered array of strings referencing keys to be used when preparing the message for transmission.
-
-        :return: a possibly empty list of key IDs
-        """
-        pass
+    id: str
+    service_endpoint: str
+    routing_keys: List[DID_URL]
+    accept: List[str]
