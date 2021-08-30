@@ -26,6 +26,7 @@ class VerificationMethodType(Enum):
 class VerificationMaterialFormat(Enum):
     JWK = 1
     BASE58 = 2
+    MULTIBASE = 3
     OTHER = 1000
 
 

@@ -29,8 +29,11 @@ class ExampleDIDResolver(DIDResolver):
 
 
 class ExampleSecretsResolver(SecretsResolver):
+    def __init__(self, secrets: List[Secret]):
+        self.secrets = {s.kid: s for s in secrets}
+
     async def get_key(self, kid: DID_URL) -> Optional[Secret]:
-        pass
+        return self.secrets.get(kid)
 
     async def get_keys(self, kids: List[DID_URL]) -> List[DID_URL]:
-        pass
+        return list(self.secrets.keys())

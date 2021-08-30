@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JSON, DID_OR_DID_URL
+from didcomm.common.types import JSON, DID_OR_DID_URL, DID_URL
 from didcomm.message import Message
 
 
@@ -55,8 +55,8 @@ class PackSignedResult:
 
     Attributes:
         packed_msg (str): A packed message as a JSON string
-        sign_from_kid (DID_OR_DID_URL): Identifier (DID URL) of sender key used for message signing
+        sign_from_kid (DID_URL): Identifier (DID URL) of sender key used for message signing
     """
 
     packed_msg: JSON
-    sign_from_kid: DID_OR_DID_URL
+    sign_from_kid: DID_URL
