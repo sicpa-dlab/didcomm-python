@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import dataclasses
 from dataclasses import dataclass
 from typing import Optional
 
@@ -85,7 +84,7 @@ async def pack_signed(
 
     jws = JsonWebSignature()
 
-    res = jws.serialize_json(header_objs, dataclasses.asdict(message), private_key)
+    res = jws.serialize_json(header_objs, message.as_dict(), private_key)
 
     return PackSignedResult(json_dumps(res), sign_frm_kid)
 

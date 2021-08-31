@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass
 from typing import Optional, List, Union, Dict
 
@@ -51,7 +52,15 @@ class Message(MessageOptionalHeaders, MessageRequiredHeaders, MessageBody):
     - `pack_plaintext` to build a Plaintext DIDComm message
     """
 
-    pass
+    def as_dict(self):
+        d = dataclasses.asdict(self)
+        for k in set(d.keys()):
+            if d[k] is None:
+                del d[k]
+        if 'frm' in d:
+            d['from'] = d['frm']
+            del d['frm']
+        return d
 
 
 @dataclass(frozen=True)
