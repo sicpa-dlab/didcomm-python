@@ -1,4 +1,3 @@
-from copy import copy
 from typing import List, Optional
 
 from didcomm.common.types import DID_URL, DID
@@ -8,48 +7,30 @@ from didcomm.secrets.secrets_resolver import SecretsResolver, Secret
 
 
 class ExampleDIDDoc(DIDDoc):
-    def __init__(self,
-                 did: DID,
-                 key_agreement_kids: List[DID_URL],
-                 authentication_kids: List[DID_URL],
-                 verification_methods: List[VerificationMethod],
-                 didcomm_services: List[DIDCommService]):
-        self._did = did
-        self._key_agreement_kids = copy(key_agreement_kids)
-        self._authentication_kids = copy(authentication_kids)
-        self._verification_methods = copy(verification_methods)
-        self._didcomm_services = copy(didcomm_services)
-
     def did(self) -> DID:
-        return self._did
+        pass
 
     def key_agreement_kids(self) -> List[DID_URL]:
-        return self._key_agreement_kids
+        pass
 
     def authentication_kids(self) -> List[DID_URL]:
-        return self._authentication_kids
+        pass
 
     def verification_methods(self) -> List[VerificationMethod]:
-        return self._verification_methods
+        pass
 
     def didcomm_services(self) -> List[DIDCommService]:
-        return self._didcomm_services
+        pass
 
 
 class ExampleDIDResolver(DIDResolver):
-    def __init__(self, did_docs: List[DIDDoc]):
-        self._did_docs = {did_doc.did(): did_doc for did_doc in did_docs}
-
     async def resolve(self, did: DID) -> Optional[DIDDoc]:
-        return self._did_docs.get(did)
+        return ExampleDIDDoc()
 
 
 class ExampleSecretsResolver(SecretsResolver):
-    def __init__(self, secrets: List[Secret]):
-        self._secrets = {secret.kid: secret for secret in secrets}
-
     async def get_key(self, kid: DID_URL) -> Optional[Secret]:
-        return self._secrets.get(kid)
+        pass
 
     async def get_keys(self, kids: List[DID_URL]) -> List[DID_URL]:
-        return list(self._secrets.keys())
+        pass

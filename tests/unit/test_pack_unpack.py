@@ -1,13 +1,13 @@
 import pytest
 from authlib.common.encoding import json_dumps, to_bytes, urlsafe_b64decode, to_unicode, json_loads
 
-from didcomm.common.resolvers import ResolversConfig
+from didcomm.common.resolvers import register_default_secrets_resolver, register_default_did_resolver
 from didcomm.common.types import VerificationMethodType, VerificationMaterial, VerificationMaterialFormat
 from didcomm.did_doc.did_doc import VerificationMethod
 from didcomm.message import Message
 from didcomm.pack_signed import pack_signed
 from didcomm.secrets.secrets_resolver import Secret
-from tests.common.example_resolvers import ExampleSecretsResolver, ExampleDIDResolver, ExampleDIDDoc
+from tests.common.test_resolvers import TestDIDDoc, TestDIDResolver, TestSecretsResolver
 
 
 @pytest.mark.asyncio
@@ -26,9 +26,9 @@ async def test_pack_signed():
         )
     )
 
-    secrets_resolver = ExampleSecretsResolver([alice_secret])
+    register_default_secrets_resolver(TestSecretsResolver([alice_secret]))
 
-    alice_did_doc = ExampleDIDDoc(
+    alice_did_doc = TestDIDDoc(
         did="did:example:alice",
         key_agreement_kids=[],
         authentication_kids=["did:example:alice#key-1"],
@@ -48,11 +48,10 @@ async def test_pack_signed():
         didcomm_services=[]
     )
 
-    did_resolver = ExampleDIDResolver([alice_did_doc])
+    register_default_did_resolver(TestDIDResolver([alice_did_doc]))
 
     message = Message(
         id="1234567890",
-        typ="application/didcomm-plain+json",
         type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
         frm="did:example:alice",
         to=[
@@ -66,9 +65,7 @@ async def test_pack_signed():
         }
     )
 
-    resolvers_config = ResolversConfig(secrets_resolver, did_resolver)
-
-    result = await pack_signed(message, "did:example:alice", resolvers_config)
+    result = await pack_signed(message, "did:example:alice")
 
     actual_decoded_packed_msg_wo_signature = _encode_and_remove_signatures(result.packed_msg)
 

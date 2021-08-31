@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from didcomm.did_doc.did_resolver import DIDResolver
+from didcomm.errors import DIDResolverNotProvidedError, SecretsResolverNotProvidedError
 from didcomm.secrets.secrets_resolver import SecretsResolver
 
 
@@ -46,5 +47,25 @@ class ResolversConfig:
         registered by 'register_default_did_resolver'
     """
 
-    secrets_resolver: SecretsResolver = None
-    did_resolver: DIDResolver = None
+    secrets_resolver: Optional[SecretsResolver] = None
+    did_resolver: Optional[DIDResolver] = None
+
+
+def get_effective_resolvers(resolvers_config: ResolversConfig) -> ResolversConfig:
+    if resolvers_config and resolvers_config.secrets_resolver:
+        secrets_resolver = resolvers_config.secrets_resolver
+    else:
+        secrets_resolver = default_secrets_resolver
+
+    if secrets_resolver is None:
+        raise SecretsResolverNotProvidedError()
+
+    if resolvers_config and resolvers_config.did_resolver:
+        did_resolver = resolvers_config.did_resolver
+    else:
+        did_resolver = default_did_resolver
+
+    if did_resolver is None:
+        raise DIDResolverNotProvidedError()
+
+    return ResolversConfig(secrets_resolver, did_resolver)

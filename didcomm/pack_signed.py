@@ -6,7 +6,7 @@ from typing import Optional
 from authlib.common.encoding import json_dumps
 from authlib.jose import JsonWebSignature
 
-from didcomm.common.resolvers import ResolversConfig
+from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
 from didcomm.common.types import JSON, DID_OR_DID_URL, DID_URL
 from didcomm.common.utils import extract_key, extract_sign_alg
 from didcomm.errors import DIDDocNotResolvedError, SecretNotFoundError, DIDUrlNotFoundError
@@ -50,6 +50,8 @@ async def pack_signed(
 
     :return: A packed message as a JSON string.
     """
+    resolvers_config = get_effective_resolvers(resolvers_config)
+
     if '#' in sign_frm:
         sign_frm_kid = sign_frm
     else:
