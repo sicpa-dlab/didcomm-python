@@ -5,23 +5,18 @@ from authlib.jose import ECKey, OKPKey
 from authlib.jose.rfc7517 import AsymmetricKey
 
 from didcomm.common.algorithms import SignAlg
-from didcomm.common.types import VerificationMaterialFormat, VerificationMethodType
+from didcomm.common.types import VerificationMaterialFormat, VerificationMethodType, DID_OR_DID_URL, DID_URL, DID
 from didcomm.did_doc.did_doc import VerificationMethod
 from didcomm.secrets.secrets_resolver import Secret
 
 
 def extract_key(verification_method: Union[VerificationMethod, Secret]) -> AsymmetricKey:
-    if verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020 or \
-            verification_method.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018:
-        if verification_method.verification_material.format == VerificationMaterialFormat.JWK:
-            jwk = json_loads(verification_method.verification_material.value)
-            if jwk['kty'] == 'EC':
-                return ECKey.import_key(jwk)
-            elif jwk['kty'] == 'OKP':
-                return OKPKey.import_key(jwk)
-            else:
-                # FIXME
-                raise NotImplemented()
+    if verification_method.verification_material.format == VerificationMaterialFormat.JWK:
+        jwk = json_loads(verification_method.verification_material.value)
+        if jwk['kty'] == 'EC':
+            return ECKey.import_key(jwk)
+        elif jwk['kty'] == 'OKP':
+            return OKPKey.import_key(jwk)
         else:
             # FIXME
             raise NotImplemented()
@@ -31,18 +26,15 @@ def extract_key(verification_method: Union[VerificationMethod, Secret]) -> Asymm
 
 
 def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> SignAlg:
-    if verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020:
-        if verification_method.verification_material.format == VerificationMaterialFormat.JWK:
-            jwk = json_loads(verification_method.verification_material.value)
-            if jwk['kty'] == 'EC' and jwk['crv'] == 'P-256':
-                return SignAlg.ES256
-            elif jwk['kty'] == 'EC' and jwk['crv'] == 'secp256k1':
-                return SignAlg.ES256K
-            elif jwk['kty'] == 'OKP' and jwk['crv'] == 'Ed25519':
-                return SignAlg.ED25519
-            else:
-                # FIXME
-                raise NotImplemented()
+    if verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020 and \
+            verification_method.verification_material.format == VerificationMaterialFormat.JWK:
+        jwk = json_loads(verification_method.verification_material.value)
+        if jwk['kty'] == 'EC' and jwk['crv'] == 'P-256':
+            return SignAlg.ES256
+        elif jwk['kty'] == 'EC' and jwk['crv'] == 'secp256k1':
+            return SignAlg.ES256K
+        elif jwk['kty'] == 'OKP' and jwk['crv'] == 'Ed25519':
+            return SignAlg.ED25519
         else:
             # FIXME
             raise NotImplemented()
@@ -53,3 +45,11 @@ def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> 
     else:
         # FIXME
         raise NotImplemented()
+
+
+def is_did_url(did_or_did_url: DID_OR_DID_URL) -> bool:
+    return '#' in did_or_did_url
+
+
+def get_did(did_url: DID_URL) -> DID:
+    return did_url.partition('#')[0]

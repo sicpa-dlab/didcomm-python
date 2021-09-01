@@ -10,7 +10,7 @@ from authlib.jose.errors import BadSignatureError
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
 from didcomm.common.types import JWS, JSON, DID_URL
-from didcomm.common.utils import extract_key, extract_sign_alg
+from didcomm.common.utils import extract_key, extract_sign_alg, get_did
 from didcomm.errors import DIDDocNotResolvedError, DIDUrlNotFoundError, MalformedMessageCode, MalformedMessageError
 from didcomm.message import Message
 
@@ -53,7 +53,7 @@ async def unpack(
 
     if 'signatures' in message:
         sign_frm_kid = message['signatures'][0]['header']['kid']
-        sign_frm_did = sign_frm_kid.partition('#')[0]
+        sign_frm_did = get_did(sign_frm_kid)
 
         signer_did_doc = await resolvers_config.did_resolver.resolve(sign_frm_did)
         if signer_did_doc is None:

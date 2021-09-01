@@ -8,7 +8,7 @@ from authlib.jose import JsonWebSignature
 
 from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
 from didcomm.common.types import JSON, DID_OR_DID_URL, DID_URL
-from didcomm.common.utils import extract_key, extract_sign_alg
+from didcomm.common.utils import extract_key, extract_sign_alg, is_did_url
 from didcomm.errors import DIDDocNotResolvedError, SecretNotFoundError, DIDUrlNotFoundError
 from didcomm.message import Message
 
@@ -52,7 +52,7 @@ async def pack_signed(
     """
     resolvers_config = get_effective_resolvers(resolvers_config)
 
-    if '#' in sign_frm:
+    if is_did_url(sign_frm):
         sign_frm_kid = sign_frm
     else:
         signer_did_doc = await resolvers_config.did_resolver.resolve(sign_frm)
