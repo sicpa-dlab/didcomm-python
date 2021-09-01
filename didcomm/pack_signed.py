@@ -67,7 +67,6 @@ async def pack_signed(
         raise SecretNotFoundError()
 
     private_key = extract_key(secret)
-
     sign_alg = extract_sign_alg(secret)
 
     protected = {

@@ -3,9 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List
 
+from authlib.common.encoding import json_loads, to_unicode
+from authlib.jose import JsonWebSignature
+from authlib.jose.errors import BadSignatureError
+
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
-from didcomm.common.resolvers import ResolversConfig
+from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
 from didcomm.common.types import JWS, JSON, DID_URL
+from didcomm.common.utils import extract_key, extract_sign_alg
+from didcomm.errors import DIDDocNotResolvedError, DIDUrlNotFoundError, MalformedMessageCode, MalformedMessageError
 from didcomm.message import Message
 
 
@@ -34,16 +40,55 @@ async def unpack(
 
     :return: the message, metadata, and optionally a JWS if the message has been signed.
     """
-    return UnpackResult(
-        message=Message(body={}, id="", type=""),
-        metadata=Metadata(
-            encrypted=True,
-            authenticated=True,
-            non_repudiation=False,
-            anonymous_sender=False,
-            signed_message=None,
-        ),
+    resolvers_config = get_effective_resolvers(resolvers_config)
+
+    message = json_loads(packed_msg)
+
+    metadata = Metadata(
+        encrypted=False,
+        authenticated=False,
+        non_repudiation=False,
+        anonymous_sender=False
     )
+
+    if 'signatures' in message:
+        sign_frm_kid = message['signatures'][0]['header']['kid']
+        sign_frm_did = sign_frm_kid.partition('#')[0]
+
+        signer_did_doc = await resolvers_config.did_resolver.resolve(sign_frm_did)
+        if signer_did_doc is None:
+            raise DIDDocNotResolvedError()
+        if sign_frm_kid not in signer_did_doc.authentication_kids():
+            raise DIDUrlNotFoundError()
+        for vm in signer_did_doc.verification_methods():
+            if vm.id == sign_frm_kid:
+                verification_method = vm
+                break
+        else:
+            raise DIDUrlNotFoundError()
+
+        key = extract_key(verification_method)
+        sign_alg = extract_sign_alg(verification_method)
+
+        jws = JsonWebSignature()
+
+        try:
+            jws_object = jws.deserialize_json(message, key)
+        except BadSignatureError:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_SIGNATURE)
+
+        metadata.non_repudiation = True
+        metadata.sign_from = sign_frm_kid
+        metadata.sign_alg = sign_alg
+        metadata.signed_message = packed_msg
+
+        payload = json_loads(to_unicode(jws_object.payload))
+        if 'from' in payload:
+            payload['frm'] = payload['from']
+            del payload['from']
+        payload = Message(**payload)
+
+    return UnpackResult(payload, metadata)
 
 
 @dataclass(frozen=True)
@@ -60,7 +105,7 @@ class UnpackResult:
     metadata: Metadata
 
 
-@dataclass(frozen=True)
+@dataclass
 class Metadata:
     """
     Metadata with details about the packed messaged. Can be used for MTC (message trust context) analysis.

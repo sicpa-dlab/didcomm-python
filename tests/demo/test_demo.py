@@ -129,7 +129,9 @@ async def test_demo_signed_unencrypted():
         didcomm_services=[]
     )
 
-    register_default_did_resolver(TestDIDResolver([alice_did_doc]))
+    register_default_did_resolver(ChainedDIDResolver([
+        TestDIDResolver([alice_did_doc])]
+    ))
 
     # ALICE
     message = Message(

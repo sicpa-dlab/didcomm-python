@@ -1,17 +1,20 @@
+from typing import Union
+
 from authlib.common.encoding import json_loads
 from authlib.jose import ECKey, OKPKey
 from authlib.jose.rfc7517 import AsymmetricKey
 
 from didcomm.common.algorithms import SignAlg
 from didcomm.common.types import VerificationMaterialFormat, VerificationMethodType
+from didcomm.did_doc.did_doc import VerificationMethod
 from didcomm.secrets.secrets_resolver import Secret
 
 
-def extract_key(secret: Secret) -> AsymmetricKey:
-    if secret.type == VerificationMethodType.JSON_WEB_KEY_2020 or \
-            secret.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018:
-        if secret.verification_material.format == VerificationMaterialFormat.JWK:
-            jwk = json_loads(secret.verification_material.value)
+def extract_key(verification_method: Union[VerificationMethod, Secret]) -> AsymmetricKey:
+    if verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020 or \
+            verification_method.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018:
+        if verification_method.verification_material.format == VerificationMaterialFormat.JWK:
+            jwk = json_loads(verification_method.verification_material.value)
             if jwk['kty'] == 'EC':
                 return ECKey.import_key(jwk)
             elif jwk['kty'] == 'OKP':
@@ -27,10 +30,10 @@ def extract_key(secret: Secret) -> AsymmetricKey:
         raise NotImplemented()
 
 
-def extract_sign_alg(secret: Secret) -> SignAlg:
-    if secret.type == VerificationMethodType.JSON_WEB_KEY_2020:
-        if secret.verification_material.format == VerificationMaterialFormat.JWK:
-            jwk = json_loads(secret.verification_material.value)
+def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> SignAlg:
+    if verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020:
+        if verification_method.verification_material.format == VerificationMaterialFormat.JWK:
+            jwk = json_loads(verification_method.verification_material.value)
             if jwk['kty'] == 'EC' and jwk['crv'] == 'P-256':
                 return SignAlg.ES256
             elif jwk['kty'] == 'EC' and jwk['crv'] == 'secp256k1':
@@ -43,9 +46,9 @@ def extract_sign_alg(secret: Secret) -> SignAlg:
         else:
             # FIXME
             raise NotImplemented()
-    elif secret.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018:
+    elif verification_method.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018:
         return SignAlg.ED25519
-    elif secret.type == VerificationMethodType.ECDSA_SECP_256K1_VERIFICATION_KEY_2019:
+    elif verification_method.type == VerificationMethodType.ECDSA_SECP_256K1_VERIFICATION_KEY_2019:
         return SignAlg.ES256K
     else:
         # FIXME
