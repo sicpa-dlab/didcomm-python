@@ -144,27 +144,17 @@ class UnpackConfig:
     """
     Unpack configuration.
 
-    If unpack config expects a particular property (for example that a message is encrypted)
-    and the packed message doesn't meet the criteria (it's not encrypted), then a corresponding
-    exception will be raised.
+    If unpack config expects a particular property and the packed message doesn't meet the criteria,
+    then a corresponding exception will be raised.
 
     Attributes:
-        expect_encrypted (bool): Whether the message must be encrypted by the sender. Not expected by default.
-        expect_authenticated (bool): Whether the message must be authenticated by the sender via authcrypt. Not expected by default.
-        expect_anonymous_sender (bool): Whether the sender ID must be hidden or protected. Not expected by default.
-        expect_non_repudiation (bool): Whether the message must be signed by the sender. Not expected by default.
-        expect_signed_by_encrypter (bool): Whether the same DID must be used for encryption and signing. True by default.
-        expect_decrypt_by_all_keys (bool): Whether the message must be decryptable by all keys resolved by the _secrets resolver. False by default.
+        expect_decrypt_by_all_keys (bool): Whether the message must be decryptable by all keys resolved by the secrets
+                                           resolver. False by default.
         unwrap_re_wrapping_forward (bool): If True (default), and the packed message is a Forward
                                            wrapping a message packed for the given recipient,
                                            then both Forward and packed messages are unpacked automatically,
                                            and the unpacked message will be returned instead of unpacked Forward.
     """
 
-    expect_non_repudiation: bool = False
-    expect_encrypted: bool = False
-    expect_authenticated: bool = False
-    expect_anonymous_sender: bool = False
-    expect_signed_by_encrypter: bool = True
     expect_decrypt_by_all_keys: bool = False
     unwrap_re_wrapping_forward: bool = True
