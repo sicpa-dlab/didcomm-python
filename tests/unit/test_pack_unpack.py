@@ -21,9 +21,9 @@ async def test_pack_signed():
             format=VerificationMaterialFormat.JWK,
             value=json_dumps({
                 "kty": "OKP",
-                "d": "uuAE6HmqnCnVjkF0ygjZMQiHeYIvI3Qcwh_2SjGMG-o",
+                "d": "pFRUKkyzx4kHdJtFSnlPA9WzqkDT1HWV0xZ5OYZd2SY",
                 "crv": "Ed25519",
-                "x": "z0x6oKBZ-ehwn_tkBzbhav132eQ7vmj5s5Xen00rtW0"
+                "x": "G-boxFB6vOZBu-wXkm-9Lh79I8nf9Z50cILaOgKKGww"
             })
         )
     )
@@ -43,7 +43,7 @@ async def test_pack_signed():
                 value=json_dumps({
                     "kty": "OKP",
                     "crv": "Ed25519",
-                    "x": "z0x6oKBZ-ehwn_tkBzbhav132eQ7vmj5s5Xen00rtW0"
+                    "x": "G-boxFB6vOZBu-wXkm-9Lh79I8nf9Z50cILaOgKKGww"
                 })
             )
         )],
@@ -127,7 +127,7 @@ async def test_unpack_signed():
                 value=json_dumps({
                     "kty": "OKP",
                     "crv": "Ed25519",
-                    "x": "z0x6oKBZ-ehwn_tkBzbhav132eQ7vmj5s5Xen00rtW0"
+                    "x": "G-boxFB6vOZBu-wXkm-9Lh79I8nf9Z50cILaOgKKGww"
                 })
             )
         )],
