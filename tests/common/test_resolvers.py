@@ -35,6 +35,13 @@ class TestDIDDoc(DIDDoc):
     def didcomm_services(self) -> List[DIDCommService]:
         return self._didcomm_services
 
+    def get_verification_method(self, id: DID_URL) -> VerificationMethod:
+        for verification_method in self._verification_methods:
+            if verification_method.id == id:
+                return verification_method
+
+        return None
+
 
 class TestDIDResolver(DIDResolver):
     def __init__(self, did_docs: List[DIDDoc]):

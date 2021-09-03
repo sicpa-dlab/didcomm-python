@@ -3,13 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from authlib.common.encoding import json_dumps
-from authlib.jose import JsonWebSignature
+from authlib.common.encoding import json_dumps, to_bytes, to_unicode
 
 from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
 from didcomm.common.types import JSON, DID_OR_DID_URL, DID_URL
-from didcomm.common.utils import extract_key, extract_sign_alg, is_did_url
-from didcomm.errors import DIDDocNotResolvedError, SecretNotFoundError, DIDUrlNotFoundError
+from didcomm.core.sign import sign
 from didcomm.message import Message
 
 
@@ -52,42 +50,14 @@ async def pack_signed(
     """
     resolvers_config = get_effective_resolvers(resolvers_config)
 
-    if is_did_url(sign_frm):
-        sign_frm_kid = sign_frm
-    else:
-        signer_did_doc = await resolvers_config.did_resolver.resolve(sign_frm)
-        if signer_did_doc is None:
-            raise DIDDocNotResolvedError()
-        if not signer_did_doc.authentication_kids():
-            raise DIDUrlNotFoundError()
-        sign_frm_kid = signer_did_doc.authentication_kids()[0]
+    msg = to_bytes(json_dumps(message.as_dict()))
 
-    secret = await resolvers_config.secrets_resolver.get_key(sign_frm_kid)
-    if secret is None:
-        raise SecretNotFoundError()
+    sign_result = await sign(msg, sign_frm, resolvers_config)
 
-    private_key = extract_key(secret)
-    sign_alg = extract_sign_alg(secret)
-
-    protected = {
-        "typ": "application/didcomm-signed+json",
-        "alg": sign_alg.value
-    }
-
-    header = {
-        "kid": sign_frm_kid
-    }
-
-    header_objs = [{
-        "protected": protected,
-        "header": header
-    }]
-
-    jws = JsonWebSignature()
-
-    res = jws.serialize_json(header_objs, message.as_dict(), private_key)
-
-    return PackSignedResult(json_dumps(res), sign_frm_kid)
+    return PackSignedResult(
+        packed_msg=to_unicode(sign_result.msg),
+        sign_from_kid=sign_result.sign_from_kid
+    )
 
 
 @dataclass(frozen=True)

@@ -1,4 +1,7 @@
-from enum import Enum, auto
+from collections import namedtuple
+from enum import Enum
+
+Algs = namedtuple('Algs', ['alg', 'enc'])
 
 
 class AnonCryptAlg(Enum):
@@ -16,9 +19,9 @@ class AnonCryptAlg(Enum):
         ECDH-ES key agreement with A256KW key wrapping
     """
 
-    A256CBC_HS512_ECDH_ES_A256KW = auto()
-    XC20P_ECDH_ES_A256KW = auto()
-    A256GCM_ECDH_ES_A256KW = auto()
+    A256CBC_HS512_ECDH_ES_A256KW = Algs(alg='ECDH-ES+A256KW', enc='A256CBC-HS512')
+    XC20P_ECDH_ES_A256KW = Algs(alg='ECDH-ES+A256KW', enc='XC20P')
+    A256GCM_ECDH_ES_A256KW = Algs(alg='ECDH-ES+A256KW', enc='A256GCM')
 
 
 class AuthCryptAlg(Enum):
@@ -30,7 +33,7 @@ class AuthCryptAlg(Enum):
         ECDH-1PU key agreement with A256KW key wrapping
     """
 
-    A256CBC_HS512_ECDH_1PU_A256KW = auto()
+    A256CBC_HS512_ECDH_1PU_A256KW = Algs(alg='ECDH-1PU+A256KW', enc='A256CBC-HS512')
 
 
 class SignAlg(Enum):

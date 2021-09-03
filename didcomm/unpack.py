@@ -4,14 +4,11 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 from authlib.common.encoding import json_loads, to_unicode
-from authlib.jose import JsonWebSignature
-from authlib.jose.errors import BadSignatureError
 
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
 from didcomm.common.types import JWS, JSON, DID_URL
-from didcomm.common.utils import extract_key, extract_sign_alg, get_did
-from didcomm.errors import DIDDocNotResolvedError, DIDUrlNotFoundError, MalformedMessageCode, MalformedMessageError
+from didcomm.core.sign import unwrap_sign
 from didcomm.message import Message
 
 
@@ -42,7 +39,7 @@ async def unpack(
     """
     resolvers_config = get_effective_resolvers(resolvers_config)
 
-    message = json_loads(packed_msg)
+    msg = json_loads(packed_msg)
 
     metadata = Metadata(
         encrypted=False,
@@ -51,42 +48,21 @@ async def unpack(
         anonymous_sender=False
     )
 
-    if 'signatures' in message:
-        sign_frm_kid = message['signatures'][0]['header']['kid']
-        sign_frm_did = get_did(sign_frm_kid)
+    if 'signatures' in msg:
+        unwrap_sign_result = await unwrap_sign(msg, resolvers_config)
 
-        signer_did_doc = await resolvers_config.did_resolver.resolve(sign_frm_did)
-        if signer_did_doc is None:
-            raise DIDDocNotResolvedError()
-        if sign_frm_kid not in signer_did_doc.authentication_kids():
-            raise DIDUrlNotFoundError()
-        for vm in signer_did_doc.verification_methods():
-            if vm.id == sign_frm_kid:
-                verification_method = vm
-                break
-        else:
-            raise DIDUrlNotFoundError()
-
-        key = extract_key(verification_method)
-        sign_alg = extract_sign_alg(verification_method)
-
-        jws = JsonWebSignature()
-
-        try:
-            jws_object = jws.deserialize_json(message, key)
-        except BadSignatureError:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_SIGNATURE)
+        msg = unwrap_sign_result.msg
 
         metadata.non_repudiation = True
-        metadata.sign_from = sign_frm_kid
-        metadata.sign_alg = sign_alg
+        metadata.sign_from = unwrap_sign_result.sign_frm_kid
+        metadata.sign_alg = unwrap_sign_result.sign_alg
         metadata.signed_message = packed_msg
 
-        payload = json_loads(to_unicode(jws_object.payload))
-        if 'from' in payload:
-            payload['frm'] = payload['from']
-            del payload['from']
-        payload = Message(**payload)
+    payload = json_loads(to_unicode(msg))
+    if 'from' in payload:
+        payload['frm'] = payload['from']
+        del payload['from']
+    payload = Message(**payload)
 
     return UnpackResult(payload, metadata)
 
