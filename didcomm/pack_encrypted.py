@@ -9,6 +9,7 @@ from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
 from didcomm.common.types import JSON, DID_OR_DID_URL
 from didcomm.common.utils import get_did
+from didcomm.core.anoncrypt import anoncrypt
 from didcomm.core.authcrypt import authcrypt
 from didcomm.core.sign import sign
 from didcomm.message import MessageOptionalHeaders, Message
@@ -108,6 +109,7 @@ async def pack_encrypted(
 
     msg = to_bytes(json_dumps(message.as_dict()))
 
+    to_kids = []
     from_kid = None
     sign_from_kid = None
 
@@ -115,14 +117,20 @@ async def pack_encrypted(
         sign_result = await sign(msg, sign_frm, resolvers_config)
 
         msg = sign_result.msg
-        sign_from_kid = sign_result.sign_from_kid
+        sign_from_kid = sign_result.sign_frm_kid
 
     if frm is not None:
-        authcrypt_result = await authcrypt(msg, to, frm, pack_config, resolvers_config)
+        authcrypt_result = await authcrypt(msg, to, frm, pack_config.enc_alg_auth, resolvers_config)
 
         msg = authcrypt_result.msg
         to_kids = authcrypt_result.to_kids
         from_kid = authcrypt_result.from_kid
+
+    if frm is None or pack_config.protect_sender_id:
+        anoncrypt_result = await anoncrypt(msg, to, pack_config.enc_alg_anon, resolvers_config)
+
+        msg = anoncrypt_result.msg
+        to_kids = anoncrypt_result.to_kids
 
     return PackEncryptedResult(
         packed_msg=to_unicode(msg),

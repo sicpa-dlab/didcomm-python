@@ -3,11 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List
 
-from authlib.common.encoding import json_loads, to_unicode
+from authlib.common.encoding import json_loads, to_unicode, to_bytes
 
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
 from didcomm.common.types import JWS, JSON, DID_URL
+from didcomm.core.anoncrypt import unwrap_anoncrypt
+from didcomm.core.authcrypt import unwrap_authcrypt
 from didcomm.core.sign import unwrap_sign
 from didcomm.message import Message
 
@@ -39,7 +41,8 @@ async def unpack(
     """
     resolvers_config = get_effective_resolvers(resolvers_config)
 
-    msg = json_loads(packed_msg)
+    msg = to_bytes(packed_msg)
+    msg_as_dict = json_loads(packed_msg)
 
     metadata = Metadata(
         encrypted=False,
@@ -48,23 +51,49 @@ async def unpack(
         anonymous_sender=False
     )
 
-    if 'signatures' in msg:
-        unwrap_sign_result = await unwrap_sign(msg, resolvers_config)
+    if 'ciphertext' in msg_as_dict and 'apu' not in msg_as_dict['protected']:
+        unwrap_anoncrypt_result = await unwrap_anoncrypt(msg_as_dict, resolvers_config)
+
+        msg = unwrap_anoncrypt_result.msg
+        msg_as_dict = json_loads(to_unicode(msg))
+
+        metadata.encrypted = True
+        metadata.anonymous_sender = True
+        metadata.encrypted_to = unwrap_anoncrypt_result.to_kids
+        metadata.enc_alg_anon = unwrap_anoncrypt_result.alg
+
+    if 'ciphertext' in msg_as_dict and 'apu' in msg_as_dict['protected']:
+        unwrap_authcrypt_result = await unwrap_authcrypt(msg_as_dict, resolvers_config)
+
+        msg = unwrap_authcrypt_result.msg
+        msg_as_dict = json_loads(to_unicode(msg))
+
+        metadata.encrypted = True
+        metadata.authenticated = True
+        metadata.encrypted_from = unwrap_authcrypt_result.frm_kid
+        metadata.encrypted_to = unwrap_authcrypt_result.to_kids
+        metadata.enc_alg_auth = unwrap_authcrypt_result.alg
+
+    if 'payload' in msg_as_dict:
+        unwrap_sign_result = await unwrap_sign(msg_as_dict, resolvers_config)
+        metadata.signed_message = to_unicode(msg)
 
         msg = unwrap_sign_result.msg
+        msg_as_dict = json_loads(to_unicode(msg))
 
         metadata.non_repudiation = True
         metadata.sign_from = unwrap_sign_result.sign_frm_kid
-        metadata.sign_alg = unwrap_sign_result.sign_alg
-        metadata.signed_message = packed_msg
+        metadata.sign_alg = unwrap_sign_result.alg
 
-    payload = json_loads(to_unicode(msg))
-    if 'from' in payload:
-        payload['frm'] = payload['from']
-        del payload['from']
-    payload = Message(**payload)
+    if 'from' in msg_as_dict:
+        msg_as_dict['frm'] = msg_as_dict['from']
+        del msg_as_dict['from']
+    message = Message(**msg_as_dict)
 
-    return UnpackResult(payload, metadata)
+    return UnpackResult(
+        message,
+        metadata
+    )
 
 
 @dataclass(frozen=True)

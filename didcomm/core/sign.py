@@ -15,7 +15,7 @@ from didcomm.errors import MalformedMessageError, MalformedMessageCode
 @dataclass(frozen=True)
 class SignResult:
     msg: bytes
-    sign_from_kid: DID_URL
+    sign_frm_kid: DID_URL
 
 
 async def sign(msg: bytes,
@@ -42,11 +42,11 @@ async def sign(msg: bytes,
         "header": header
     }]
 
-    msg = jws.serialize_json(header_objs, msg, private_key)
+    res = jws.serialize_json(header_objs, msg, private_key)
 
     return SignResult(
-        msg=to_bytes(json_dumps(msg)),
-        sign_from_kid=secret.kid
+        msg=to_bytes(json_dumps(res)),
+        sign_frm_kid=secret.kid
     )
 
 
@@ -54,7 +54,7 @@ async def sign(msg: bytes,
 class UnwrapSignResult:
     msg: bytes
     sign_frm_kid: DID_URL
-    sign_alg: SignAlg
+    alg: SignAlg
 
 
 async def unwrap_sign(msg: dict,
@@ -73,9 +73,11 @@ async def unwrap_sign(msg: dict,
         jws_object = jws.deserialize_json(msg, public_key)
     except BadSignatureError:
         raise MalformedMessageError(MalformedMessageCode.INVALID_SIGNATURE)
+    except Exception:
+        raise MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT)
 
     return UnwrapSignResult(
         msg=jws_object.payload,
         sign_frm_kid=sign_frm_kid,
-        sign_alg=alg
+        alg=alg
     )
