@@ -1,6 +1,6 @@
 from typing import Union, List, Optional
 
-from authlib.common.encoding import json_loads
+from authlib.common.encoding import json_loads, to_unicode, urlsafe_b64decode, to_bytes
 from authlib.jose import ECKey, OKPKey
 from authlib.jose.rfc7517 import AsymmetricKey
 
@@ -262,3 +262,7 @@ async def find_key_agreement_sender_verification_method(
         raise DIDUrlNotFoundError()
 
     return verification_method
+
+
+def parse_base64url_encoded_json(base64url):
+    return json_loads(to_unicode(urlsafe_b64decode(to_bytes(base64url))))

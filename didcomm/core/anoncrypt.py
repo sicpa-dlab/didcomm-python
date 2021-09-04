@@ -73,12 +73,12 @@ async def unwrap_anoncrypt(msg: dict,
 
     to_secrets = await find_key_agreement_recipient_secrets(to_kids, resolvers_config)
 
-    to_private_keys = [extract_key(to_s) for to_s in to_secrets]
+    to_private_kids_and_keys = [(to_s.kid, extract_key(to_s)) for to_s in to_secrets]
 
     error = None
-    for to_private_key in to_private_keys:
+    for to_private_kid_and_key in to_private_kids_and_keys:
         try:
-            res = jwe.deserialize_json(msg, to_private_key)
+            res = jwe.deserialize_json(msg, to_private_kid_and_key)
             protected = res['header']['protected']
             alg = AnonCryptAlg(Algs(alg=protected['alg'], enc=protected['enc']))
 

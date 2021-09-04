@@ -52,7 +52,7 @@ class Message(MessageOptionalHeaders, MessageRequiredHeaders, MessageBody):
     - `pack_plaintext` to build a Plaintext DIDComm message
     """
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         d = dataclasses.asdict(self)
         for k in set(d.keys()):
             if d[k] is None:
@@ -61,6 +61,13 @@ class Message(MessageOptionalHeaders, MessageRequiredHeaders, MessageBody):
             d['from'] = d['frm']
             del d['frm']
         return d
+
+    @staticmethod
+    def from_dict(d: dict) -> Message:
+        if 'from' in d:
+            d['frm'] = d['from']
+            del d['from']
+        return Message(**d)
 
 
 @dataclass(frozen=True)

@@ -8,7 +8,7 @@ from didcomm.common.algorithms import AuthCryptAlg, Algs
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import DID_OR_DID_URL, DID_URL
 from didcomm.common.utils import find_key_agreement_secret_and_verification_methods, extract_key, \
-    find_key_agreement_sender_verification_method, find_key_agreement_recipient_secrets
+    find_key_agreement_sender_verification_method, find_key_agreement_recipient_secrets, parse_base64url_encoded_json
 from didcomm.errors import MalformedMessageError, MalformedMessageCode
 
 
@@ -32,7 +32,7 @@ async def authcrypt(msg: bytes,
     frm_private_key = extract_key(frm_secret)
     to_public_keys = [extract_key(to_vm) for to_vm in to_verification_methods]
 
-    skid = frm_private_key.kid
+    skid = frm_secret.kid
     kids = [to_vm.id for to_vm in to_verification_methods]
 
     apu = to_unicode(urlsafe_b64encode(to_bytes(skid)))
@@ -76,9 +76,11 @@ async def unwrap_authcrypt(msg: dict,
 
     jwe = JsonWebEncryption()
 
-    frm_kid = msg['protected'].get('skid')
+    protected = parse_base64url_encoded_json(msg['protected'])
+    frm_kid = protected.get('skid')
     if frm_kid is None:
-        frm_kid = to_unicode(urlsafe_b64decode(to_bytes(msg['protected']['apu'])))
+        frm_kid = to_unicode(urlsafe_b64decode(to_bytes(protected['apu'])))
+
     to_kids = [r['header']['kid'] for r in msg['recipients']]
     # FIXME: Add checks of "apu" (unconditional) and "apv" header fields
 
@@ -86,12 +88,12 @@ async def unwrap_authcrypt(msg: dict,
     to_secrets = await find_key_agreement_recipient_secrets(to_kids, resolvers_config)
 
     frm_public_key = extract_key(frm_verification_method)
-    to_private_keys = [extract_key(to_s) for to_s in to_secrets]
+    to_private_kids_and_keys = [(to_s.kid, extract_key(to_s)) for to_s in to_secrets]
 
     error = None
-    for to_private_key in to_private_keys:
+    for to_private_kid_and_key in to_private_kids_and_keys:
         try:
-            res = jwe.deserialize_json(msg, to_private_key, sender_key=frm_public_key)
+            res = jwe.deserialize_json(msg, to_private_kid_and_key, sender_key=frm_public_key)
             protected = res['header']['protected']
             alg = AuthCryptAlg(Algs(alg=protected['alg'], enc=protected['enc']))
 

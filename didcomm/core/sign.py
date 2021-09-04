@@ -74,6 +74,7 @@ async def unwrap_sign(msg: dict,
     except BadSignatureError:
         raise MalformedMessageError(MalformedMessageCode.INVALID_SIGNATURE)
     except Exception:
+        # FIXME: Use proper error code
         raise MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT)
 
     return UnwrapSignResult(

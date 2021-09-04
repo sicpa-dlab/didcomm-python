@@ -8,6 +8,7 @@ from authlib.common.encoding import json_loads, to_unicode, to_bytes
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
 from didcomm.common.types import JWS, JSON, DID_URL
+from didcomm.common.utils import parse_base64url_encoded_json
 from didcomm.core.anoncrypt import unwrap_anoncrypt
 from didcomm.core.authcrypt import unwrap_authcrypt
 from didcomm.core.sign import unwrap_sign
@@ -51,7 +52,9 @@ async def unpack(
         anonymous_sender=False
     )
 
-    if 'ciphertext' in msg_as_dict and 'apu' not in msg_as_dict['protected']:
+    if 'ciphertext' in msg_as_dict and \
+            parse_base64url_encoded_json(msg_as_dict['protected'])['alg'].startswith('ECDH-ES'):
+
         unwrap_anoncrypt_result = await unwrap_anoncrypt(msg_as_dict, resolvers_config)
 
         msg = unwrap_anoncrypt_result.msg
@@ -62,7 +65,9 @@ async def unpack(
         metadata.encrypted_to = unwrap_anoncrypt_result.to_kids
         metadata.enc_alg_anon = unwrap_anoncrypt_result.alg
 
-    if 'ciphertext' in msg_as_dict and 'apu' in msg_as_dict['protected']:
+    if 'ciphertext' in msg_as_dict and \
+            parse_base64url_encoded_json(msg_as_dict['protected'])['alg'].startswith('ECDH-1PU'):
+
         unwrap_authcrypt_result = await unwrap_authcrypt(msg_as_dict, resolvers_config)
 
         msg = unwrap_authcrypt_result.msg
@@ -85,14 +90,12 @@ async def unpack(
         metadata.sign_from = unwrap_sign_result.sign_frm_kid
         metadata.sign_alg = unwrap_sign_result.alg
 
-    if 'from' in msg_as_dict:
-        msg_as_dict['frm'] = msg_as_dict['from']
-        del msg_as_dict['from']
-    message = Message(**msg_as_dict)
+    # TODO: Validate `msg_as_dict` structure
+    message = Message.from_dict(msg_as_dict)
 
     return UnpackResult(
-        message,
-        metadata
+        message=message,
+        metadata=metadata
     )
 
 

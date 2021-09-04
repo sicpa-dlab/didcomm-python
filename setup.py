@@ -22,6 +22,9 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     packages=["didcomm"],
-    install_requires=["Authlib@git+https://github.com/spivachuk/authlib.git@json-serialization"],
+    install_requires=[
+        "Authlib@git+https://github.com/sicpa-dlab/authlib.git@json-serialization-and-multi-recipient",
+        "pycryptodomex>=3.10,<4"
+    ],
     extras_require={"tests": ["pytest", "pytest-asyncio"]}
 )
