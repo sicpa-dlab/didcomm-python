@@ -9,7 +9,6 @@ from didcomm.unpack import unpack
 from tests.test_vectors.test_vectors_common import TEST_MESSAGE, ALICE_DID
 from tests.test_vectors.test_vectors_signed import (
     TEST_SIGNED_DIDCOMM_MESSAGE,
-    TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_1,
 )
 
 

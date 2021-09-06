@@ -1,5 +1,3 @@
-from typing import List
-
 from authlib.common.encoding import json_dumps
 
 from didcomm.common.types import (

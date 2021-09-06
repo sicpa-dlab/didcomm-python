@@ -37,10 +37,10 @@ def extract_key(
             return OKPKey.import_key(jwk)
         else:
             # FIXME
-            raise NotImplemented()
+            raise NotImplementedError()
     else:
         # FIXME
-        raise NotImplemented()
+        raise NotImplementedError()
 
 
 def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> SignAlg:
@@ -58,7 +58,7 @@ def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> 
             return SignAlg.ED25519
         else:
             # FIXME
-            raise NotImplemented()
+            raise NotImplementedError()
     elif (
         verification_method.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018
     ):
@@ -70,7 +70,7 @@ def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> 
         return SignAlg.ES256K
     else:
         # FIXME
-        raise NotImplemented()
+        raise NotImplementedError()
 
 
 def is_did_url(did_or_did_url: DID_OR_DID_URL) -> bool:

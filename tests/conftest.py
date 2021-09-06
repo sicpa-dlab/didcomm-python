@@ -22,11 +22,6 @@ def secrets_resolver_bob():
 
 
 @pytest.fixture()
-def secrets_resolver_bob():
-    return MockSecretsResolverBob()
-
-
-@pytest.fixture()
 def resolvers_config_alice(secrets_resolver_alice, did_resolver):
     return ResolversConfig(
         secrets_resolver=secrets_resolver_alice, did_resolver=did_resolver
