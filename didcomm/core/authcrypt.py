@@ -105,7 +105,6 @@ async def unwrap_authcrypt(
     frm_public_key = extract_key(frm_verification_method)
     to_private_kids_and_keys = [(to_s.kid, extract_key(to_s)) for to_s in to_secrets]
 
-    error = None
     for to_private_kid_and_key in to_private_kids_and_keys:
         try:
             res = jwe.deserialize_json(
@@ -118,8 +117,5 @@ async def unwrap_authcrypt(
             return UnwrapAuthcryptResult(
                 msg=res["payload"], to_kids=to_kids, frm_kid=frm_kid, alg=alg
             )
-        except Exception:
-            error = MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT)
-            continue
-
-    raise error
+        except Exception as exc:
+            raise MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT) from exc

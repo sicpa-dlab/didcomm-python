@@ -1,21 +1,13 @@
 import pytest as pytest
 
-from didcomm.common.resolvers import ResolversConfig
 from didcomm.message import Attachment, Message, AttachmentDataJson
 from didcomm.pack_encrypted import pack_encrypted
 from didcomm.unpack import unpack
-from tests.common.example_resolvers import ExampleSecretsResolver, ExampleDIDResolver
-
-ALICE_DID = "did:example:alice"
-BOB_DID = "did:example:bob"
-
-resolvers_config = ResolversConfig(
-    secrets_resolver=ExampleSecretsResolver(), did_resolver=ExampleDIDResolver()
-)
+from tests.test_vectors.test_vectors_common import ALICE_DID, BOB_DID
 
 
 @pytest.mark.asyncio
-async def test_demo_attachments():
+async def test_demo_attachments(resolvers_config_alice, resolvers_config_bob):
     # ALICE
     attachment = Attachment(
         id="123",
@@ -34,11 +26,14 @@ async def test_demo_attachments():
         attachments=[attachment],
     )
     pack_result = await pack_encrypted(
-        message=message, frm=ALICE_DID, to=BOB_DID, resolvers_config=resolvers_config
+        message=message,
+        frm=ALICE_DID,
+        to=BOB_DID,
+        resolvers_config=resolvers_config_alice,
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB
-    unpack_result = await unpack(packed_msg, resolvers_config=resolvers_config)
+    unpack_result = await unpack(packed_msg, resolvers_config=resolvers_config_bob)
     print(f"Got ${unpack_result.message}")

@@ -24,7 +24,6 @@ class AnoncryptResult:
 async def anoncrypt(
     msg: bytes, to: DID_OR_DID_URL, alg: AnonCryptAlg, resolvers_config: ResolversConfig
 ) -> AnoncryptResult:
-
     jwe = JsonWebEncryption()
 
     to_verification_methods = await find_key_agreement_recipient_verification_methods(
@@ -62,7 +61,6 @@ class UnwrapAnoncryptResult:
 async def unwrap_anoncrypt(
     msg: dict, resolvers_config: ResolversConfig
 ) -> UnwrapAnoncryptResult:
-
     jwe = JsonWebEncryption()
 
     to_kids = [r["header"]["kid"] for r in msg["recipients"]]
@@ -72,7 +70,6 @@ async def unwrap_anoncrypt(
 
     to_private_kids_and_keys = [(to_s.kid, extract_key(to_s)) for to_s in to_secrets]
 
-    error = None
     for to_private_kid_and_key in to_private_kids_and_keys:
         try:
             res = jwe.deserialize_json(msg, to_private_kid_and_key)
@@ -81,8 +78,5 @@ async def unwrap_anoncrypt(
 
             # FIXME: Support `expect_decrypt_by_all_keys` flag
             return UnwrapAnoncryptResult(msg=res["payload"], to_kids=to_kids, alg=alg)
-        except Exception:
-            error = MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT)
-            continue
-
-    raise error
+        except Exception as exc:
+            raise MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT) from exc

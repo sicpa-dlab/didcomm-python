@@ -12,7 +12,7 @@ from didcomm.common.utils import get_did
 from didcomm.core.anoncrypt import anoncrypt
 from didcomm.core.authcrypt import authcrypt
 from didcomm.core.sign import sign
-from didcomm.message import MessageOptionalHeaders, Message
+from didcomm.message import Message, Header
 
 
 async def pack_encrypted(
@@ -211,5 +211,5 @@ class PackEncryptedParameters:
 
     """
 
-    forward_headers: Optional[MessageOptionalHeaders] = None
+    forward_headers: Optional[List[Header]] = None
     forward_service_id: Optional[str] = None
