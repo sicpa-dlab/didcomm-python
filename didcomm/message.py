@@ -57,16 +57,16 @@ class Message(MessageOptionalHeaders, MessageRequiredHeaders, MessageBody):
         for k in set(d.keys()):
             if d[k] is None:
                 del d[k]
-        if 'frm' in d:
-            d['from'] = d['frm']
-            del d['frm']
+        if "frm" in d:
+            d["from"] = d["frm"]
+            del d["frm"]
         return d
 
     @staticmethod
     def from_dict(d: dict) -> Message:
-        if 'from' in d:
-            d['frm'] = d['from']
-            del d['from']
+        if "from" in d:
+            d["frm"] = d["from"]
+            del d["from"]
         return Message(**d)
 
 

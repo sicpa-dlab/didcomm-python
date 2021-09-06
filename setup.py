@@ -24,7 +24,7 @@ setup(
     packages=["didcomm"],
     install_requires=[
         "Authlib@git+https://github.com/sicpa-dlab/authlib.git@json-serialization-and-multi-recipient",
-        "pycryptodomex>=3.10,<4"
+        "pycryptodomex>=3.10,<4",
     ],
-    extras_require={"tests": ["pytest", "pytest-asyncio"]}
+    extras_require={"tests": ["pytest", "pytest-asyncio"]},
 )

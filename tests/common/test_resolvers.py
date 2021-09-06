@@ -8,12 +8,14 @@ from didcomm.secrets.secrets_resolver import SecretsResolver, Secret
 
 
 class TestDIDDoc(DIDDoc):
-    def __init__(self,
-                 did: DID,
-                 key_agreement_kids: List[DID_URL],
-                 authentication_kids: List[DID_URL],
-                 verification_methods: List[VerificationMethod],
-                 didcomm_services: List[DIDCommService]):
+    def __init__(
+        self,
+        did: DID,
+        key_agreement_kids: List[DID_URL],
+        authentication_kids: List[DID_URL],
+        verification_methods: List[VerificationMethod],
+        didcomm_services: List[DIDCommService],
+    ):
         self._did = did
         self._key_agreement_kids = copy(key_agreement_kids)
         self._authentication_kids = copy(authentication_kids)

@@ -5,7 +5,11 @@ from didcomm.common.resolvers import (
     register_default_did_resolver,
     register_default_secrets_resolver,
 )
-from didcomm.common.types import VerificationMethodType, VerificationMaterial, VerificationMaterialFormat
+from didcomm.common.types import (
+    VerificationMethodType,
+    VerificationMaterial,
+    VerificationMaterialFormat,
+)
 from didcomm.did_doc.did_doc import VerificationMethod
 from didcomm.did_doc.did_resolver import ChainedDIDResolver
 from didcomm.message import Message
@@ -98,13 +102,15 @@ async def test_demo_signed_unencrypted():
         type=VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
         verification_material=VerificationMaterial(
             format=VerificationMaterialFormat.JWK,
-            value=json_dumps({
-                "kty": "OKP",
-                "d": "uuAE6HmqnCnVjkF0ygjZMQiHeYIvI3Qcwh_2SjGMG-o",
-                "crv": "Ed25519",
-                "x": "z0x6oKBZ-ehwn_tkBzbhav132eQ7vmj5s5Xen00rtW0"
-            })
-        )
+            value=json_dumps(
+                {
+                    "kty": "OKP",
+                    "d": "uuAE6HmqnCnVjkF0ygjZMQiHeYIvI3Qcwh_2SjGMG-o",
+                    "crv": "Ed25519",
+                    "x": "z0x6oKBZ-ehwn_tkBzbhav132eQ7vmj5s5Xen00rtW0",
+                }
+            ),
+        ),
     )
 
     register_default_secrets_resolver(TestSecretsResolver([alice_secret]))
@@ -113,25 +119,29 @@ async def test_demo_signed_unencrypted():
         did="did:example:alice",
         key_agreement_kids=[],
         authentication_kids=["did:example:alice#key-1"],
-        verification_methods=[VerificationMethod(
-            id="did:example:alice#key-1",
-            type=VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
-            controller="did:example:alice",
-            verification_material=VerificationMaterial(
-                format=VerificationMaterialFormat.JWK,
-                value=json_dumps({
-                    "kty": "OKP",
-                    "crv": "Ed25519",
-                    "x": "z0x6oKBZ-ehwn_tkBzbhav132eQ7vmj5s5Xen00rtW0"
-                })
+        verification_methods=[
+            VerificationMethod(
+                id="did:example:alice#key-1",
+                type=VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
+                controller="did:example:alice",
+                verification_material=VerificationMaterial(
+                    format=VerificationMaterialFormat.JWK,
+                    value=json_dumps(
+                        {
+                            "kty": "OKP",
+                            "crv": "Ed25519",
+                            "x": "z0x6oKBZ-ehwn_tkBzbhav132eQ7vmj5s5Xen00rtW0",
+                        }
+                    ),
+                ),
             )
-        )],
-        didcomm_services=[]
+        ],
+        didcomm_services=[],
     )
 
-    register_default_did_resolver(ChainedDIDResolver([
-        TestDIDResolver([alice_did_doc])]
-    ))
+    register_default_did_resolver(
+        ChainedDIDResolver([TestDIDResolver([alice_did_doc])])
+    )
 
     # ALICE
     message = Message(
