@@ -22,6 +22,9 @@ class ExampleDIDDoc(DIDDoc):
     def didcomm_services(self) -> List[DIDCommService]:
         pass
 
+    def get_verification_method(self, id: DID_URL) -> VerificationMethod:
+        pass
+
 
 class ExampleDIDResolver(DIDResolver):
     async def resolve(self, did: DID) -> Optional[DIDDoc]:

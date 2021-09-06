@@ -8,6 +8,14 @@ class DIDCommError(Exception):
     pass
 
 
+class SecretsResolverNotProvidedError(DIDCommError):
+    pass
+
+
+class DIDResolverNotProvidedError(DIDCommError):
+    pass
+
+
 class DIDDocNotResolvedError(DIDCommError):
     pass
 

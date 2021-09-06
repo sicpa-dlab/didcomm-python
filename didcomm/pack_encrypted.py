@@ -3,9 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List
 
+from authlib.common.encoding import json_dumps, to_bytes, to_unicode
+
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
-from didcomm.common.resolvers import ResolversConfig
+from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
 from didcomm.common.types import JSON, DID_OR_DID_URL
+from didcomm.common.utils import get_did
+from didcomm.core.anoncrypt import anoncrypt
+from didcomm.core.authcrypt import authcrypt
+from didcomm.core.sign import sign
 from didcomm.message import MessageOptionalHeaders, Message
 
 
@@ -49,7 +55,7 @@ async def pack_encrypted(
         - if `frm` is None, then anonymous encryption is done (anoncrypt).
           Otherwise authenticated encryption is done (authcrypt).
         - if `frm` is a DID, then the first sender's `keyAgreement` verification method is used which can be resolved
-          via secrets resolver and has the same type as any of recipient keys
+          via _secrets resolver and has the same type as any of recipient keys
         - if `frm` is a key ID, then the sender's `keyAgreement` verification method identified by the given key ID is used.
         - if `to` frm a DID, then multiplex encryption is done for all keys from the receiver's `keyAgreement`
           verification relationship which have the same type as the sender's key
@@ -59,7 +65,7 @@ async def pack_encrypted(
         - Signing is done via the keys from the `authentication` verification relationship in the DID Doc
           for the DID to be used for signing
         - If `sign_frm` is a DID, then the first sender's `authentication` verification method is used for which
-          a private key in the secrets resolver is found
+          a private key in the _secrets resolver is found
         - If `sign_frm` is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
 
     :param message: The message to be packed into a DIDComm message
@@ -87,12 +93,51 @@ async def pack_encrypted(
     :return: A pack result consisting of a packed message as a JSON string
              and an optional service metadata with an endpoint to be used to transport the packed message.
     """
+    if message.to is not None and get_did(to) not in message.to:
+        raise ValueError()
+
+    if frm is not None and message.frm is not None and get_did(frm) != message.frm:
+        raise ValueError()
+
+    if pack_config is None:
+        pack_config = PackEncryptedConfig()
+
+    if pack_params is None:
+        pack_params = PackEncryptedParameters()
+
+    resolvers_config = get_effective_resolvers(resolvers_config)
+
+    msg = to_bytes(json_dumps(message.as_dict()))
+
+    to_kids = []
+    from_kid = None
+    sign_from_kid = None
+
+    if sign_frm is not None:
+        sign_result = await sign(msg, sign_frm, resolvers_config)
+
+        msg = sign_result.msg
+        sign_from_kid = sign_result.sign_frm_kid
+
+    if frm is not None:
+        authcrypt_result = await authcrypt(msg, to, frm, pack_config.enc_alg_auth, resolvers_config)
+
+        msg = authcrypt_result.msg
+        to_kids = authcrypt_result.to_kids
+        from_kid = authcrypt_result.from_kid
+
+    if frm is None or pack_config.protect_sender_id:
+        anoncrypt_result = await anoncrypt(msg, to, pack_config.enc_alg_anon, resolvers_config)
+
+        msg = anoncrypt_result.msg
+        to_kids = anoncrypt_result.to_kids
+
     return PackEncryptedResult(
-        packed_msg="",
+        packed_msg=to_unicode(msg),
         service_metadata=ServiceMetadata("", ""),
-        from_kid="",
-        sign_from_kid="",
-        to_kids=[],
+        to_kids=to_kids,
+        from_kid=from_kid,
+        sign_from_kid=sign_from_kid
     )
 
 

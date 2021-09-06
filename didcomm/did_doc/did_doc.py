@@ -68,6 +68,16 @@ class DIDDoc(ABC):
         """
         pass
 
+    @abstractmethod
+    def get_verification_method(self, id: DID_URL) -> VerificationMethod:
+        """
+        Returns the verification method with the given identifier.
+
+        :param id: an identifier of a verification method
+        :return: the verification method or None of there is no one for the given identifier
+        """
+        pass
+
 
 @dataclass
 class VerificationMethod:
@@ -77,13 +87,13 @@ class VerificationMethod:
     See https://www.w3.org/TR/did-core/#verification-methods.
 
     Attributes:
-        id (str): verification method `id` field
+        id (DID_URL): verification method `id` field
         type (VerificationMethodType): verification method `type` field as VerificationMethodType enum
         controller (str): verification method `controller` field
         verification_material (VerificationMaterial): A verification material representing a public key
     """
 
-    id: str
+    id: DID_URL
     type: VerificationMethodType
     controller: str
     verification_material: VerificationMaterial
