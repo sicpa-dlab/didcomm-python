@@ -25,19 +25,18 @@ class ForwardResult:
 
 
 async def wrap_in_forward(
+    resolvers_config: ResolversConfig,
     packed_msg: Union[JSON_OBJ, JSON],
     routing_key_ids: List[DID_OR_DID_URL],
     forward_headers: Optional[List[Header]] = None,
-    resolvers_config: Optional[ResolversConfig] = None,
 ) -> JSON:
     """
     Wraps the given packed DIDComm message in Forward messages for every routing key.
 
+    :param resolvers_config: secrets and DIDDoc resolvers
     :param packed_msg: the message to be wrapped in Forward messages
     :param routing_key: a list of routing keys
     :param forward_headers: optional headers for Forward message
-    :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             `register_default_secrets_resolver` and `register_default_did_resolver`
 
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
     :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc
@@ -55,14 +54,13 @@ async def wrap_in_forward(
 
 
 async def unpack_forward(
-    packed_msg: JSON, resolvers_config: Optional[ResolversConfig] = None
+    resolvers_config: ResolversConfig, packed_msg: JSON
 ) -> ForwardResult:
     """
     Can be called by a Mediator who expects a Forward message to be unpacked
 
+    :param resolvers_config: secrets and DIDDoc resolvers
     :param packed_msg: a Forward message as JSON string to be unpacked
-    :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             'register_default_secrets_resolver' and 'register_default_did_resolver'
 
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
     :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc

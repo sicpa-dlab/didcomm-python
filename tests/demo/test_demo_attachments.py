@@ -26,14 +26,14 @@ async def test_demo_attachments(resolvers_config_alice, resolvers_config_bob):
         attachments=[attachment],
     )
     pack_result = await pack_encrypted(
+        resolvers_config=resolvers_config_alice,
         message=message,
         frm=ALICE_DID,
         to=BOB_DID,
-        resolvers_config=resolvers_config_alice,
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB
-    unpack_result = await unpack(packed_msg, resolvers_config=resolvers_config_bob)
+    unpack_result = await unpack(resolvers_config_bob, packed_msg)
     print(f"Got ${unpack_result.message}")

@@ -21,16 +21,16 @@ async def test_demo_repudiable_authentication_encryption(
         to=[BOB_DID],
     )
     pack_result = await pack_encrypted(
+        resolvers_config=resolvers_config_alice,
         message=message,
         frm=ALICE_DID,
         to=BOB_DID,
-        resolvers_config=resolvers_config_alice,
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB
-    unpack_result = await unpack(packed_msg, resolvers_config=resolvers_config_bob)
+    unpack_result = await unpack(resolvers_config_bob, packed_msg)
     print(f"Got ${unpack_result.message} message")
 
 
@@ -47,13 +47,13 @@ async def test_demo_repudiable_non_authenticated_encryption(
         to=[BOB_DID],
     )
     pack_result = await pack_encrypted(
-        message=message, to=BOB_DID, resolvers_config=resolvers_config_alice
+        resolvers_config=resolvers_config_alice, message=message, to=BOB_DID
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB
-    unpack_result = await unpack(packed_msg, resolvers_config=resolvers_config_bob)
+    unpack_result = await unpack(resolvers_config_bob, packed_msg)
     print(f"Got ${unpack_result.message} message")
 
 
@@ -70,17 +70,17 @@ async def test_demo_non_repudiable_encryption(
         to=[BOB_DID],
     )
     pack_result = await pack_encrypted(
+        resolvers_config=resolvers_config_alice,
         message=message,
         frm=ALICE_DID,
         sign_frm=ALICE_DID,
         to=BOB_DID,
-        resolvers_config=resolvers_config_alice,
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB
-    unpack_result = await unpack(packed_msg, resolvers_config=resolvers_config_bob)
+    unpack_result = await unpack(resolvers_config_bob, packed_msg)
     print(
         f"Got ${unpack_result.message} message signed as ${unpack_result.metadata.signed_message}"
     )
@@ -97,13 +97,13 @@ async def test_demo_signed_unencrypted(resolvers_config_alice, resolvers_config_
         to=[BOB_DID],
     )
     pack_result = await pack_signed(
-        message=message, sign_frm=ALICE_DID, resolvers_config=resolvers_config_alice
+        resolvers_config=resolvers_config_alice, message=message, sign_frm=ALICE_DID
     )
     packed_msg = pack_result.packed_msg
     print(f"Publishing ${packed_msg}")
 
     # BOB
-    unpack_result = await unpack(packed_msg, resolvers_config=resolvers_config_bob)
+    unpack_result = await unpack(resolvers_config_bob, packed_msg)
     print(
         f"Got ${unpack_result.message} message signed as ${unpack_result.metadata.signed_message}"
     )
@@ -120,10 +120,10 @@ async def test_demo_plaintext(resolvers_config_alice, resolvers_config_bob):
         to=[BOB_DID],
     )
     packed_msg = await pack_plaintext(
-        message=message, resolvers_config=resolvers_config_alice
+        resolvers_config=resolvers_config_alice, message=message
     )
     print(f"Publishing ${packed_msg}")
 
     # BOB
-    unpack_result = await unpack(packed_msg, resolvers_config=resolvers_config_bob)
+    unpack_result = await unpack(resolvers_config_bob, packed_msg)
     print(f"Got ${unpack_result.message} message")

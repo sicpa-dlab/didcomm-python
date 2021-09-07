@@ -6,7 +6,7 @@ from typing import Optional, List
 from authlib.common.encoding import json_loads, to_unicode, to_bytes
 
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
-from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
+from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JWS, JSON, DID_URL
 from didcomm.common.utils import parse_base64url_encoded_json
 from didcomm.core.anoncrypt import unwrap_anoncrypt
@@ -16,9 +16,9 @@ from didcomm.message import Message
 
 
 async def unpack(
+    resolvers_config: ResolversConfig,
     packed_msg: JSON,
     unpack_config: Optional[UnpackConfig] = None,
-    resolvers_config: Optional[ResolversConfig] = None,
 ) -> UnpackResult:
     """
     Unpacks the packed DIDComm message by doing decryption and verifying the signatures.
@@ -26,10 +26,9 @@ async def unpack(
     If unpack config expects the message to be packed in a particular way (for example that a message is encrypted)
     and the packed message doesn't meet the criteria (it's not encrypted), then `UnsatisfiedConstraintError` will be raised.
 
+    :param resolvers_config: secrets and DIDDoc resolvers
     :param packed_msg: packed DIDComm message as JSON string to be unpacked
     :param unpack_config: configuration for unpack. Default parameters are used if not specified.
-    :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             `register_default_secrets_resolver` and `register_default_did_resolver`
 
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
     :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc
@@ -40,8 +39,6 @@ async def unpack(
 
     :return: the message, metadata, and optionally a JWS if the message has been signed.
     """
-    resolvers_config = get_effective_resolvers(resolvers_config)
-
     msg = to_bytes(packed_msg)
     msg_as_dict = json_loads(packed_msg)
 

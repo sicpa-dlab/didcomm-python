@@ -6,7 +6,7 @@ from typing import Optional, List
 from authlib.common.encoding import json_dumps, to_bytes, to_unicode
 
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
-from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
+from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON, DID_OR_DID_URL
 from didcomm.common.utils import get_did
 from didcomm.core.anoncrypt import anoncrypt
@@ -16,13 +16,13 @@ from didcomm.message import Message, Header
 
 
 async def pack_encrypted(
+    resolvers_config: ResolversConfig,
     message: Message,
     to: DID_OR_DID_URL,
     frm: Optional[DID_OR_DID_URL] = None,
     sign_frm: Optional[DID_OR_DID_URL] = None,
     pack_config: Optional[PackEncryptedConfig] = None,
     pack_params: Optional[PackEncryptedParameters] = None,
-    resolvers_config: Optional[ResolversConfig] = None,
 ) -> PackEncryptedResult:
     """
     Produces `DIDComm Encrypted Message`
@@ -68,6 +68,7 @@ async def pack_encrypted(
           a private key in the _secrets resolver is found
         - If `sign_frm` is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
 
+    :param resolvers_config: secrets and DIDDoc resolvers
     :param message: The message to be packed into a DIDComm message
     :param to: A target DID or key ID the message will be encrypted for.
                Must match any of `to` header values in Message if the header is set.
@@ -79,8 +80,6 @@ async def pack_encrypted(
     :param pack_config: Configuration defining how pack needs to be done.
                         If not specified - default configuration is used.
     :param pack_params: Optional parameters for pack
-    :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             `register_default_secrets_resolver` and `register_default_did_resolver`
 
     :raises ValueError: If invalid input is provided. For example, if `frm` argument doesn't match `from` header in Message,
                         or `to` argument doesn't match any of `to` header values in Message.
@@ -104,8 +103,6 @@ async def pack_encrypted(
 
     if pack_params is None:
         pack_params = PackEncryptedParameters()
-
-    resolvers_config = get_effective_resolvers(resolvers_config)
 
     msg = to_bytes(json_dumps(message.as_dict()))
 

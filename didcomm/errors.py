@@ -8,14 +8,6 @@ class DIDCommError(Exception):
     pass
 
 
-class SecretsResolverNotProvidedError(DIDCommError):
-    pass
-
-
-class DIDResolverNotProvidedError(DIDCommError):
-    pass
-
-
 class DIDDocNotResolvedError(DIDCommError):
     pass
 
@@ -36,6 +28,7 @@ class MalformedMessageCode(Enum):
     CAN_NOT_DECRYPT = 1
     INVALID_SIGNATURE = 2
     INVALID_PLAINTEXT = 3
+    INVALID_MESSAGE = 4
 
 
 class MalformedMessageError(DIDCommError):
