@@ -5,7 +5,6 @@ from authlib.common.encoding import (
     to_bytes,
     to_unicode,
     urlsafe_b64encode,
-    json_dumps,
     urlsafe_b64decode,
 )
 from authlib.jose import JsonWebEncryption
@@ -17,6 +16,7 @@ from didcomm.core.keys.authcrypt_keys_selector import (
     find_authcrypt_pack_sender_and_recipient_keys,
     find_authcrypt_unpack_sender_and_recipient_keys,
 )
+from didcomm.core.serialization import dict_to_json_bytes
 from didcomm.core.types import EncryptResult, UnpackAuthcryptResult, Key
 from didcomm.core.utils import extract_key, get_jwe_alg
 from didcomm.core.validation import validate_authcrypt_jwe
@@ -32,7 +32,9 @@ def is_authcrypted(msg: dict) -> bool:
     return alg.startswith("ECDH-1PU")
 
 
-def authcrypt(msg: bytes, to: List[Key], frm: Key, alg: AuthCryptAlg) -> EncryptResult:
+def authcrypt(msg: dict, to: List[Key], frm: Key, alg: AuthCryptAlg) -> EncryptResult:
+    msg = dict_to_json_bytes(msg)
+
     skid = frm.kid
     kids = [to_key.kid for to_key in to]
     to_keys = [to_key.key for to_key in to]
@@ -41,13 +43,11 @@ def authcrypt(msg: bytes, to: List[Key], frm: Key, alg: AuthCryptAlg) -> Encrypt
     jwe = JsonWebEncryption()
     res = jwe.serialize_json(header_obj, msg, to_keys, sender_key=frm.key)
 
-    return EncryptResult(
-        msg=to_bytes(json_dumps(res)), to_kids=kids, to_keys=to, from_kid=skid
-    )
+    return EncryptResult(msg=res, to_kids=kids, to_keys=to, from_kid=skid)
 
 
 async def find_keys_and_authcrypt(
-    msg: bytes,
+    msg: dict,
     to: DID_OR_DID_URL,
     frm: DID_OR_DID_URL,
     alg: AuthCryptAlg,
@@ -92,19 +92,27 @@ async def unpack_authcrypt(
             res = jwe.deserialize_json(
                 msg, to_private_kid_and_key, sender_key=frm_public_key
             )
-
-            protected = res["header"]["protected"]
-            alg = AuthCryptAlg(Algs(alg=protected["alg"], enc=protected["enc"]))
-            unpack_res = UnpackAuthcryptResult(
-                msg=res["payload"], to_kids=to_kids, frm_kid=frm_kid, alg=alg
-            )
-            if not decrypt_by_all_keys:
-                return unpack_res
         except Exception as exc:
             if decrypt_by_all_keys:
                 raise MalformedMessageError(
                     MalformedMessageCode.CAN_NOT_DECRYPT
                 ) from exc
+            continue
+
+        if "payload" not in res:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        if "header" not in res or "protected" not in res["header"]:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        protected = res["header"]["protected"]
+        if "alg" not in protected or "enc" not in protected:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        alg = AuthCryptAlg(Algs(alg=protected["alg"], enc=protected["enc"]))
+
+        unpack_res = UnpackAuthcryptResult(
+            msg=res["payload"], to_kids=to_kids, frm_kid=frm_kid, alg=alg
+        )
+        if not decrypt_by_all_keys:
+            return unpack_res
 
     if unpack_res is None:
         raise MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT)

@@ -9,7 +9,6 @@ from didcomm.errors import (
     DIDUrlNotFoundError,
     SecretNotFoundError,
 )
-from didcomm.secrets.secrets_resolver import Secret
 
 
 async def find_anoncrypt_pack_recipient_public_keys(

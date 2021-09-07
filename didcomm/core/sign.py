@@ -1,10 +1,10 @@
-from authlib.common.encoding import json_dumps, to_bytes
 from authlib.jose import JsonWebSignature
 from authlib.jose.errors import BadSignatureError
 
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import DID_OR_DID_URL, DIDCommMessageTypes
 from didcomm.core.keys.sign_keys_selector import find_signing_key, find_verification_key
+from didcomm.core.serialization import dict_to_json_bytes
 from didcomm.core.types import SignResult, UnpackSignResult
 from didcomm.core.utils import extract_key, extract_sign_alg
 from didcomm.core.validation import validate_jws
@@ -16,8 +16,10 @@ def is_signed(msg: dict) -> bool:
 
 
 async def sign(
-    msg: bytes, sign_frm: DID_OR_DID_URL, resolvers_config: ResolversConfig
+    msg: dict, sign_frm: DID_OR_DID_URL, resolvers_config: ResolversConfig
 ) -> SignResult:
+    msg = dict_to_json_bytes(msg)
+
     jws = JsonWebSignature()
 
     secret = await find_signing_key(sign_frm, resolvers_config)
@@ -32,7 +34,7 @@ async def sign(
 
     res = jws.serialize_json(header_objs, msg, private_key)
 
-    return SignResult(msg=to_bytes(json_dumps(res)), sign_frm_kid=secret.kid)
+    return SignResult(msg=res, sign_frm_kid=secret.kid)
 
 
 async def unpack_sign(msg: dict, resolvers_config: ResolversConfig) -> UnpackSignResult:

@@ -15,13 +15,13 @@ class Key:
 
 @dataclass(frozen=True)
 class SignResult:
-    msg: bytes
+    msg: dict
     sign_frm_kid: DID_URL
 
 
 @dataclass(frozen=True)
 class EncryptResult:
-    msg: bytes
+    msg: dict
     to_kids: List[DID_OR_DID_URL]
     to_keys: List[Key]
     from_kid: Optional[DID_OR_DID_URL] = None

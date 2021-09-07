@@ -83,6 +83,16 @@ class Attachment:
     lastmod_time: Optional[int] = None
     byte_count: Optional[int] = None
 
+    def as_dict(self) -> dict:
+        d = dataclasses.asdict(self)
+        for k in set(d.keys()):
+            if d[k] is None:
+                del d[k]
+        for k in set(d.data.keys()):
+            if d[k] is None:
+                del d[k]
+        return d
+
 
 @dataclass(frozen=True)
 class AttachmentDataLinks:
@@ -115,3 +125,10 @@ class FromPrior:
     iat: Optional[int] = None
     jti: Optional[str] = None
     iss_kid: DID_URL = None
+
+    def as_dict(self) -> dict:
+        d = dataclasses.asdict(self)
+        for k in set(d.keys()):
+            if d[k] is None:
+                del d[k]
+        return d

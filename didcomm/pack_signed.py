@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from authlib.common.encoding import json_dumps, to_bytes, to_unicode
-
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON, DID_OR_DID_URL, DID_URL
+from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
 from didcomm.message import Message
 
@@ -47,12 +46,10 @@ async def pack_signed(
 
     :return: A packed message as a JSON string.
     """
-    msg = to_bytes(json_dumps(message.as_dict()))
-
-    sign_result = await sign(msg, sign_frm, resolvers_config)
-
+    sign_result = await sign(message.as_dict(), sign_frm, resolvers_config)
+    packed_msg = dict_to_json(sign_result.msg)
     return PackSignedResult(
-        packed_msg=to_unicode(sign_result.msg), sign_from_kid=sign_result.sign_frm_kid
+        packed_msg=packed_msg, sign_from_kid=sign_result.sign_frm_kid
     )
 
 

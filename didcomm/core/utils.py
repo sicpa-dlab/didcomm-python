@@ -12,6 +12,7 @@ from didcomm.common.types import (
     DID_URL,
     DID,
 )
+from didcomm.core.serialization import json_str_to_dict
 from didcomm.did_doc.did_doc import VerificationMethod
 from didcomm.errors import DIDCommValueError
 from didcomm.secrets.secrets_resolver import Secret
@@ -25,7 +26,7 @@ def extract_key(
         and verification_method.verification_material.format
         == VerificationMaterialFormat.JWK
     ):
-        jwk = json_loads(verification_method.verification_material.value)
+        jwk = json_str_to_dict(verification_method.verification_material.value)
         if jwk["kty"] == "EC":
             return ECKey.import_key(jwk)
         elif jwk["kty"] == "OKP":
@@ -46,7 +47,7 @@ def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> 
         and verification_method.verification_material.format
         == VerificationMaterialFormat.JWK
     ):
-        jwk = json_loads(verification_method.verification_material.value)
+        jwk = json_str_to_dict(verification_method.verification_material.value)
         if jwk["kty"] == "EC" and jwk["crv"] == "P-256":
             return SignAlg.ES256
         elif jwk["kty"] == "EC" and jwk["crv"] == "secp256k1":
@@ -96,8 +97,8 @@ def are_keys_compatible(
         and method1.verification_material.format == method2.verification_material.format
     ):
         if method1.verification_material.format == VerificationMaterialFormat.JWK:
-            private_jwk = json_loads(method1.verification_material.value)
-            public_jwk = json_loads(method2.verification_material.value)
+            private_jwk = json_str_to_dict(method1.verification_material.value)
+            public_jwk = json_str_to_dict(method2.verification_material.value)
             return (
                 private_jwk["kty"] == public_jwk["kty"]
                 and private_jwk["crv"] == public_jwk["crv"]
@@ -109,7 +110,7 @@ def are_keys_compatible(
 
 
 def parse_base64url_encoded_json(base64url):
-    return json_loads(to_unicode(urlsafe_b64decode(to_bytes(base64url))))
+    return json_str_to_dict(to_unicode(urlsafe_b64decode(to_bytes(base64url))))
 
 
 def get_jwe_alg(jwe: dict) -> Optional[str]:

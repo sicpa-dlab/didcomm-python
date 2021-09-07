@@ -3,15 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List
 
-from authlib.common.encoding import json_loads, to_unicode, to_bytes
+from authlib.common.encoding import to_unicode, to_bytes
 
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JWS, JSON, DID_URL
 from didcomm.core.anoncrypt import unpack_anoncrypt, is_anoncrypted
 from didcomm.core.authcrypt import is_authcrypted, unpack_authcrypt
+from didcomm.core.serialization import json_bytes_to_dict, json_str_to_dict
 from didcomm.core.sign import is_signed, unpack_sign
-from didcomm.errors import MalformedMessageError, MalformedMessageCode
 from didcomm.message import Message
 
 
@@ -42,10 +42,7 @@ async def unpack(
     unpack_config = unpack_config or UnpackConfig()
 
     msg = to_bytes(packed_msg)
-    try:
-        msg_as_dict = json_loads(packed_msg)
-    except Exception as exc:
-        raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE) from exc
+    msg_as_dict = json_str_to_dict(packed_msg)
 
     metadata = Metadata(
         encrypted=False,
@@ -60,9 +57,8 @@ async def unpack(
             resolvers_config,
             decrypt_by_all_keys=unpack_config.expect_decrypt_by_all_keys,
         )
-
         msg = unwrap_anoncrypt_result.msg
-        msg_as_dict = json_loads(to_unicode(msg))
+        msg_as_dict = json_bytes_to_dict(msg)
 
         metadata.encrypted = True
         metadata.anonymous_sender = True
@@ -75,9 +71,8 @@ async def unpack(
             resolvers_config,
             decrypt_by_all_keys=unpack_config.expect_decrypt_by_all_keys,
         )
-
         msg = unwrap_authcrypt_result.msg
-        msg_as_dict = json_loads(to_unicode(msg))
+        msg_as_dict = json_bytes_to_dict(msg)
 
         metadata.encrypted = True
         metadata.authenticated = True
@@ -88,9 +83,8 @@ async def unpack(
     if is_signed(msg_as_dict):
         unwrap_sign_result = await unpack_sign(msg_as_dict, resolvers_config)
         metadata.signed_message = to_unicode(msg)
-
         msg = unwrap_sign_result.msg
-        msg_as_dict = json_loads(to_unicode(msg))
+        msg_as_dict = json_bytes_to_dict(msg)
 
         metadata.non_repudiation = True
         metadata.sign_from = unwrap_sign_result.sign_frm_kid

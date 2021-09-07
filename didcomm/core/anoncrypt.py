@@ -1,7 +1,7 @@
 import hashlib
 from typing import List
 
-from authlib.common.encoding import to_bytes, to_unicode, urlsafe_b64encode, json_dumps
+from authlib.common.encoding import to_bytes, to_unicode, urlsafe_b64encode
 from authlib.jose import JsonWebEncryption
 
 from didcomm.common.algorithms import AnonCryptAlg, Algs
@@ -11,6 +11,7 @@ from didcomm.core.keys.anoncrypt_keys_selector import (
     find_anoncrypt_pack_recipient_public_keys,
     find_anoncrypt_unpack_recipient_private_keys,
 )
+from didcomm.core.serialization import dict_to_json_bytes
 from didcomm.core.types import EncryptResult, UnpackAnoncryptResult, Key
 from didcomm.core.utils import extract_key, get_jwe_alg
 from didcomm.core.validation import validate_anoncrypt_jwe
@@ -26,7 +27,9 @@ def is_anoncrypted(msg: dict) -> bool:
     return alg.startswith("ECDH-ES")
 
 
-def anoncrypt(msg: bytes, to: List[Key], alg: AnonCryptAlg) -> EncryptResult:
+def anoncrypt(msg: dict, to: List[Key], alg: AnonCryptAlg) -> EncryptResult:
+    msg = dict_to_json_bytes(msg)
+
     kids = [to_key.kid for to_key in to]
     keys = [to_key.key for to_key in to]
 
@@ -35,11 +38,11 @@ def anoncrypt(msg: bytes, to: List[Key], alg: AnonCryptAlg) -> EncryptResult:
     jwe = JsonWebEncryption()
     res = jwe.serialize_json(header_obj, msg, keys)
 
-    return EncryptResult(msg=to_bytes(json_dumps(res)), to_kids=kids, to_keys=to)
+    return EncryptResult(msg=res, to_kids=kids, to_keys=to)
 
 
 async def find_keys_and_anoncrypt(
-    msg: bytes, to: DID_OR_DID_URL, alg: AnonCryptAlg, resolvers_config: ResolversConfig
+    msg: dict, to: DID_OR_DID_URL, alg: AnonCryptAlg, resolvers_config: ResolversConfig
 ) -> EncryptResult:
     to_verification_methods = await find_anoncrypt_pack_recipient_public_keys(
         to, resolvers_config
@@ -65,19 +68,25 @@ async def unpack_anoncrypt(
         try:
             jwe = JsonWebEncryption()
             res = jwe.deserialize_json(msg, to_private_kid_and_key)
-            protected = res["header"]["protected"]
-            alg = AnonCryptAlg(Algs(alg=protected["alg"], enc=protected["enc"]))
-
-            unpack_res = UnpackAnoncryptResult(
-                msg=res["payload"], to_kids=to_kids, alg=alg
-            )
-            if not decrypt_by_all_keys:
-                return unpack_res
         except Exception as exc:
             if decrypt_by_all_keys:
                 raise MalformedMessageError(
                     MalformedMessageCode.CAN_NOT_DECRYPT
                 ) from exc
+            continue
+
+        if "payload" not in res:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        if "header" not in res or "protected" not in res["header"]:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        protected = res["header"]["protected"]
+        if "alg" not in protected or "enc" not in protected:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        alg = AnonCryptAlg(Algs(alg=protected["alg"], enc=protected["enc"]))
+
+        unpack_res = UnpackAnoncryptResult(msg=res["payload"], to_kids=to_kids, alg=alg)
+        if not decrypt_by_all_keys:
+            return unpack_res
 
     if unpack_res is None:
         raise MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT)

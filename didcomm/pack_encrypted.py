@@ -3,13 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List
 
-from authlib.common.encoding import json_dumps, to_bytes, to_unicode
-
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON, DID_OR_DID_URL
 from didcomm.core.anoncrypt import anoncrypt, find_keys_and_anoncrypt
 from didcomm.core.authcrypt import find_keys_and_authcrypt
+from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
 from didcomm.core.types import EncryptResult, SignResult
 from didcomm.core.utils import get_did
@@ -101,16 +100,16 @@ async def pack_encrypted(
     # 1. validate message
     _validate(message, to, frm)
 
-    # 2. message to bytes
-    msg = to_bytes(json_dumps(message.as_dict()))
+    # 2. message as dict
+    msg_as_dict = message.as_dict()
 
     # 3. sign if needed
-    sign_res = await __sign_if_needed(resolvers_config, msg, sign_frm)
+    sign_res = await __sign_if_needed(resolvers_config, msg_as_dict, sign_frm)
 
     # 4. encrypt
     encrypt_res = await __encrypt(
         resolvers_config,
-        msg=sign_res.msg if sign_res else msg,
+        msg=sign_res.msg if sign_res else msg_as_dict,
         to=to,
         frm=frm,
         pack_config=pack_config,
@@ -122,10 +121,11 @@ async def pack_encrypted(
     # 6. do forward if needed
     await __forward_if_needed()  # TBD
 
+    packed_msg = dict_to_json(
+        encrypt_res_protected.msg if encrypt_res_protected else encrypt_res.msg
+    )
     return PackEncryptedResult(
-        packed_msg=to_unicode(
-            encrypt_res_protected.msg if encrypt_res_protected else encrypt_res.msg
-        ),
+        packed_msg=packed_msg,
         service_metadata=ServiceMetadata("", ""),
         to_kids=encrypt_res.to_kids,
         from_kid=encrypt_res.from_kid,
@@ -215,7 +215,7 @@ def _validate(
 
 async def __sign_if_needed(
     resolvers_config: ResolversConfig,
-    msg: bytes,
+    msg: dict,
     sign_frm: Optional[DID_OR_DID_URL] = None,
 ) -> Optional[SignResult]:
     if sign_frm is None:
@@ -225,7 +225,7 @@ async def __sign_if_needed(
 
 async def __encrypt(
     resolvers_config: ResolversConfig,
-    msg: bytes,
+    msg: dict,
     to: DID_OR_DID_URL,
     frm: Optional[DID_OR_DID_URL] = None,
     pack_config: Optional[PackEncryptedConfig] = None,
