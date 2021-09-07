@@ -43,6 +43,7 @@ async def unpack_sign(msg: dict, resolvers_config: ResolversConfig) -> UnpackSig
         sign_frm_kid, resolvers_config
     )
     public_key = extract_key(sign_frm_verification_method)
+    alg = extract_sign_alg(sign_frm_verification_method)
 
     try:
         jws = JsonWebSignature()
@@ -52,5 +53,4 @@ async def unpack_sign(msg: dict, resolvers_config: ResolversConfig) -> UnpackSig
     except Exception as exc:
         raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE) from exc
 
-    alg = extract_sign_alg(sign_frm_verification_method)
     return UnpackSignResult(msg=jws_object.payload, sign_frm_kid=sign_frm_kid, alg=alg)

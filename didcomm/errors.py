@@ -1,10 +1,11 @@
 from enum import Enum
 
 
-# TODO: finalize exceptions during development
-
-
 class DIDCommError(Exception):
+    pass
+
+
+class DIDCommValueError(DIDCommError):
     pass
 
 

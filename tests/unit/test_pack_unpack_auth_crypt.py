@@ -11,7 +11,8 @@ from tests.test_vectors.test_vectors_auth_encrypted import (
 from tests.test_vectors.test_vectors_common import (
     TEST_MESSAGE,
     BOB_DID,
-    ALICE_DID, TestVector,
+    ALICE_DID,
+    TestVector,
 )
 from tests.unit.common import unpack_test_vector, decode_jwe_headers, remove_signed_msg
 
@@ -39,49 +40,60 @@ async def test_unpack_authcrypt_signed_p521(resolvers_config_bob):
 
 @pytest.mark.asyncio
 async def test_pack_authcrypt_sender_as_did_recipient_as_did(
-        resolvers_config_alice, resolvers_config_bob
+    resolvers_config_alice, resolvers_config_bob
 ):
     await check_pack_authcrypt(
-        frm=ALICE_DID, to=BOB_DID, sign_frm=None,
+        frm=ALICE_DID,
+        to=BOB_DID,
+        sign_frm=None,
         pack_config=PackEncryptedConfig(forward=False),
         test_vector=TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH[0],
-        resolvers_config_alice=resolvers_config_alice, resolvers_config_bob=resolvers_config_bob
+        resolvers_config_alice=resolvers_config_alice,
+        resolvers_config_bob=resolvers_config_bob,
     )
 
 
 @pytest.mark.asyncio
 async def test_pack_authcrypt_signed_sender_as_kid_recipient_as_did(
-        resolvers_config_alice, resolvers_config_bob
+    resolvers_config_alice, resolvers_config_bob
 ):
     test_vector = TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH[1]
     await check_pack_authcrypt(
-        frm=test_vector.metadata.encrypted_from, to=BOB_DID, sign_frm=ALICE_DID,
+        frm=test_vector.metadata.encrypted_from,
+        to=BOB_DID,
+        sign_frm=ALICE_DID,
         pack_config=PackEncryptedConfig(forward=False),
         test_vector=test_vector,
-        resolvers_config_alice=resolvers_config_alice, resolvers_config_bob=resolvers_config_bob
+        resolvers_config_alice=resolvers_config_alice,
+        resolvers_config_bob=resolvers_config_bob,
     )
 
 
 @pytest.mark.asyncio
 async def test_pack_authcrypt_signed_protect_sender_sender_as_kid_recipient_as_did(
-        resolvers_config_alice, resolvers_config_bob
+    resolvers_config_alice, resolvers_config_bob
 ):
     test_vector = TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH[2]
     await check_pack_authcrypt(
-        frm=test_vector.metadata.encrypted_from, to=BOB_DID, sign_frm=test_vector.metadata.sign_from,
+        frm=test_vector.metadata.encrypted_from,
+        to=BOB_DID,
+        sign_frm=test_vector.metadata.sign_from,
         pack_config=PackEncryptedConfig(protect_sender_id=True, forward=False),
         test_vector=test_vector,
-        resolvers_config_alice=resolvers_config_alice, resolvers_config_bob=resolvers_config_bob
+        resolvers_config_alice=resolvers_config_alice,
+        resolvers_config_bob=resolvers_config_bob,
     )
 
 
 async def check_pack_authcrypt(
-        frm: DID_OR_DID_URL,
-        to: DID_OR_DID_URL,
-        sign_frm: Optional[DID_OR_DID_URL],
-        pack_config: PackEncryptedConfig,
-        test_vector: TestVector,
-        resolvers_config_alice, resolvers_config_bob):
+    frm: DID_OR_DID_URL,
+    to: DID_OR_DID_URL,
+    sign_frm: Optional[DID_OR_DID_URL],
+    pack_config: PackEncryptedConfig,
+    test_vector: TestVector,
+    resolvers_config_alice,
+    resolvers_config_bob,
+):
     expected_metadata = test_vector.metadata
     pack_result = await pack_encrypted(
         resolvers_config_alice,

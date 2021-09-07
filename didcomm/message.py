@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Optional, List, Union, Dict, TypeVar, Generic
 
 from didcomm.common.types import JSON_VALUE, DID, DID_URL, JSON_OBJ, DIDCommMessageTypes
+from didcomm.errors import MalformedMessageError, MalformedMessageCode
 
 Header = Dict[str, JSON_VALUE]
 T = TypeVar("T")
@@ -52,7 +53,18 @@ class GenericMessage(Generic[T]):
             d["frm"] = d["from"]
             del d["from"]
         del d["typ"]
-        return Message(**d)
+        msg = Message(**d)
+
+        # TODO: consider using attrs lib and its validators
+        if msg.id is None:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+        if msg.type is None:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+        if msg.body is None:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+        # TODO: more validation
+
+        return msg
 
 
 Message = GenericMessage[JSON_OBJ]

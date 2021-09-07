@@ -96,7 +96,6 @@ async def unpack(
         metadata.sign_from = unwrap_sign_result.sign_frm_kid
         metadata.sign_alg = unwrap_sign_result.alg
 
-    # TODO: Validate `msg_as_dict` structure
     message = Message.from_dict(msg_as_dict)
 
     return UnpackResult(message=message, metadata=metadata)

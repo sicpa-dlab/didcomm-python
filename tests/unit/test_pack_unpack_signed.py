@@ -30,36 +30,52 @@ async def test_unpack_signed_es256k(resolvers_config_bob):
 @pytest.mark.asyncio
 async def test_pack_signed_by_did(resolvers_config_alice, resolvers_config_bob):
     await check_pack_signed(
-        ALICE_DID, TEST_SIGNED_DIDCOMM_MESSAGE[0],
-        resolvers_config_alice, resolvers_config_bob)
+        ALICE_DID,
+        TEST_SIGNED_DIDCOMM_MESSAGE[0],
+        resolvers_config_alice,
+        resolvers_config_bob,
+    )
 
 
 @pytest.mark.asyncio
 async def test_pack_signed_by_kid_ed25519(resolvers_config_alice, resolvers_config_bob):
     test_vector = TEST_SIGNED_DIDCOMM_MESSAGE[0]
     await check_pack_signed(
-        test_vector.metadata.sign_from, test_vector,
-        resolvers_config_alice, resolvers_config_bob)
+        test_vector.metadata.sign_from,
+        test_vector,
+        resolvers_config_alice,
+        resolvers_config_bob,
+    )
 
 
 @pytest.mark.asyncio
 async def test_pack_signed_by_kid_es256(resolvers_config_alice, resolvers_config_bob):
     test_vector = TEST_SIGNED_DIDCOMM_MESSAGE[1]
     await check_pack_signed(
-        test_vector.metadata.sign_from, test_vector,
-        resolvers_config_alice, resolvers_config_bob)
+        test_vector.metadata.sign_from,
+        test_vector,
+        resolvers_config_alice,
+        resolvers_config_bob,
+    )
 
 
 @pytest.mark.asyncio
 async def test_pack_signed_by_kid_es256k(resolvers_config_alice, resolvers_config_bob):
     test_vector = TEST_SIGNED_DIDCOMM_MESSAGE[2]
     await check_pack_signed(
-        test_vector.metadata.sign_from, test_vector,
-        resolvers_config_alice, resolvers_config_bob)
+        test_vector.metadata.sign_from,
+        test_vector,
+        resolvers_config_alice,
+        resolvers_config_bob,
+    )
 
 
-async def check_pack_signed(sign_frm: DID_OR_DID_URL, test_vector: TestVector, resolvers_config_alice,
-                            resolvers_config_bob):
+async def check_pack_signed(
+    sign_frm: DID_OR_DID_URL,
+    test_vector: TestVector,
+    resolvers_config_alice,
+    resolvers_config_bob,
+):
     expected_packed_msg = test_vector.value
     expected_metadata = copy.deepcopy(test_vector.metadata)
 

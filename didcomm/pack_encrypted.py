@@ -13,6 +13,7 @@ from didcomm.core.authcrypt import find_keys_and_authcrypt
 from didcomm.core.sign import sign
 from didcomm.core.types import EncryptResult, SignResult
 from didcomm.core.utils import get_did
+from didcomm.errors import DIDCommValueError
 from didcomm.message import Message, Header
 
 
@@ -82,8 +83,8 @@ async def pack_encrypted(
                         If not specified - default configuration is used.
     :param pack_params: Optional parameters for pack
 
-    :raises ValueError: If invalid input is provided. For example, if `frm` argument doesn't match `from` header in Message,
-                        or `to` argument doesn't match any of `to` header values in Message.
+    :raises DIDCommValueError: If invalid input is provided. For example, if `frm` argument doesn't match `from` header in Message,
+                               or `to` argument doesn't match any of `to` header values in Message.
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
     :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc
     :raises SecretNotFoundError: If there is no secret for the given DID or DID URL (key ID)
@@ -206,10 +207,10 @@ def _validate(
     message: Message, to: DID_OR_DID_URL, frm: Optional[DID_OR_DID_URL] = None
 ):
     if message.to is not None and get_did(to) not in message.to:
-        raise ValueError()
+        raise DIDCommValueError()
 
     if frm is not None and message.frm is not None and get_did(frm) != message.frm:
-        raise ValueError()
+        raise DIDCommValueError()
 
 
 async def __sign_if_needed(

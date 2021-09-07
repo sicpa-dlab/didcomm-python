@@ -13,6 +13,7 @@ from didcomm.common.types import (
     DID,
 )
 from didcomm.did_doc.did_doc import VerificationMethod
+from didcomm.errors import DIDCommValueError
 from didcomm.secrets.secrets_resolver import Secret
 
 
@@ -20,7 +21,8 @@ def extract_key(
     verification_method: Union[VerificationMethod, Secret]
 ) -> AsymmetricKey:
     if (
-        verification_method.verification_material.format
+        verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020
+        and verification_method.verification_material.format
         == VerificationMaterialFormat.JWK
     ):
         jwk = json_loads(verification_method.verification_material.value)
@@ -28,12 +30,14 @@ def extract_key(
             return ECKey.import_key(jwk)
         elif jwk["kty"] == "OKP":
             return OKPKey.import_key(jwk)
-        else:
-            # FIXME
-            raise NotImplementedError()
-    else:
+        raise DIDCommValueError()
+    elif (
+        verification_method.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018
+    ):
         # FIXME
         raise NotImplementedError()
+
+    raise DIDCommValueError()
 
 
 def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> SignAlg:
@@ -49,21 +53,21 @@ def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> 
             return SignAlg.ES256K
         elif jwk["kty"] == "OKP" and jwk["crv"] == "Ed25519":
             return SignAlg.ED25519
-        else:
-            # FIXME
-            raise NotImplementedError()
+
+        raise DIDCommValueError()
+
     elif (
         verification_method.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018
     ):
         return SignAlg.ED25519
+
     elif (
         verification_method.type
         == VerificationMethodType.ECDSA_SECP_256K1_VERIFICATION_KEY_2019
     ):
         return SignAlg.ES256K
-    else:
-        # FIXME
-        raise NotImplementedError()
+
+    raise DIDCommValueError()
 
 
 def is_did_url(did_or_did_url: DID_OR_DID_URL) -> bool:

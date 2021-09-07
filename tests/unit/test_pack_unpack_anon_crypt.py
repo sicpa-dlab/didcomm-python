@@ -33,19 +33,22 @@ async def test_unpack_anoncrypt_a256gcm(resolvers_config_bob):
 
 @pytest.mark.asyncio
 async def test_pack_anoncrypt_recipient_as_did(
-        resolvers_config_alice, resolvers_config_bob
+    resolvers_config_alice, resolvers_config_bob
 ):
     await check_pack_anoncrypt(
         to=BOB_DID,
         test_vector=TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON[0],
-        resolvers_config_alice=resolvers_config_alice, resolvers_config_bob=resolvers_config_bob
+        resolvers_config_alice=resolvers_config_alice,
+        resolvers_config_bob=resolvers_config_bob,
     )
 
 
 async def check_pack_anoncrypt(
-        to: DID_OR_DID_URL,
-        test_vector: TestVector,
-        resolvers_config_alice, resolvers_config_bob):
+    to: DID_OR_DID_URL,
+    test_vector: TestVector,
+    resolvers_config_alice,
+    resolvers_config_bob,
+):
     expected_metadata = test_vector.metadata
     pack_result = await pack_encrypted(
         resolvers_config_alice,

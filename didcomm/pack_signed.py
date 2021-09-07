@@ -43,6 +43,7 @@ async def pack_signed(
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
     :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc
     :raises SecretNotFoundError: If there is no secret for the given DID or DID URL (key ID)
+    :raises DIDCommValueError: If invalid input is provided.
 
     :return: A packed message as a JSON string.
     """
