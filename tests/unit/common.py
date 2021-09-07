@@ -1,6 +1,6 @@
 from authlib.common.encoding import json_loads
 
-from didcomm.common.utils import parse_base64url_encoded_json
+from didcomm.core.utils import parse_base64url_encoded_json
 from didcomm.unpack import unpack
 from tests.test_vectors.test_vectors_common import TestVector, TEST_MESSAGE
 

@@ -8,21 +8,22 @@ from authlib.common.encoding import json_dumps, to_bytes, to_unicode
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON, DID_OR_DID_URL
-from didcomm.common.utils import get_did
-from didcomm.core.anoncrypt import anoncrypt
-from didcomm.core.authcrypt import authcrypt
+from didcomm.core.anoncrypt import anoncrypt, find_keys_and_anoncrypt
+from didcomm.core.authcrypt import find_keys_and_authcrypt
 from didcomm.core.sign import sign
+from didcomm.core.types import EncryptResult, SignResult
+from didcomm.core.utils import get_did
 from didcomm.message import Message, Header
 
 
 async def pack_encrypted(
-    resolvers_config: ResolversConfig,
-    message: Message,
-    to: DID_OR_DID_URL,
-    frm: Optional[DID_OR_DID_URL] = None,
-    sign_frm: Optional[DID_OR_DID_URL] = None,
-    pack_config: Optional[PackEncryptedConfig] = None,
-    pack_params: Optional[PackEncryptedParameters] = None,
+        resolvers_config: ResolversConfig,
+        message: Message,
+        to: DID_OR_DID_URL,
+        frm: Optional[DID_OR_DID_URL] = None,
+        sign_frm: Optional[DID_OR_DID_URL] = None,
+        pack_config: Optional[PackEncryptedConfig] = None,
+        pack_params: Optional[PackEncryptedParameters] = None,
 ) -> PackEncryptedResult:
     """
     Produces `DIDComm Encrypted Message`
@@ -92,53 +93,38 @@ async def pack_encrypted(
     :return: A pack result consisting of a packed message as a JSON string
              and an optional service metadata with an endpoint to be used to transport the packed message.
     """
-    if message.to is not None and get_did(to) not in message.to:
-        raise ValueError()
 
-    if frm is not None and message.frm is not None and get_did(frm) != message.frm:
-        raise ValueError()
+    pack_config = pack_config or PackEncryptedConfig()
+    pack_params = pack_params or PackEncryptedParameters()
 
-    if pack_config is None:
-        pack_config = PackEncryptedConfig()
+    # 1. validate message
+    _validate(message, to, frm)
 
-    if pack_params is None:
-        pack_params = PackEncryptedParameters()
-
+    # 2. message to bytes
     msg = to_bytes(json_dumps(message.as_dict()))
 
-    to_kids = []
-    from_kid = None
-    sign_from_kid = None
+    # 3. sign if needed
+    sign_res = await __sign_if_needed(resolvers_config, msg, sign_frm)
 
-    if sign_frm is not None:
-        sign_result = await sign(msg, sign_frm, resolvers_config)
+    # 4. encrypt
+    encrypt_res = await __encrypt(
+        resolvers_config,
+        msg=sign_res.msg if sign_res else msg,
+        to=to, frm=frm, pack_config=pack_config
+    )
 
-        msg = sign_result.msg
-        sign_from_kid = sign_result.sign_frm_kid
+    # 5. protected sender ID if needed
+    encrypt_res_protected = __protected_sender_id_if_needed(encrypt_res, pack_config)
 
-    if frm is not None:
-        authcrypt_result = await authcrypt(
-            msg, to, frm, pack_config.enc_alg_auth, resolvers_config
-        )
-
-        msg = authcrypt_result.msg
-        to_kids = authcrypt_result.to_kids
-        from_kid = authcrypt_result.from_kid
-
-    if frm is None or pack_config.protect_sender_id:
-        anoncrypt_result = await anoncrypt(
-            msg, to, pack_config.enc_alg_anon, resolvers_config
-        )
-
-        msg = anoncrypt_result.msg
-        to_kids = anoncrypt_result.to_kids
+    # 6. do forward if needed
+    await __forward_if_needed()  # TBD
 
     return PackEncryptedResult(
-        packed_msg=to_unicode(msg),
+        packed_msg=to_unicode(encrypt_res_protected.msg if encrypt_res_protected else encrypt_res.msg),
         service_metadata=ServiceMetadata("", ""),
-        to_kids=to_kids,
-        from_kid=from_kid,
-        sign_from_kid=sign_from_kid,
+        to_kids=encrypt_res.to_kids,
+        from_kid=encrypt_res.from_kid,
+        sign_from_kid=sign_res.sign_frm_kid if sign_res else None
     )
 
 
@@ -210,3 +196,47 @@ class PackEncryptedParameters:
 
     forward_headers: Optional[List[Header]] = None
     forward_service_id: Optional[str] = None
+
+
+def _validate(message: Message, to: DID_OR_DID_URL, frm: Optional[DID_OR_DID_URL] = None):
+    if message.to is not None and get_did(to) not in message.to:
+        raise ValueError()
+
+    if frm is not None and message.frm is not None and get_did(frm) != message.frm:
+        raise ValueError()
+
+
+async def __sign_if_needed(resolvers_config: ResolversConfig,
+                           msg: bytes,
+                           sign_frm: Optional[DID_OR_DID_URL] = None) -> Optional[SignResult]:
+    if sign_frm is None:
+        return None
+    return await sign(msg, sign_frm, resolvers_config)
+
+
+async def __encrypt(resolvers_config: ResolversConfig,
+                    msg: bytes,
+                    to: DID_OR_DID_URL,
+                    frm: Optional[DID_OR_DID_URL] = None,
+                    pack_config: Optional[PackEncryptedConfig] = None) -> EncryptResult:
+    if frm is not None:
+        return await find_keys_and_authcrypt(
+            msg, to, frm, pack_config.enc_alg_auth, resolvers_config
+        )
+    return await find_keys_and_anoncrypt(
+        msg, to, pack_config.enc_alg_anon, resolvers_config
+    )
+
+
+def __protected_sender_id_if_needed(
+        encrypt_result: EncryptResult,
+        pack_config: Optional[PackEncryptedConfig] = None
+) -> Optional[EncryptResult]:
+    if encrypt_result.from_kid is None or not pack_config.protect_sender_id:
+        return None
+    return anoncrypt(encrypt_result.msg, encrypt_result.to_keys, pack_config.enc_alg_anon)
+
+
+async def __forward_if_needed():
+    # TBD
+    pass

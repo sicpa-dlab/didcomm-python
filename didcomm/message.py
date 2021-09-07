@@ -4,7 +4,7 @@ import dataclasses
 from dataclasses import dataclass
 from typing import Optional, List, Union, Dict, TypeVar, Generic
 
-from didcomm.common.types import JSON_VALUE, DID, DID_URL, JSON_OBJ
+from didcomm.common.types import JSON_VALUE, DID, DID_URL, JSON_OBJ, DIDCommMessageTypes
 
 Header = Dict[str, JSON_VALUE]
 T = TypeVar("T")
@@ -23,7 +23,6 @@ class GenericMessage(Generic[T]):
     id: str
     type: str
     body: T
-    typ: str = "application/didcomm-plain+json"
     frm: Optional[DID] = None
     to: Optional[List[DID]] = None
     created_time: Optional[int] = None
@@ -44,6 +43,7 @@ class GenericMessage(Generic[T]):
         if "frm" in d:
             d["from"] = d["frm"]
             del d["frm"]
+        d["typ"] = DIDCommMessageTypes.PLAINTEXT.value
         return d
 
     @staticmethod
@@ -51,6 +51,7 @@ class GenericMessage(Generic[T]):
         if "from" in d:
             d["frm"] = d["from"]
             del d["from"]
+        del d["typ"]
         return Message(**d)
 
 

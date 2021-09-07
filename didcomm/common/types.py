@@ -33,3 +33,9 @@ class VerificationMaterialFormat(Enum):
 class VerificationMaterial:
     format: VerificationMaterialFormat
     value: str
+
+
+class DIDCommMessageTypes(Enum):
+    ENCRYPTED = "application/didcomm-encrypted+json"
+    SIGNED = "application/didcomm-signed+json"
+    PLAINTEXT = "application/didcomm-plain+json"
