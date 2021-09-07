@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Optional
 
 from didcomm.common.resolvers import ResolversConfig
@@ -34,4 +35,4 @@ async def pack_plaintext(
 
     :return: A packed message as a JSON string.
     """
-    return ""
+    return json.dumps(message.as_dict())

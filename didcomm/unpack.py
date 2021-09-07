@@ -49,11 +49,12 @@ async def unpack(
         encrypted=False,
         authenticated=False,
         non_repudiation=False,
-        anonymous_sender=False
+        anonymous_sender=False,
     )
 
-    if 'ciphertext' in msg_as_dict and \
-            parse_base64url_encoded_json(msg_as_dict['protected'])['alg'].startswith('ECDH-ES'):
+    if "ciphertext" in msg_as_dict and parse_base64url_encoded_json(
+        msg_as_dict["protected"]
+    )["alg"].startswith("ECDH-ES"):
 
         unwrap_anoncrypt_result = await unwrap_anoncrypt(msg_as_dict, resolvers_config)
 
@@ -65,8 +66,9 @@ async def unpack(
         metadata.encrypted_to = unwrap_anoncrypt_result.to_kids
         metadata.enc_alg_anon = unwrap_anoncrypt_result.alg
 
-    if 'ciphertext' in msg_as_dict and \
-            parse_base64url_encoded_json(msg_as_dict['protected'])['alg'].startswith('ECDH-1PU'):
+    if "ciphertext" in msg_as_dict and parse_base64url_encoded_json(
+        msg_as_dict["protected"]
+    )["alg"].startswith("ECDH-1PU"):
 
         unwrap_authcrypt_result = await unwrap_authcrypt(msg_as_dict, resolvers_config)
 
@@ -79,7 +81,7 @@ async def unpack(
         metadata.encrypted_to = unwrap_authcrypt_result.to_kids
         metadata.enc_alg_auth = unwrap_authcrypt_result.alg
 
-    if 'payload' in msg_as_dict:
+    if "payload" in msg_as_dict:
         unwrap_sign_result = await unwrap_sign(msg_as_dict, resolvers_config)
         metadata.signed_message = to_unicode(msg)
 
@@ -93,10 +95,7 @@ async def unpack(
     # TODO: Validate `msg_as_dict` structure
     message = Message.from_dict(msg_as_dict)
 
-    return UnpackResult(
-        message=message,
-        metadata=metadata
-    )
+    return UnpackResult(message=message, metadata=metadata)
 
 
 @dataclass(frozen=True)

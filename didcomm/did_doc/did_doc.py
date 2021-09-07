@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 from didcomm.common.types import (
     DID_URL,
@@ -12,71 +11,41 @@ from didcomm.common.types import (
 )
 
 
-class DIDDoc(ABC):
-    """DID DOC abstraction (https://www.w3.org/TR/did-core/#dfn-did-documents)"""
+@dataclass
+class DIDDoc:
+    """
+    DID DOC abstraction (https://www.w3.org/TR/did-core/#dfn-did-documents)
+    Attributes:
+        did (str): a DID for the given DID Doc
+        key_agreement_kids(List[str]): Key IDs (DID URLs) of all verification methods from the 'keyAgreement' verification relationship in this DID DOC.
+                                       See https://www.w3.org/TR/did-core/#verification-methods.
+        authentication_kids(List[str]): Key IDs (DID URLs) of all verification methods from the 'authentication' verification relationship in this DID DOC.
+                                        See https://www.w3.org/TR/did-core/#authentication.
+        verification_methods(List[VerificationMethod): All local verification methods including embedded to key agreement and authentication sections.
+                                                       See https://www.w3.org/TR/did-core/#verification-methods.
+        didcomm_services(List[DIDCommService]): All services of 'DIDCommMessaging' type in this DID DOC.
+                                                Empty list is returned if there are no services of 'DIDCommMessaging' type.
+                                                See https://www.w3.org/TR/did-core/#services and
+                                                https://identity.foundation/didcomm-messaging/spec/#did-document-service-endpoint.
+    """
 
-    @property
-    @abstractmethod
-    def did(self) -> DID:
-        """
-        :return: a DID for the given DID Doc
-        """
-        pass
+    did: DID
+    key_agreement_kids: List[DID_URL]
+    authentication_kids: List[DID_URL]
+    verification_methods: List[VerificationMethod]
+    didcomm_services: List[DIDCommService]
 
-    @property
-    @abstractmethod
-    def key_agreement_kids(self) -> List[DID_URL]:
-        """
-        Key IDs (DID URLs) of all verification methods from the 'keyAgreement' verification relationship in this DID DOC.
-        See https://www.w3.org/TR/did-core/#verification-methods.
-
-        :return: a possibly empty list of key ID of all 'keyAgreement' verification methods
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def authentication_kids(self) -> List[DID_URL]:
-        """
-        Key IDs (DID URLs) of all verification methods from the 'authentication' verification relationship in this DID DOC.
-        See https://www.w3.org/TR/did-core/#authentication.
-
-        :return: a possibly empty list of key ID of all 'authentication' verification methods
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def verification_methods(self) -> List[VerificationMethod]:
-        """
-        Returns all local verification methods including embedded to key agreement and authentication sections.
-        See https://www.w3.org/TR/did-core/#verification-methods.
-
-        :return: a list of verification method instances
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def didcomm_services(self) -> List[DIDCommService]:
-        """
-        All services of 'DIDCommMessaging' type in this DID DOC.
-        Empty list is returned if there are no services of 'DIDCommMessaging' type.
-        See https://www.w3.org/TR/did-core/#services and https://identity.foundation/didcomm-messaging/spec/#did-document-service-endpoint.
-
-        :return: a possibly empty list of 'DIDCommMessaging' type services
-        """
-        pass
-
-    @abstractmethod
-    def get_verification_method(self, id: DID_URL) -> VerificationMethod:
+    def get_verification_method(self, id: DID_URL) -> Optional[VerificationMethod]:
         """
         Returns the verification method with the given identifier.
 
         :param id: an identifier of a verification method
         :return: the verification method or None of there is no one for the given identifier
         """
-        pass
+        for m in self.verification_methods:
+            if m.id == id:
+                return m
+        return None
 
 
 @dataclass

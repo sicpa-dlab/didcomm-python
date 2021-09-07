@@ -2,17 +2,28 @@ from __future__ import annotations
 
 import dataclasses
 from dataclasses import dataclass
-from typing import Optional, List, Union, Dict
+from typing import Optional, List, Union, Dict, TypeVar, Generic
 
 from didcomm.common.types import JSON_VALUE, DID, DID_URL, JSON_OBJ
 
 Header = Dict[str, JSON_VALUE]
+T = TypeVar("T")
 
 
 @dataclass
-class MessageOptionalHeaders:
-    """Optional headers for a message"""
+class GenericMessage(Generic[T]):
+    """
+    Message consisting of headers and application/protocol specific data (body).
+    In order to convert a message to a DIDComm message for further transporting, call one of the following:
+    - `pack_encrypted` to build an Encrypted DIDComm message
+    - `pack_signed` to build a signed DIDComm message
+    - `pack_plaintext` to build a Plaintext DIDComm message
+    """
 
+    id: str
+    type: str
+    body: T
+    typ: str = "application/didcomm-plain+json"
     frm: Optional[DID] = None
     to: Optional[List[DID]] = None
     created_time: Optional[int] = None
@@ -25,49 +36,25 @@ class MessageOptionalHeaders:
     attachments: Optional[List[Attachment]] = None
     custom_headers: Optional[List[Header]] = None
 
-
-@dataclass
-class MessageRequiredHeaders:
-    """Required headers for a message"""
-
-    id: str
-    type: str
-    typ: str = "application/didcomm-plain+json"
-
-
-@dataclass
-class MessageBody:
-    """Message body as a application/protocol specific data"""
-
-    body: JSON_OBJ
-
-
-@dataclass
-class Message(MessageOptionalHeaders, MessageRequiredHeaders, MessageBody):
-    """
-    Message consisting of headers and application/protocol specific data (body).
-    In order to convert a message to a DIDComm message for further transporting, call one of the following:
-    - `pack_encrypted` to build an Encrypted DIDComm message
-    - `pack_signed` to build a signed DIDComm message
-    - `pack_plaintext` to build a Plaintext DIDComm message
-    """
-
     def as_dict(self) -> dict:
         d = dataclasses.asdict(self)
         for k in set(d.keys()):
             if d[k] is None:
                 del d[k]
-        if 'frm' in d:
-            d['from'] = d['frm']
-            del d['frm']
+        if "frm" in d:
+            d["from"] = d["frm"]
+            del d["frm"]
         return d
 
     @staticmethod
     def from_dict(d: dict) -> Message:
-        if 'from' in d:
-            d['frm'] = d['from']
-            del d['from']
+        if "from" in d:
+            d["frm"] = d["from"]
+            del d["from"]
         return Message(**d)
+
+
+Message = GenericMessage[JSON_OBJ]
 
 
 @dataclass(frozen=True)

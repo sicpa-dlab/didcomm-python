@@ -55,8 +55,7 @@ async def pack_signed(
     sign_result = await sign(msg, sign_frm, resolvers_config)
 
     return PackSignedResult(
-        packed_msg=to_unicode(sign_result.msg),
-        sign_from_kid=sign_result.sign_frm_kid
+        packed_msg=to_unicode(sign_result.msg), sign_from_kid=sign_result.sign_frm_kid
     )
 
 
