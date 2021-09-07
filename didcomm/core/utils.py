@@ -1,6 +1,7 @@
+import dataclasses
 from typing import Union, Optional
 
-from authlib.common.encoding import json_loads, to_unicode, urlsafe_b64decode, to_bytes
+from authlib.common.encoding import to_unicode, urlsafe_b64decode, to_bytes
 from authlib.jose import ECKey, OKPKey
 from authlib.jose.rfc7517 import AsymmetricKey
 
@@ -123,3 +124,11 @@ def get_jwe_alg(jwe: dict) -> Optional[str]:
         return None
 
     return protected.get("alg")
+
+
+def dataclass_to_dict(msg) -> dict:
+    d = dataclasses.asdict(msg)
+    for k in set(d.keys()):
+        if d[k] is None:
+            del d[k]
+    return d

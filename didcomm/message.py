@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import dataclasses
 from dataclasses import dataclass
 from typing import Optional, List, Union, Dict, TypeVar, Generic
 
 from didcomm.common.types import JSON_VALUE, DID, DID_URL, JSON_OBJ, DIDCommMessageTypes
+from didcomm.core.utils import dataclass_to_dict
 from didcomm.errors import MalformedMessageError, MalformedMessageCode
 
 Header = Dict[str, JSON_VALUE]
@@ -37,14 +37,19 @@ class GenericMessage(Generic[T]):
     custom_headers: Optional[List[Header]] = None
 
     def as_dict(self) -> dict:
-        d = dataclasses.asdict(self)
-        for k in set(d.keys()):
-            if d[k] is None:
-                del d[k]
+        d = dataclass_to_dict(self)
+
         if "frm" in d:
             d["from"] = d["frm"]
             del d["frm"]
+
         d["typ"] = DIDCommMessageTypes.PLAINTEXT.value
+
+        if self.attachments:
+            d["attachments"] = [a.as_dict() for a in self.attachments]
+        if self.from_prior:
+            d["from_prior"] = self.from_prior.as_dict()
+
         return d
 
     @staticmethod
@@ -53,6 +58,13 @@ class GenericMessage(Generic[T]):
             d["frm"] = d["from"]
             del d["from"]
         del d["typ"]
+
+        if "from_prior" in d:
+            d["from_prior"] = FromPrior.from_dict(d["from_prior"])
+
+        if "attachments" in d:
+            d["attachments"] = [Attachment.from_dict(e) for e in d["attachments"]]
+
         msg = Message(**d)
 
         # TODO: consider using attrs lib and its validators
@@ -84,14 +96,21 @@ class Attachment:
     byte_count: Optional[int] = None
 
     def as_dict(self) -> dict:
-        d = dataclasses.asdict(self)
-        for k in set(d.keys()):
-            if d[k] is None:
-                del d[k]
-        for k in set(d.data.keys()):
-            if d[k] is None:
-                del d[k]
+        d = dataclass_to_dict(self)
+        d["data"] = self.data.as_dict()
         return d
+
+    @staticmethod
+    def from_dict(d: dict) -> Attachment:
+        # TODO: validation
+        if "data" in d:
+            if "links" in d["data"]:
+                d["data"] = AttachmentDataLinks.from_dict(d["data"])
+            elif "base64" in d["data"]:
+                d["data"] = AttachmentDataBase64.from_dict(d["data"])
+            elif "json" in d["data"]:
+                d["data"] = AttachmentDataJson.from_dict(d["data"])
+        return Attachment(**d)
 
 
 @dataclass(frozen=True)
@@ -100,6 +119,14 @@ class AttachmentDataLinks:
     hash: str
     jws: Optional[JSON_OBJ] = None
 
+    def as_dict(self) -> dict:
+        return dataclass_to_dict(self)
+
+    @staticmethod
+    def from_dict(d: dict) -> AttachmentDataLinks:
+        # TODO: validation
+        return AttachmentDataLinks(**d)
+
 
 @dataclass(frozen=True)
 class AttachmentDataBase64:
@@ -107,12 +134,28 @@ class AttachmentDataBase64:
     hash: Optional[str] = None
     jws: Optional[JSON_OBJ] = None
 
+    def as_dict(self) -> dict:
+        return dataclass_to_dict(self)
+
+    @staticmethod
+    def from_dict(d: dict) -> AttachmentDataBase64:
+        # TODO: validation
+        return AttachmentDataBase64(**d)
+
 
 @dataclass(frozen=True)
 class AttachmentDataJson:
     json: JSON_VALUE
     hash: Optional[str] = None
     jws: Optional[JSON_OBJ] = None
+
+    def as_dict(self) -> dict:
+        return dataclass_to_dict(self)
+
+    @staticmethod
+    def from_dict(d: dict) -> AttachmentDataJson:
+        # TODO: validation
+        return AttachmentDataJson(**d)
 
 
 @dataclass(frozen=True)
@@ -127,8 +170,9 @@ class FromPrior:
     iss_kid: DID_URL = None
 
     def as_dict(self) -> dict:
-        d = dataclasses.asdict(self)
-        for k in set(d.keys()):
-            if d[k] is None:
-                del d[k]
-        return d
+        return dataclass_to_dict(self)
+
+    @staticmethod
+    def from_dict(d: dict) -> FromPrior:
+        # TODO: validation
+        return FromPrior(**d)
