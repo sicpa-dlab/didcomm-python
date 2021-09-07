@@ -17,11 +17,11 @@ from didcomm.secrets.secrets_resolver import Secret
 
 
 def extract_key(
-        verification_method: Union[VerificationMethod, Secret]
+    verification_method: Union[VerificationMethod, Secret]
 ) -> AsymmetricKey:
     if (
-            verification_method.verification_material.format
-            == VerificationMaterialFormat.JWK
+        verification_method.verification_material.format
+        == VerificationMaterialFormat.JWK
     ):
         jwk = json_loads(verification_method.verification_material.value)
         if jwk["kty"] == "EC":
@@ -38,9 +38,9 @@ def extract_key(
 
 def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> SignAlg:
     if (
-            verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020
-            and verification_method.verification_material.format
-            == VerificationMaterialFormat.JWK
+        verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020
+        and verification_method.verification_material.format
+        == VerificationMaterialFormat.JWK
     ):
         jwk = json_loads(verification_method.verification_material.value)
         if jwk["kty"] == "EC" and jwk["crv"] == "P-256":
@@ -53,12 +53,12 @@ def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> 
             # FIXME
             raise NotImplementedError()
     elif (
-            verification_method.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018
+        verification_method.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018
     ):
         return SignAlg.ED25519
     elif (
-            verification_method.type
-            == VerificationMethodType.ECDSA_SECP_256K1_VERIFICATION_KEY_2019
+        verification_method.type
+        == VerificationMethodType.ECDSA_SECP_256K1_VERIFICATION_KEY_2019
     ):
         return SignAlg.ES256K
     else:
@@ -85,19 +85,18 @@ def get_did_and_optionally_kid(did_or_kid: DID_OR_DID_URL) -> (DID, Optional[DID
 
 
 def are_keys_compatible(
-        method1: Union[Secret, VerificationMethod], method2: VerificationMethod
+    method1: Union[Secret, VerificationMethod], method2: VerificationMethod
 ) -> bool:
     if (
-            method1.type == method2.type
-            and method1.verification_material.format
-            == method2.verification_material.format
+        method1.type == method2.type
+        and method1.verification_material.format == method2.verification_material.format
     ):
         if method1.verification_material.format == VerificationMaterialFormat.JWK:
             private_jwk = json_loads(method1.verification_material.value)
             public_jwk = json_loads(method2.verification_material.value)
             return (
-                    private_jwk["kty"] == public_jwk["kty"]
-                    and private_jwk["crv"] == public_jwk["crv"]
+                private_jwk["kty"] == public_jwk["kty"]
+                and private_jwk["crv"] == public_jwk["crv"]
             )
         else:
             return True

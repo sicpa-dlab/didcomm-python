@@ -16,7 +16,7 @@ def is_signed(msg: dict) -> bool:
 
 
 async def sign(
-        msg: bytes, sign_frm: DID_OR_DID_URL, resolvers_config: ResolversConfig
+    msg: bytes, sign_frm: DID_OR_DID_URL, resolvers_config: ResolversConfig
 ) -> SignResult:
     jws = JsonWebSignature()
 
@@ -24,10 +24,7 @@ async def sign(
     private_key = extract_key(secret)
     alg = extract_sign_alg(secret)
 
-    protected = {
-        "typ": DIDCommMessageTypes.SIGNED.value,
-        "alg": alg.value
-    }
+    protected = {"typ": DIDCommMessageTypes.SIGNED.value, "alg": alg.value}
 
     header = {"kid": secret.kid}
 
@@ -42,7 +39,9 @@ async def unpack_sign(msg: dict, resolvers_config: ResolversConfig) -> UnpackSig
     validate_jws(msg)
 
     sign_frm_kid = msg["signatures"][0]["header"]["kid"]
-    sign_frm_verification_method = await find_verification_key(sign_frm_kid, resolvers_config)
+    sign_frm_verification_method = await find_verification_key(
+        sign_frm_kid, resolvers_config
+    )
     public_key = extract_key(sign_frm_verification_method)
 
     try:

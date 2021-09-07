@@ -16,9 +16,9 @@ from didcomm.message import Message
 
 
 async def unpack(
-        resolvers_config: ResolversConfig,
-        packed_msg: JSON,
-        unpack_config: Optional[UnpackConfig] = None,
+    resolvers_config: ResolversConfig,
+    packed_msg: JSON,
+    unpack_config: Optional[UnpackConfig] = None,
 ) -> UnpackResult:
     """
     Unpacks the packed DIDComm message by doing decryption and verifying the signatures.
@@ -56,7 +56,9 @@ async def unpack(
 
     if is_anoncrypted(msg_as_dict):
         unwrap_anoncrypt_result = await unpack_anoncrypt(
-            msg_as_dict, resolvers_config, decrypt_by_all_keys=unpack_config.expect_decrypt_by_all_keys
+            msg_as_dict,
+            resolvers_config,
+            decrypt_by_all_keys=unpack_config.expect_decrypt_by_all_keys,
         )
 
         msg = unwrap_anoncrypt_result.msg
@@ -69,7 +71,9 @@ async def unpack(
 
     if is_authcrypted(msg_as_dict):
         unwrap_authcrypt_result = await unpack_authcrypt(
-            msg_as_dict, resolvers_config, decrypt_by_all_keys=unpack_config.expect_decrypt_by_all_keys
+            msg_as_dict,
+            resolvers_config,
+            decrypt_by_all_keys=unpack_config.expect_decrypt_by_all_keys,
         )
 
         msg = unwrap_authcrypt_result.msg

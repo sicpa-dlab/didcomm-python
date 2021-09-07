@@ -5,7 +5,12 @@ from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import DID_OR_DID_URL, DID_URL
 from didcomm.core.utils import get_did_and_optionally_kid, get_did, are_keys_compatible
 from didcomm.did_doc.did_doc import VerificationMethod
-from didcomm.errors import DIDDocNotResolvedError, DIDUrlNotFoundError, SecretNotFoundError, IncompatibleCryptoError
+from didcomm.errors import (
+    DIDDocNotResolvedError,
+    DIDUrlNotFoundError,
+    SecretNotFoundError,
+    IncompatibleCryptoError,
+)
 from didcomm.secrets.secrets_resolver import Secret
 
 
@@ -22,9 +27,9 @@ class AuthcryptUnpackKeys:
 
 
 async def find_authcrypt_pack_sender_and_recipient_keys(
-        frm_did_or_kid: DID_OR_DID_URL,
-        to_did_or_kid: DID_OR_DID_URL,
-        resolvers_config: ResolversConfig,
+    frm_did_or_kid: DID_OR_DID_URL,
+    to_did_or_kid: DID_OR_DID_URL,
+    resolvers_config: ResolversConfig,
 ) -> AuthcryptPackKeys:
     frm_did, frm_kid = get_did_and_optionally_kid(frm_did_or_kid)
     to_did, to_kid = get_did_and_optionally_kid(to_did_or_kid)
@@ -72,9 +77,7 @@ async def find_authcrypt_pack_sender_and_recipient_keys(
 
 
 async def find_authcrypt_unpack_sender_and_recipient_keys(
-        frm_kid: DID_URL,
-        to_kids: List[DID_URL],
-        resolvers_config: ResolversConfig
+    frm_kid: DID_URL, to_kids: List[DID_URL], resolvers_config: ResolversConfig
 ):
     secret_ids = await resolvers_config.secrets_resolver.get_keys(to_kids)
     if not secret_ids:

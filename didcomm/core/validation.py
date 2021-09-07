@@ -5,10 +5,12 @@ from didcomm.errors import MalformedMessageError, MalformedMessageCode
 
 
 def validate_jws(msg: dict):
-    if "signatures" not in msg or \
-            not msg["signatures"] or \
-            "header" not in msg["signatures"][0] or \
-            "kid" not in msg["signatures"][0]["header"]:
+    if (
+        "signatures" not in msg
+        or not msg["signatures"]
+        or "header" not in msg["signatures"][0]
+        or "kid" not in msg["signatures"][0]["header"]
+    ):
         raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
 
 
@@ -17,8 +19,7 @@ def validate_anoncrypt_jwe(msg: dict):
     if "recipients" not in msg:
         raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
     for r in msg["recipients"]:
-        if "header" not in r or \
-                "kid" not in r["header"]:
+        if "header" not in r or "kid" not in r["header"]:
             raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
 
     # 2. Decode protected header
@@ -35,8 +36,7 @@ def validate_authcrypt_jwe(msg: dict):
     if "recipients" not in msg:
         raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
     for r in msg["recipients"]:
-        if "header" not in r or \
-                "kid" not in r["header"]:
+        if "header" not in r or "kid" not in r["header"]:
             raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
         if not is_did_url(r["header"]["kid"]):
             raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
