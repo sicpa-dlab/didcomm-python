@@ -3,7 +3,6 @@ import copy
 from authlib.common.encoding import json_loads
 
 from didcomm.core.utils import parse_base64url_encoded_json
-from didcomm.message import Message
 from didcomm.unpack import unpack, Metadata
 from tests.test_vectors.common import TestVector, TEST_MESSAGE
 
