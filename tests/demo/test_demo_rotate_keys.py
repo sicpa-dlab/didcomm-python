@@ -5,9 +5,9 @@ from didcomm.message import Message, FromPrior
 from didcomm.pack_encrypted import pack_encrypted
 from didcomm.secrets.secrets_resolver_in_memory import SecretsResolverInMemory
 from didcomm.unpack import unpack
-from tests.test_vectors.mock_secrets_resolver_alice import MockSecretsResolverAlice
-from tests.test_vectors.mock_secrets_resolver_charlie import MockSecretsResolverCharlie
-from tests.test_vectors.test_vectors_common import ALICE_DID, CHARLIE_DID, BOB_DID
+from tests.test_vectors.common import CHARLIE_DID, BOB_DID, ALICE_DID
+from tests.test_vectors.secrets.mock_secrets_resolver_alice import MockSecretsResolverAlice
+from tests.test_vectors.secrets.mock_secrets_resolver_charlie import MockSecretsResolverCharlie
 
 
 class MockSecretsResolverAliceNewDid(SecretsResolverInMemory):

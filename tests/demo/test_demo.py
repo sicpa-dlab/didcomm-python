@@ -5,12 +5,12 @@ from didcomm.pack_encrypted import pack_encrypted
 from didcomm.pack_plaintext import pack_plaintext
 from didcomm.pack_signed import pack_signed
 from didcomm.unpack import unpack
-from tests.test_vectors.test_vectors_common import ALICE_DID, BOB_DID
+from tests.test_vectors.common import ALICE_DID, BOB_DID
 
 
 @pytest.mark.asyncio
 async def test_demo_repudiable_authentication_encryption(
-    resolvers_config_alice, resolvers_config_bob
+        resolvers_config_alice, resolvers_config_bob
 ):
     # ALICE
     message = Message(
@@ -36,7 +36,7 @@ async def test_demo_repudiable_authentication_encryption(
 
 @pytest.mark.asyncio
 async def test_demo_repudiable_non_authenticated_encryption(
-    resolvers_config_alice, resolvers_config_bob
+        resolvers_config_alice, resolvers_config_bob
 ):
     # ALICE
     message = Message(
@@ -59,7 +59,7 @@ async def test_demo_repudiable_non_authenticated_encryption(
 
 @pytest.mark.asyncio
 async def test_demo_non_repudiable_encryption(
-    resolvers_config_alice, resolvers_config_bob
+        resolvers_config_alice, resolvers_config_bob
 ):
     # ALICE
     message = Message(

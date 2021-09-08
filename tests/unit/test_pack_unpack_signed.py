@@ -5,10 +5,8 @@ import pytest
 from didcomm.common.types import DID_OR_DID_URL
 from didcomm.pack_signed import pack_signed
 from didcomm.unpack import unpack
-from tests.test_vectors.test_vectors_common import TEST_MESSAGE, ALICE_DID, TestVector
-from tests.test_vectors.test_vectors_signed import (
-    TEST_SIGNED_DIDCOMM_MESSAGE,
-)
+from tests.test_vectors.common import ALICE_DID, TestVector, TEST_MESSAGE
+from tests.test_vectors.didcomm_messages.test_vectors_signed import TEST_SIGNED_DIDCOMM_MESSAGE
 from tests.unit.common import unpack_test_vector, decode_and_remove_jws_signatures
 
 
@@ -71,10 +69,10 @@ async def test_pack_signed_by_kid_es256k(resolvers_config_alice, resolvers_confi
 
 
 async def check_pack_signed(
-    sign_frm: DID_OR_DID_URL,
-    test_vector: TestVector,
-    resolvers_config_alice,
-    resolvers_config_bob,
+        sign_frm: DID_OR_DID_URL,
+        test_vector: TestVector,
+        resolvers_config_alice,
+        resolvers_config_bob,
 ):
     expected_packed_msg = test_vector.value
     expected_metadata = copy.deepcopy(test_vector.metadata)

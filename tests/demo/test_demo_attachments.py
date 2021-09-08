@@ -3,7 +3,7 @@ import pytest as pytest
 from didcomm.message import Attachment, Message, AttachmentDataJson
 from didcomm.pack_encrypted import pack_encrypted
 from didcomm.unpack import unpack
-from tests.test_vectors.test_vectors_common import ALICE_DID, BOB_DID
+from tests.test_vectors.common import ALICE_DID, BOB_DID
 
 
 @pytest.mark.asyncio

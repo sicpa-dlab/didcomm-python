@@ -8,8 +8,7 @@ from didcomm.pack_encrypted import (
     pack_encrypted,
 )
 from didcomm.unpack import unpack, UnpackConfig
-from tests.test_vectors.mock_did_resolver import DID_DOC_ALICE, DID_DOC_BOB
-from tests.test_vectors.test_vectors_common import ALICE_DID, BOB_DID
+from tests.test_vectors.common import ALICE_DID, BOB_DID
 
 
 @pytest.mark.asyncio
@@ -35,9 +34,9 @@ async def test_demo_advanced_parameters(resolvers_config_alice, resolvers_config
     pack_result = await pack_encrypted(
         resolvers_config=resolvers_config_alice,
         message=message,
-        frm=DID_DOC_ALICE.key_agreement_kids[0],
-        sign_frm=DID_DOC_ALICE.authentication_kids[1],
-        to=DID_DOC_BOB.key_agreement_kids[2],
+        frm="did:example:alice#key-p256-1",
+        sign_frm="did:example:alice#key-2",
+        to="did:example:bob#key-p256-1",
         pack_config=pack_config,
         pack_params=pack_parameters,
     )

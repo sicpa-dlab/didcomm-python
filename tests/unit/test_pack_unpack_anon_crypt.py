@@ -3,10 +3,8 @@ import pytest
 from didcomm.common.types import DID_OR_DID_URL
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.unpack import unpack
-from tests.test_vectors.test_vectors_anon_encrypted import (
-    TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON,
-)
-from tests.test_vectors.test_vectors_common import TEST_MESSAGE, BOB_DID, TestVector
+from tests.test_vectors.common import BOB_DID, TestVector, TEST_MESSAGE
+from tests.test_vectors.didcomm_messages.test_vectors_anon_encrypted import TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON
 from tests.unit.common import unpack_test_vector, decode_jwe_headers
 
 
@@ -33,7 +31,7 @@ async def test_unpack_anoncrypt_a256gcm(resolvers_config_bob):
 
 @pytest.mark.asyncio
 async def test_pack_anoncrypt_recipient_as_did(
-    resolvers_config_alice, resolvers_config_bob
+        resolvers_config_alice, resolvers_config_bob
 ):
     await check_pack_anoncrypt(
         to=BOB_DID,
@@ -44,10 +42,10 @@ async def test_pack_anoncrypt_recipient_as_did(
 
 
 async def check_pack_anoncrypt(
-    to: DID_OR_DID_URL,
-    test_vector: TestVector,
-    resolvers_config_alice,
-    resolvers_config_bob,
+        to: DID_OR_DID_URL,
+        test_vector: TestVector,
+        resolvers_config_alice,
+        resolvers_config_bob,
 ):
     expected_metadata = test_vector.metadata
     pack_result = await pack_encrypted(

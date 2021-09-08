@@ -4,7 +4,7 @@ from authlib.common.encoding import json_dumps
 
 from didcomm.common.algorithms import SignAlg
 from didcomm.unpack import Metadata
-from tests.test_vectors.test_vectors_common import TestVector
+from tests.test_vectors.common import TestVector
 
 TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_1 = json_dumps(
     {
