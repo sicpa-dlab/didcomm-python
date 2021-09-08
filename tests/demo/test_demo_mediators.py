@@ -8,8 +8,12 @@ from didcomm.pack_encrypted import pack_encrypted
 from didcomm.protocols.forward.forward import unpack_forward, wrap_in_forward
 from didcomm.unpack import unpack, UnpackConfig
 from tests.test_vectors.common import ALICE_DID, BOB_DID
-from tests.test_vectors.secrets.mock_secrets_resolver_mediator_1 import MockSecretsResolverMediator1
-from tests.test_vectors.secrets.mock_secrets_resolver_mediator_2 import MockSecretsResolverMediator2
+from tests.test_vectors.secrets.mock_secrets_resolver_mediator_1 import (
+    MockSecretsResolverMediator1,
+)
+from tests.test_vectors.secrets.mock_secrets_resolver_mediator_2 import (
+    MockSecretsResolverMediator2,
+)
 
 
 @pytest.fixture()

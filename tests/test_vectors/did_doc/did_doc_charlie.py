@@ -1,6 +1,10 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.common.types import VerificationMethodType, VerificationMaterial, VerificationMaterialFormat
+from didcomm.common.types import (
+    VerificationMethodType,
+    VerificationMaterial,
+    VerificationMaterialFormat,
+)
 from didcomm.did_doc.did_doc import DIDDoc, VerificationMethod
 
 DID_DOC_CHARLIE = DIDDoc(

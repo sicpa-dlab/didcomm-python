@@ -10,14 +10,20 @@ def did_resolver_spec_test_vectors():
 
 
 @pytest.fixture()
-def resolvers_config_alice_spec_test_vectors(secrets_resolver_alice, did_resolver_spec_test_vectors):
+def resolvers_config_alice_spec_test_vectors(
+    secrets_resolver_alice, did_resolver_spec_test_vectors
+):
     return ResolversConfig(
-        secrets_resolver=secrets_resolver_alice, did_resolver=did_resolver_spec_test_vectors
+        secrets_resolver=secrets_resolver_alice,
+        did_resolver=did_resolver_spec_test_vectors,
     )
 
 
 @pytest.fixture()
-def resolvers_config_bob_spec_test_vectors(secrets_resolver_bob, did_resolver_spec_test_vectors):
+def resolvers_config_bob_spec_test_vectors(
+    secrets_resolver_bob, did_resolver_spec_test_vectors
+):
     return ResolversConfig(
-        secrets_resolver=secrets_resolver_bob, did_resolver=did_resolver_spec_test_vectors
+        secrets_resolver=secrets_resolver_bob,
+        did_resolver=did_resolver_spec_test_vectors,
     )

@@ -1,6 +1,10 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.common.types import VerificationMethodType, VerificationMaterial, VerificationMaterialFormat
+from didcomm.common.types import (
+    VerificationMethodType,
+    VerificationMaterial,
+    VerificationMaterialFormat,
+)
 from didcomm.did_doc.did_doc import VerificationMethod, DIDDoc
 
 ALICE_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRET = VerificationMethod(
@@ -110,7 +114,7 @@ ALICE_AUTH_METHOD_P256 = VerificationMethod(
                 "y": "BgsGtI7UPsObMRjdElxLOrgAO9JggNMjOcfzEPox18w",
             }
         ),
-    )
+    ),
 )
 ALICE_AUTH_METHOD_SECPP256K1 = VerificationMethod(
     id="did:example:alice#key-3",

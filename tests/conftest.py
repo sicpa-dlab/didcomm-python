@@ -2,7 +2,9 @@ import pytest
 
 from didcomm.common.resolvers import ResolversConfig
 from tests.test_vectors.did_doc.mock_did_resolver import MockDIDResolver
-from tests.test_vectors.secrets.mock_secrets_resolver_alice import MockSecretsResolverAlice
+from tests.test_vectors.secrets.mock_secrets_resolver_alice import (
+    MockSecretsResolverAlice,
+)
 from tests.test_vectors.secrets.mock_secrets_resolver_bob import MockSecretsResolverBob
 
 

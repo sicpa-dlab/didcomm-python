@@ -171,6 +171,6 @@ class MockSecretsResolverBob(MockSecretsResolverInMemory):
                 BOB_SECRET_KEY_AGREEMENT_KEY_P384_1,
                 BOB_SECRET_KEY_AGREEMENT_KEY_P384_2,
                 BOB_SECRET_KEY_AGREEMENT_KEY_P521_1,
-                BOB_SECRET_KEY_AGREEMENT_KEY_P521_2
+                BOB_SECRET_KEY_AGREEMENT_KEY_P521_2,
             ]
         )

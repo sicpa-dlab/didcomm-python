@@ -3,21 +3,21 @@ import pytest
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.unpack import unpack
 from tests.test_vectors.common import TEST_MESSAGE, BOB_DID
-from tests.test_vectors.didcomm_messages.test_vectors_anon_encrypted import TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON
+from tests.test_vectors.didcomm_messages.spec.spec_test_vectors_anon_encrypted import (
+    TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON,
+)
 from tests.unit.common import check_unpack_test_vector, decode_jwe_headers
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("test_vector", TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON)
 async def test_unpack_anoncrypt(test_vector, resolvers_config_bob_spec_test_vectors):
-    await check_unpack_test_vector(
-        test_vector, resolvers_config_bob_spec_test_vectors
-    )
+    await check_unpack_test_vector(test_vector, resolvers_config_bob_spec_test_vectors)
 
 
 @pytest.mark.asyncio
 async def test_pack_anoncrypt_recipient_as_did(
-        resolvers_config_alice_spec_test_vectors, resolvers_config_bob_spec_test_vectors
+    resolvers_config_alice_spec_test_vectors, resolvers_config_bob_spec_test_vectors
 ):
     test_vector = TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON[0]
     expected_metadata = test_vector.metadata
@@ -36,6 +36,8 @@ async def test_pack_anoncrypt_recipient_as_did(
     assert pack_result.from_kid == expected_metadata.encrypted_from
     assert pack_result.sign_from_kid == expected_metadata.sign_from
 
-    unpack_result = await unpack(resolvers_config_bob_spec_test_vectors, pack_result.packed_msg)
+    unpack_result = await unpack(
+        resolvers_config_bob_spec_test_vectors, pack_result.packed_msg
+    )
     assert unpack_result.message == TEST_MESSAGE
     assert unpack_result.metadata == expected_metadata

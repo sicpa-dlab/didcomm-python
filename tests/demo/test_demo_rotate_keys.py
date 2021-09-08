@@ -6,8 +6,12 @@ from didcomm.pack_encrypted import pack_encrypted
 from didcomm.secrets.secrets_resolver_in_memory import SecretsResolverInMemory
 from didcomm.unpack import unpack
 from tests.test_vectors.common import CHARLIE_DID, BOB_DID, ALICE_DID
-from tests.test_vectors.secrets.mock_secrets_resolver_alice import MockSecretsResolverAlice
-from tests.test_vectors.secrets.mock_secrets_resolver_charlie import MockSecretsResolverCharlie
+from tests.test_vectors.secrets.mock_secrets_resolver_alice import (
+    MockSecretsResolverAlice,
+)
+from tests.test_vectors.secrets.mock_secrets_resolver_charlie import (
+    MockSecretsResolverCharlie,
+)
 
 
 class MockSecretsResolverAliceNewDid(SecretsResolverInMemory):

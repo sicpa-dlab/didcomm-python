@@ -18,9 +18,7 @@ TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE = json_dumps(
         "to": ["did:example:bob"],
         "created_time": 1516269022,
         "expires_time": 1516385931,
-        "body": {
-            "messagespecificattribute": "and its value"
-        }
+        "body": {"messagespecificattribute": "and its value"},
     }
 )
 
@@ -33,15 +31,8 @@ TEST_PLAINTEXT_ATTACHMENT_BASE64 = json_dumps(
         "to": ["did:example:bob"],
         "created_time": 1516269022,
         "expires_time": 1516385931,
-        "body": {
-            "messagespecificattribute": "and its value"
-        },
-        "attachments": [{
-            "id": "23",
-            "data": {
-                "base64": "qwerty"
-            }
-        }]
+        "body": {"messagespecificattribute": "and its value"},
+        "attachments": [{"id": "23", "data": {"base64": "qwerty"}}],
     }
 )
 
@@ -54,16 +45,10 @@ TEST_PLAINTEXT_ATTACHMENT_LINKS = json_dumps(
         "to": ["did:example:bob"],
         "created_time": 1516269022,
         "expires_time": 1516385931,
-        "body": {
-            "messagespecificattribute": "and its value"
-        },
-        "attachments": [{
-            "id": "23",
-            "data": {
-                "links": ["1", "2", "3"],
-                "hash": "qwerty"
-            }
-        }]
+        "body": {"messagespecificattribute": "and its value"},
+        "attachments": [
+            {"id": "23", "data": {"links": ["1", "2", "3"], "hash": "qwerty"}}
+        ],
     }
 )
 
@@ -76,18 +61,10 @@ TEST_PLAINTEXT_ATTACHMENT_JSON = json_dumps(
         "to": ["did:example:bob"],
         "created_time": 1516269022,
         "expires_time": 1516385931,
-        "body": {
-            "messagespecificattribute": "and its value"
-        },
-        "attachments": [{
-            "id": "23",
-            "data": {
-                "json": {
-                    "foo": "bar",
-                    "links": [2, 3]
-                }
-            }
-        }]
+        "body": {"messagespecificattribute": "and its value"},
+        "attachments": [
+            {"id": "23", "data": {"json": {"foo": "bar", "links": [2, 3]}}}
+        ],
     }
 )
 
@@ -100,33 +77,12 @@ TEST_PLAINTEXT_ATTACHMENT_MULTI_1 = json_dumps(
         "to": ["did:example:bob"],
         "created_time": 1516269022,
         "expires_time": 1516385931,
-        "body": {
-            "messagespecificattribute": "and its value"
-        },
+        "body": {"messagespecificattribute": "and its value"},
         "attachments": [
-            {
-                "id": "23",
-                "data": {
-                    "json": {
-                        "foo": "bar",
-                        "links": [2, 3]
-                    }
-                }
-            },
-            {
-                "id": "24",
-                "data": {
-                    "base64": "qwerty"
-                }
-            },
-            {
-                "id": "25",
-                "data": {
-                    "links": ["1", "2", "3"],
-                    "hash": "qwerty"
-                }
-            }
-        ]
+            {"id": "23", "data": {"json": {"foo": "bar", "links": [2, 3]}}},
+            {"id": "24", "data": {"base64": "qwerty"}},
+            {"id": "25", "data": {"links": ["1", "2", "3"], "hash": "qwerty"}},
+        ],
     }
 )
 TEST_PLAINTEXT_ATTACHMENT_MULTI_2 = json_dumps(
@@ -138,26 +94,11 @@ TEST_PLAINTEXT_ATTACHMENT_MULTI_2 = json_dumps(
         "to": ["did:example:bob"],
         "created_time": 1516269022,
         "expires_time": 1516385931,
-        "body": {
-            "messagespecificattribute": "and its value"
-        },
-        "attachments": [{
-            "id": "23",
-            "data": {
-                "links": ["1", "2", "3"],
-                "hash": "qwerty"
-            }
-        }, {
-            "id": "24",
-            "data": {
-                "base64": "qwerty"
-            }
-        }, {
-            "id": "25",
-            "data": {
-                "links": ["1", "2", "3", "4"],
-                "hash": "qwerty2"
-            }
-        }]
+        "body": {"messagespecificattribute": "and its value"},
+        "attachments": [
+            {"id": "23", "data": {"links": ["1", "2", "3"], "hash": "qwerty"}},
+            {"id": "24", "data": {"base64": "qwerty"}},
+            {"id": "25", "data": {"links": ["1", "2", "3", "4"], "hash": "qwerty2"}},
+        ],
     }
 )

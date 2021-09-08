@@ -11,7 +11,7 @@ from didcomm.secrets.secrets_resolver import Secret
 
 
 async def find_signing_key(
-        frm_did_or_kid: DID_OR_DID_URL, resolvers_config: ResolversConfig
+    frm_did_or_kid: DID_OR_DID_URL, resolvers_config: ResolversConfig
 ) -> Secret:
     frm_did, frm_kid = get_did_and_optionally_kid(frm_did_or_kid)
 
@@ -21,7 +21,7 @@ async def find_signing_key(
 
 
 async def find_verification_key(
-        frm_kid: DID_URL, resolvers_config: ResolversConfig
+    frm_kid: DID_URL, resolvers_config: ResolversConfig
 ) -> VerificationMethod:
     did = get_did(frm_kid)
 
@@ -40,7 +40,7 @@ async def find_verification_key(
 
 
 async def _find_signing_key_by_kid(
-        frm_kid: DID_URL, resolvers_config: ResolversConfig
+    frm_kid: DID_URL, resolvers_config: ResolversConfig
 ) -> Secret:
     secret = await resolvers_config.secrets_resolver.get_key(frm_kid)
     if secret is None:
@@ -50,7 +50,7 @@ async def _find_signing_key_by_kid(
 
 
 async def _find_signing_key_by_did(
-        frm_did: DID_OR_DID_URL, resolvers_config: ResolversConfig
+    frm_did: DID_OR_DID_URL, resolvers_config: ResolversConfig
 ) -> Secret:
     did_doc = await resolvers_config.did_resolver.resolve(frm_did)
     if did_doc is None:

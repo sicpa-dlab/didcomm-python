@@ -6,7 +6,6 @@ from didcomm.secrets.secrets_resolver_in_memory import SecretsResolverInMemory
 
 
 class MockSecretsResolverInMemory(SecretsResolverInMemory):
-
     def __init__(self, secrets: List[Secret]):
         self._secrets_list = secrets
         super().__init__(secrets)

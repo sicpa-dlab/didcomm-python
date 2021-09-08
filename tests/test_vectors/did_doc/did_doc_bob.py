@@ -1,6 +1,10 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.common.types import VerificationMethodType, VerificationMaterial, VerificationMaterialFormat
+from didcomm.common.types import (
+    VerificationMethodType,
+    VerificationMaterial,
+    VerificationMaterialFormat,
+)
 from didcomm.did_doc.did_doc import VerificationMethod, DIDDoc
 
 BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1 = VerificationMethod(
@@ -252,7 +256,7 @@ DID_DOC_BOB = DIDDoc(
         "did:example:bob#key-p384-not-secrets-1",
         "did:example:bob#key-p521-1",
         "did:example:bob#key-p521-2",
-        "did:example:bob#key-p521-not-secrets-1"
+        "did:example:bob#key-p521-not-secrets-1",
     ],
     didcomm_services=[],
     verification_methods=[
