@@ -1,121 +1,139 @@
-from dataclasses import dataclass
+import hashlib
 from typing import List
 
 from authlib.common.encoding import (
     to_bytes,
     to_unicode,
     urlsafe_b64encode,
-    json_dumps,
     urlsafe_b64decode,
 )
 from authlib.jose import JsonWebEncryption
 
 from didcomm.common.algorithms import AuthCryptAlg, Algs
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import DID_OR_DID_URL, DID_URL
-from didcomm.common.utils import (
-    find_key_agreement_secret_and_verification_methods,
-    extract_key,
-    find_key_agreement_sender_verification_method,
-    find_key_agreement_recipient_secrets,
-    parse_base64url_encoded_json,
+from didcomm.common.types import DID_OR_DID_URL, DIDCommMessageTypes
+from didcomm.core.keys.authcrypt_keys_selector import (
+    find_authcrypt_pack_sender_and_recipient_keys,
+    find_authcrypt_unpack_sender_and_recipient_keys,
 )
+from didcomm.core.serialization import dict_to_json_bytes
+from didcomm.core.types import EncryptResult, UnpackAuthcryptResult, Key
+from didcomm.core.utils import extract_key, get_jwe_alg
+from didcomm.core.validation import validate_authcrypt_jwe
 from didcomm.errors import MalformedMessageError, MalformedMessageCode
 
 
-@dataclass(frozen=True)
-class AuthcryptResult:
-    msg: bytes
-    to_kids: List[DID_OR_DID_URL]
-    from_kid: DID_OR_DID_URL
+def is_authcrypted(msg: dict) -> bool:
+    if "ciphertext" not in msg:
+        return False
+    alg = get_jwe_alg(msg)
+    if alg is None:
+        return False
+    return alg.startswith("ECDH-1PU")
 
 
-async def authcrypt(
-    msg: bytes,
+def authcrypt(msg: dict, to: List[Key], frm: Key, alg: AuthCryptAlg) -> EncryptResult:
+    msg = dict_to_json_bytes(msg)
+
+    skid = frm.kid
+    kids = [to_key.kid for to_key in to]
+    to_keys = [to_key.key for to_key in to]
+
+    header_obj = _build_header(to=to, frm=frm, alg=alg)
+    jwe = JsonWebEncryption()
+    res = jwe.serialize_json(header_obj, msg, to_keys, sender_key=frm.key)
+
+    return EncryptResult(msg=res, to_kids=kids, to_keys=to, from_kid=skid)
+
+
+async def find_keys_and_authcrypt(
+    msg: dict,
     to: DID_OR_DID_URL,
     frm: DID_OR_DID_URL,
     alg: AuthCryptAlg,
     resolvers_config: ResolversConfig,
-) -> AuthcryptResult:
-
-    jwe = JsonWebEncryption()
-
-    (
-        frm_secret,
-        to_verification_methods,
-    ) = await find_key_agreement_secret_and_verification_methods(
+) -> EncryptResult:
+    pack_keys = await find_authcrypt_pack_sender_and_recipient_keys(
         frm, to, resolvers_config
     )
-    frm_private_key = extract_key(frm_secret)
-    to_public_keys = [extract_key(to_vm) for to_vm in to_verification_methods]
+    frm_private_key = Key(
+        kid=pack_keys.sender_private_key.kid,
+        key=extract_key(pack_keys.sender_private_key),
+    )
+    to_public_keys = [
+        Key(kid=to_key.id, key=extract_key(to_key))
+        for to_key in pack_keys.recipient_public_keys
+    ]
+    return authcrypt(msg, to_public_keys, frm_private_key, alg)
 
-    skid = frm_secret.kid
-    kids = [to_vm.id for to_vm in to_verification_methods]
+
+async def unpack_authcrypt(
+    msg: dict, resolvers_config: ResolversConfig, decrypt_by_all_keys: bool
+) -> UnpackAuthcryptResult:
+    protected = validate_authcrypt_jwe(msg)
+
+    frm_kid = protected.get("skid")
+    if frm_kid is None:
+        frm_kid = to_unicode(urlsafe_b64decode(to_bytes(protected["apu"])))
+
+    to_kids = [r["header"]["kid"] for r in msg["recipients"]]
+
+    unpack_res = None
+    async for unpack_keys in find_authcrypt_unpack_sender_and_recipient_keys(
+        frm_kid, to_kids, resolvers_config
+    ):
+        frm_public_key = extract_key(unpack_keys.sender_public_key)
+        to_private_kid_and_key = (
+            unpack_keys.recipient_private_key.kid,
+            extract_key(unpack_keys.recipient_private_key),
+        )
+        try:
+            jwe = JsonWebEncryption()
+            res = jwe.deserialize_json(
+                msg, to_private_kid_and_key, sender_key=frm_public_key
+            )
+        except Exception as exc:
+            if decrypt_by_all_keys:
+                raise MalformedMessageError(
+                    MalformedMessageCode.CAN_NOT_DECRYPT
+                ) from exc
+            continue
+
+        if "payload" not in res:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        if "header" not in res or "protected" not in res["header"]:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        protected = res["header"]["protected"]
+        if "alg" not in protected or "enc" not in protected:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        alg = AuthCryptAlg(Algs(alg=protected["alg"], enc=protected["enc"]))
+
+        unpack_res = UnpackAuthcryptResult(
+            msg=res["payload"], to_kids=to_kids, frm_kid=frm_kid, alg=alg
+        )
+        if not decrypt_by_all_keys:
+            return unpack_res
+
+    if unpack_res is None:
+        raise MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT)
+    return unpack_res
+
+
+def _build_header(to: List[Key], frm: Key, alg: AuthCryptAlg):
+    skid = frm.kid
+    kids = [to_key.kid for to_key in to]
 
     apu = to_unicode(urlsafe_b64encode(to_bytes(skid)))
-    apv = to_unicode(urlsafe_b64encode(to_bytes(".".join(sorted(kids)))))
-
+    apv = to_unicode(
+        urlsafe_b64encode(hashlib.sha256(to_bytes(".".join(sorted(kids)))).digest())
+    )
     protected = {
-        "typ": "application/didcomm-encrypted+json",
+        "typ": DIDCommMessageTypes.ENCRYPTED.value,
         "alg": alg.value.alg,
         "enc": alg.value.enc,
         "apu": apu,
         "apv": apv,
         "skid": skid,
     }
-
     recipients = [{"header": {"kid": kid}} for kid in kids]
-
-    header_obj = {"protected": protected, "recipients": recipients}
-
-    res = jwe.serialize_json(
-        header_obj, msg, to_public_keys, sender_key=frm_private_key
-    )
-
-    return AuthcryptResult(msg=to_bytes(json_dumps(res)), to_kids=kids, from_kid=skid)
-
-
-@dataclass(frozen=True)
-class UnwrapAuthcryptResult:
-    msg: bytes
-    to_kids: List[DID_URL]
-    frm_kid: DID_URL
-    alg: AuthCryptAlg
-
-
-async def unwrap_authcrypt(
-    msg: dict, resolvers_config: ResolversConfig
-) -> UnwrapAuthcryptResult:
-
-    jwe = JsonWebEncryption()
-
-    protected = parse_base64url_encoded_json(msg["protected"])
-    frm_kid = protected.get("skid")
-    if frm_kid is None:
-        frm_kid = to_unicode(urlsafe_b64decode(to_bytes(protected["apu"])))
-
-    to_kids = [r["header"]["kid"] for r in msg["recipients"]]
-    # FIXME: Add checks of "apu" (unconditional) and "apv" header fields
-
-    frm_verification_method = await find_key_agreement_sender_verification_method(
-        frm_kid, resolvers_config
-    )
-    to_secrets = await find_key_agreement_recipient_secrets(to_kids, resolvers_config)
-
-    frm_public_key = extract_key(frm_verification_method)
-    to_private_kids_and_keys = [(to_s.kid, extract_key(to_s)) for to_s in to_secrets]
-
-    for to_private_kid_and_key in to_private_kids_and_keys:
-        try:
-            res = jwe.deserialize_json(
-                msg, to_private_kid_and_key, sender_key=frm_public_key
-            )
-            protected = res["header"]["protected"]
-            alg = AuthCryptAlg(Algs(alg=protected["alg"], enc=protected["enc"]))
-
-            # FIXME: Support `expect_decrypt_by_all_keys` flag
-            return UnwrapAuthcryptResult(
-                msg=res["payload"], to_kids=to_kids, frm_kid=frm_kid, alg=alg
-            )
-        except Exception as exc:
-            raise MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT) from exc
+    return {"protected": protected, "recipients": recipients}

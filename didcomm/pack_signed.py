@@ -1,20 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
-from authlib.common.encoding import json_dumps, to_bytes, to_unicode
-
-from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
+from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON, DID_OR_DID_URL, DID_URL
+from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
 from didcomm.message import Message
 
 
 async def pack_signed(
+    resolvers_config: ResolversConfig,
     message: Message,
     sign_frm: DID_OR_DID_URL,
-    resolvers_config: Optional[ResolversConfig] = None,
 ) -> PackSignedResult:
     """
     Produces `DIDComm Signed Message`
@@ -37,25 +35,21 @@ async def pack_signed(
           a private key in the _secrets resolver is found
         - If `sign_frm` is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
 
+    :param resolvers_config: secrets and DIDDoc resolvers
     :param message: The message to be packed into a DIDComm message
     :param sign_frm: DID or key ID the sender uses for signing.
-    :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             `register_default_secrets_resolver` and `register_default_did_resolver`
 
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
     :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc
     :raises SecretNotFoundError: If there is no secret for the given DID or DID URL (key ID)
+    :raises DIDCommValueError: If invalid input is provided.
 
     :return: A packed message as a JSON string.
     """
-    resolvers_config = get_effective_resolvers(resolvers_config)
-
-    msg = to_bytes(json_dumps(message.as_dict()))
-
-    sign_result = await sign(msg, sign_frm, resolvers_config)
-
+    sign_result = await sign(message.as_dict(), sign_frm, resolvers_config)
+    packed_msg = dict_to_json(sign_result.msg)
     return PackSignedResult(
-        packed_msg=to_unicode(sign_result.msg), sign_from_kid=sign_result.sign_frm_kid
+        packed_msg=packed_msg, sign_from_kid=sign_result.sign_frm_kid
     )
 
 

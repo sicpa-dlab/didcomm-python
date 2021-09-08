@@ -3,22 +3,22 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List
 
-from authlib.common.encoding import json_loads, to_unicode, to_bytes
+from authlib.common.encoding import to_unicode, to_bytes
 
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
-from didcomm.common.resolvers import ResolversConfig, get_effective_resolvers
+from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JWS, JSON, DID_URL
-from didcomm.common.utils import parse_base64url_encoded_json
-from didcomm.core.anoncrypt import unwrap_anoncrypt
-from didcomm.core.authcrypt import unwrap_authcrypt
-from didcomm.core.sign import unwrap_sign
+from didcomm.core.anoncrypt import unpack_anoncrypt, is_anoncrypted
+from didcomm.core.authcrypt import is_authcrypted, unpack_authcrypt
+from didcomm.core.serialization import json_bytes_to_dict, json_str_to_dict
+from didcomm.core.sign import is_signed, unpack_sign
 from didcomm.message import Message
 
 
 async def unpack(
+    resolvers_config: ResolversConfig,
     packed_msg: JSON,
     unpack_config: Optional[UnpackConfig] = None,
-    resolvers_config: Optional[ResolversConfig] = None,
 ) -> UnpackResult:
     """
     Unpacks the packed DIDComm message by doing decryption and verifying the signatures.
@@ -26,10 +26,9 @@ async def unpack(
     If unpack config expects the message to be packed in a particular way (for example that a message is encrypted)
     and the packed message doesn't meet the criteria (it's not encrypted), then `UnsatisfiedConstraintError` will be raised.
 
+    :param resolvers_config: secrets and DIDDoc resolvers
     :param packed_msg: packed DIDComm message as JSON string to be unpacked
     :param unpack_config: configuration for unpack. Default parameters are used if not specified.
-    :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             `register_default_secrets_resolver` and `register_default_did_resolver`
 
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
     :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc
@@ -40,10 +39,10 @@ async def unpack(
 
     :return: the message, metadata, and optionally a JWS if the message has been signed.
     """
-    resolvers_config = get_effective_resolvers(resolvers_config)
+    unpack_config = unpack_config or UnpackConfig()
 
     msg = to_bytes(packed_msg)
-    msg_as_dict = json_loads(packed_msg)
+    msg_as_dict = json_str_to_dict(packed_msg)
 
     metadata = Metadata(
         encrypted=False,
@@ -52,28 +51,28 @@ async def unpack(
         anonymous_sender=False,
     )
 
-    if "ciphertext" in msg_as_dict and parse_base64url_encoded_json(
-        msg_as_dict["protected"]
-    )["alg"].startswith("ECDH-ES"):
-
-        unwrap_anoncrypt_result = await unwrap_anoncrypt(msg_as_dict, resolvers_config)
-
+    if is_anoncrypted(msg_as_dict):
+        unwrap_anoncrypt_result = await unpack_anoncrypt(
+            msg_as_dict,
+            resolvers_config,
+            decrypt_by_all_keys=unpack_config.expect_decrypt_by_all_keys,
+        )
         msg = unwrap_anoncrypt_result.msg
-        msg_as_dict = json_loads(to_unicode(msg))
+        msg_as_dict = json_bytes_to_dict(msg)
 
         metadata.encrypted = True
         metadata.anonymous_sender = True
         metadata.encrypted_to = unwrap_anoncrypt_result.to_kids
         metadata.enc_alg_anon = unwrap_anoncrypt_result.alg
 
-    if "ciphertext" in msg_as_dict and parse_base64url_encoded_json(
-        msg_as_dict["protected"]
-    )["alg"].startswith("ECDH-1PU"):
-
-        unwrap_authcrypt_result = await unwrap_authcrypt(msg_as_dict, resolvers_config)
-
+    if is_authcrypted(msg_as_dict):
+        unwrap_authcrypt_result = await unpack_authcrypt(
+            msg_as_dict,
+            resolvers_config,
+            decrypt_by_all_keys=unpack_config.expect_decrypt_by_all_keys,
+        )
         msg = unwrap_authcrypt_result.msg
-        msg_as_dict = json_loads(to_unicode(msg))
+        msg_as_dict = json_bytes_to_dict(msg)
 
         metadata.encrypted = True
         metadata.authenticated = True
@@ -81,18 +80,16 @@ async def unpack(
         metadata.encrypted_to = unwrap_authcrypt_result.to_kids
         metadata.enc_alg_auth = unwrap_authcrypt_result.alg
 
-    if "payload" in msg_as_dict:
-        unwrap_sign_result = await unwrap_sign(msg_as_dict, resolvers_config)
+    if is_signed(msg_as_dict):
+        unwrap_sign_result = await unpack_sign(msg_as_dict, resolvers_config)
         metadata.signed_message = to_unicode(msg)
-
         msg = unwrap_sign_result.msg
-        msg_as_dict = json_loads(to_unicode(msg))
+        msg_as_dict = json_bytes_to_dict(msg)
 
         metadata.non_repudiation = True
         metadata.sign_from = unwrap_sign_result.sign_frm_kid
         metadata.sign_alg = unwrap_sign_result.alg
 
-    # TODO: Validate `msg_as_dict` structure
     message = Message.from_dict(msg_as_dict)
 
     return UnpackResult(message=message, metadata=metadata)

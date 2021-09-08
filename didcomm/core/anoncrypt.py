@@ -1,82 +1,108 @@
-from dataclasses import dataclass
+import hashlib
 from typing import List
 
-from authlib.common.encoding import to_bytes, to_unicode, urlsafe_b64encode, json_dumps
+from authlib.common.encoding import to_bytes, to_unicode, urlsafe_b64encode
 from authlib.jose import JsonWebEncryption
 
 from didcomm.common.algorithms import AnonCryptAlg, Algs
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import DID_OR_DID_URL, DID_URL
-from didcomm.common.utils import (
-    extract_key,
-    find_key_agreement_recipient_secrets,
-    find_key_agreement_recipient_verification_methods,
+from didcomm.common.types import DID_OR_DID_URL, DIDCommMessageTypes
+from didcomm.core.keys.anoncrypt_keys_selector import (
+    find_anoncrypt_pack_recipient_public_keys,
+    find_anoncrypt_unpack_recipient_private_keys,
 )
+from didcomm.core.serialization import dict_to_json_bytes
+from didcomm.core.types import EncryptResult, UnpackAnoncryptResult, Key
+from didcomm.core.utils import extract_key, get_jwe_alg
+from didcomm.core.validation import validate_anoncrypt_jwe
 from didcomm.errors import MalformedMessageError, MalformedMessageCode
 
 
-@dataclass(frozen=True)
-class AnoncryptResult:
-    msg: bytes
-    to_kids: List[DID_OR_DID_URL]
+def is_anoncrypted(msg: dict) -> bool:
+    if "ciphertext" not in msg:
+        return False
+    alg = get_jwe_alg(msg)
+    if alg is None:
+        return False
+    return alg.startswith("ECDH-ES")
 
 
-async def anoncrypt(
-    msg: bytes, to: DID_OR_DID_URL, alg: AnonCryptAlg, resolvers_config: ResolversConfig
-) -> AnoncryptResult:
+def anoncrypt(msg: dict, to: List[Key], alg: AnonCryptAlg) -> EncryptResult:
+    msg = dict_to_json_bytes(msg)
+
+    kids = [to_key.kid for to_key in to]
+    keys = [to_key.key for to_key in to]
+
+    header_obj = _build_header(to=to, alg=alg)
+
     jwe = JsonWebEncryption()
+    res = jwe.serialize_json(header_obj, msg, keys)
 
-    to_verification_methods = await find_key_agreement_recipient_verification_methods(
+    return EncryptResult(msg=res, to_kids=kids, to_keys=to)
+
+
+async def find_keys_and_anoncrypt(
+    msg: dict, to: DID_OR_DID_URL, alg: AnonCryptAlg, resolvers_config: ResolversConfig
+) -> EncryptResult:
+    to_verification_methods = await find_anoncrypt_pack_recipient_public_keys(
         to, resolvers_config
     )
-    to_public_keys = [extract_key(to_vm) for to_vm in to_verification_methods]
+    to_public_keys = [
+        Key(kid=to_vm.id, key=extract_key(to_vm)) for to_vm in to_verification_methods
+    ]
+    return anoncrypt(msg, to_public_keys, alg)
 
-    kids = [to_vm.id for to_vm in to_verification_methods]
 
-    apv = to_unicode(urlsafe_b64encode(to_bytes(".".join(sorted(kids)))))
+async def unpack_anoncrypt(
+    msg: dict, resolvers_config: ResolversConfig, decrypt_by_all_keys: bool
+) -> UnpackAnoncryptResult:
+    validate_anoncrypt_jwe(msg)
 
+    to_kids = [r["header"]["kid"] for r in msg["recipients"]]
+
+    unpack_res = None
+    async for to_secret in find_anoncrypt_unpack_recipient_private_keys(
+        to_kids, resolvers_config
+    ):
+        to_private_kid_and_key = (to_secret.kid, extract_key(to_secret))
+        try:
+            jwe = JsonWebEncryption()
+            res = jwe.deserialize_json(msg, to_private_kid_and_key)
+        except Exception as exc:
+            if decrypt_by_all_keys:
+                raise MalformedMessageError(
+                    MalformedMessageCode.CAN_NOT_DECRYPT
+                ) from exc
+            continue
+
+        if "payload" not in res:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        if "header" not in res or "protected" not in res["header"]:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        protected = res["header"]["protected"]
+        if "alg" not in protected or "enc" not in protected:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+        alg = AnonCryptAlg(Algs(alg=protected["alg"], enc=protected["enc"]))
+
+        unpack_res = UnpackAnoncryptResult(msg=res["payload"], to_kids=to_kids, alg=alg)
+        if not decrypt_by_all_keys:
+            return unpack_res
+
+    if unpack_res is None:
+        raise MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT)
+    return unpack_res
+
+
+def _build_header(to: List[Key], alg: AnonCryptAlg):
+    kids = [to_key.kid for to_key in to]
+    apv = to_unicode(
+        urlsafe_b64encode(hashlib.sha256(to_bytes(".".join(sorted(kids)))).digest())
+    )
     protected = {
-        "typ": "application/didcomm-encrypted+json",
+        "typ": DIDCommMessageTypes.ENCRYPTED.value,
         "alg": alg.value.alg,
         "enc": alg.value.enc,
         "apv": apv,
     }
-
     recipients = [{"header": {"kid": kid}} for kid in kids]
-
-    header_obj = {"protected": protected, "recipients": recipients}
-
-    res = jwe.serialize_json(header_obj, msg, to_public_keys)
-
-    return AnoncryptResult(msg=to_bytes(json_dumps(res)), to_kids=kids)
-
-
-@dataclass(frozen=True)
-class UnwrapAnoncryptResult:
-    msg: bytes
-    to_kids: List[DID_URL]
-    alg: AnonCryptAlg
-
-
-async def unwrap_anoncrypt(
-    msg: dict, resolvers_config: ResolversConfig
-) -> UnwrapAnoncryptResult:
-    jwe = JsonWebEncryption()
-
-    to_kids = [r["header"]["kid"] for r in msg["recipients"]]
-    # FIXME: Add check "apv" header field
-
-    to_secrets = await find_key_agreement_recipient_secrets(to_kids, resolvers_config)
-
-    to_private_kids_and_keys = [(to_s.kid, extract_key(to_s)) for to_s in to_secrets]
-
-    for to_private_kid_and_key in to_private_kids_and_keys:
-        try:
-            res = jwe.deserialize_json(msg, to_private_kid_and_key)
-            protected = res["header"]["protected"]
-            alg = AnonCryptAlg(Algs(alg=protected["alg"], enc=protected["enc"]))
-
-            # FIXME: Support `expect_decrypt_by_all_keys` flag
-            return UnwrapAnoncryptResult(msg=res["payload"], to_kids=to_kids, alg=alg)
-        except Exception as exc:
-            raise MalformedMessageError(MalformedMessageCode.CAN_NOT_DECRYPT) from exc
+    return {"protected": protected, "recipients": recipients}

@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 import json
-from typing import Optional
 
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON
 from didcomm.message import Message
 
 
-async def pack_plaintext(
-    message: Message, resolvers_config: Optional[ResolversConfig] = None
-) -> JSON:
+async def pack_plaintext(resolvers_config: ResolversConfig, message: Message) -> JSON:
     """
     Produces `DIDComm Plaintext Messages`
     https://identity.foundation/didcomm-messaging/spec/#didcomm-plaintext-messages.
@@ -26,9 +23,9 @@ async def pack_plaintext(
     and it is the format used in the DIDComm spec to give examples of headers and other internals.
     Depending on ambient security, plaintext may or may not be an appropriate format for DIDComm data at rest.
 
+    :param resolvers_config: secrets and DIDDoc resolvers
     :param message: The message to be packed into a DIDComm message
-    :param resolvers_config: Optional resolvers that can override a default resolvers registered by
-                             `register_default_secrets_resolver` and `register_default_did_resolver`
+
 
     :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
     :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)

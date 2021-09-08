@@ -55,10 +55,10 @@ async def test_demo_mediator(
         expires_time=1516385931,
     )
     pack_result = await pack_encrypted(
+        resolvers_config=resolvers_config_alice,
         message=message,
         frm=ALICE_DID,
         to=BOB_DID,
-        resolvers_config=resolvers_config_alice,
     )
     print(
         f"Sending ${pack_result.packed_msg} to ${pack_result.service_metadata.service_endpoint}"
@@ -66,14 +66,12 @@ async def test_demo_mediator(
 
     # BOB MEDIATOR
     forward_bob = await unpack_forward(
-        packed_msg=pack_result.packed_msg, resolvers_config=resolvers_config_mediator_1
+        resolvers_config_mediator_1, pack_result.packed_msg
     )
     print(f"Sending ${forward_bob.forwarded_msg} to Bob")
 
     # BOB
-    unpack_result_bob = await unpack(
-        forward_bob.forwarded_msg, resolvers_config=resolvers_config_bob
-    )
+    unpack_result_bob = await unpack(resolvers_config_bob, forward_bob.forwarded_msg)
     print(f"Got ${unpack_result_bob.message} message")
 
 
@@ -95,10 +93,10 @@ async def test_demo_mediators_unknown_to_sender(
         expires_time=1516385931,
     )
     pack_result = await pack_encrypted(
+        resolvers_config=resolvers_config_alice,
         message=message,
         frm=ALICE_DID,
         to=BOB_DID,
-        resolvers_config=resolvers_config_alice,
     )
     print(
         f"Sending ${pack_result.packed_msg} to ${pack_result.service_metadata.service_endpoint}"
@@ -106,7 +104,7 @@ async def test_demo_mediators_unknown_to_sender(
 
     # BOB MEDIATOR 1: re-wrap to a new mediator
     forward_bob_1 = await unpack_forward(
-        pack_result.packed_msg, resolvers_config=resolvers_config_mediator_1
+        resolvers_config_mediator_1, pack_result.packed_msg
     )
     forward_bob_2 = await wrap_in_forward(
         packed_msg=forward_bob_1.forwarded_msg,
@@ -117,15 +115,11 @@ async def test_demo_mediators_unknown_to_sender(
     print(f"Sending ${forward_bob_2} to Bob Mediator 2")
 
     # BOB MEDIATOR 2
-    forward_bob = await unpack_forward(
-        forward_bob_2, resolvers_config=resolvers_config_mediator_2
-    )
+    forward_bob = await unpack_forward(resolvers_config_mediator_2, forward_bob_2)
     print(f"Sending ${forward_bob.forwarded_msg} to Bob")
 
     # BOB
-    unpack_result_bob = await unpack(
-        forward_bob.forwarded_msg, resolvers_config=resolvers_config_bob
-    )
+    unpack_result_bob = await unpack(resolvers_config_bob, forward_bob.forwarded_msg)
     print(f"Got ${unpack_result_bob.message} message")
 
 
@@ -144,10 +138,10 @@ async def test_demo_re_wrap_ro_receiver(
         expires_time=1516385931,
     )
     pack_result = await pack_encrypted(
+        resolvers_config=resolvers_config_alice,
         message=message,
         frm=ALICE_DID,
         to=BOB_DID,
-        resolvers_config=resolvers_config_alice,
     )
     print(
         f"Sending ${pack_result.packed_msg} to ${pack_result.service_metadata.service_endpoint}"
@@ -155,7 +149,7 @@ async def test_demo_re_wrap_ro_receiver(
 
     # BOB MEDIATOR 1: re-wrap to Bob
     old_forward_bob = await unpack_forward(
-        pack_result.packed_msg, resolvers_config=resolvers_config_mediator_1
+        resolvers_config_mediator_1, pack_result.packed_msg
     )
     new_packed_forward_bob = await wrap_in_forward(
         packed_msg=old_forward_bob.forwarded_msg,
@@ -167,8 +161,8 @@ async def test_demo_re_wrap_ro_receiver(
 
     # BOB
     unpack_result_bob = await unpack(
+        resolvers_config_bob,
         new_packed_forward_bob,
         unpack_config=UnpackConfig(unwrap_re_wrapping_forward=True),
-        resolvers_config=resolvers_config_bob,
     )
     print(f"Got ${unpack_result_bob.message} message")
