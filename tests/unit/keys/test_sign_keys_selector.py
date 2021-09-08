@@ -5,27 +5,25 @@ from didcomm.did_doc.did_doc import VerificationMethod
 from didcomm.errors import DIDDocNotResolvedError, SecretNotFoundError, DIDUrlNotFoundError
 from didcomm.secrets.secrets_resolver import Secret
 from tests.test_vectors.common import ALICE_DID
-from tests.test_vectors.did_doc.did_doc_alice import DID_DOC_ALICE
-from tests.test_vectors.utils import Person, get_authentication_secrets, get_auth_verification_methods_not_in_secrets, \
-    get_authentication_methods
+from tests.test_vectors.utils import Person, get_auth_secrets, get_auth_methods_not_in_secrets, \
+    get_auth_methods
 
 
 @pytest.mark.asyncio
 async def test_find_signing_key_by_did_positive(resolvers_config_alice):
     secret = await find_signing_key(ALICE_DID, resolvers_config_alice)
     # the first found secret is returned
-    assert secret == get_authentication_secrets(Person.ALICE)[0]
+    assert secret == get_auth_secrets(Person.ALICE)[0]
 
 
 @pytest.mark.asyncio
 async def test_find_signing_key_by_kid_positive(resolvers_config_alice):
-    for secret in get_authentication_secrets(Person.ALICE):
+    for secret in get_auth_secrets(Person.ALICE):
         await check_find_signing_key_by_kid(secret, resolvers_config_alice)
 
 
 async def check_find_signing_key_by_kid(expected_secret: Secret, resolvers_config_alice):
-    secret = await find_signing_key(expected_secret.kid, resolvers_config_alice)
-    assert secret == expected_secret
+    assert await find_signing_key(expected_secret.kid, resolvers_config_alice) == expected_secret
 
 
 @pytest.mark.asyncio
@@ -42,7 +40,7 @@ async def test_find_signing_key_by_kid_unknown_did(resolvers_config_alice):
 
 @pytest.mark.asyncio
 async def test_find_signing_key_by_kid_secret_not_found(resolvers_config_alice):
-    for vm in get_auth_verification_methods_not_in_secrets(Person.ALICE):
+    for vm in get_auth_methods_not_in_secrets(Person.ALICE):
         with pytest.raises(SecretNotFoundError):
             await find_signing_key(vm.id, resolvers_config_alice)
 
@@ -55,7 +53,7 @@ async def test_find_signing_key_by_kid_unknown_kid(resolvers_config_alice):
 
 @pytest.mark.asyncio
 async def test_find_verification_key_positive(resolvers_config_alice):
-    for vm in get_authentication_methods(Person.ALICE):
+    for vm in get_auth_methods(Person.ALICE):
         await check_find_verification_key_by_kid(vm, resolvers_config_alice)
 
 

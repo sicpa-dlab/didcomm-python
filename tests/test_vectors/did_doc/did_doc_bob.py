@@ -33,9 +33,24 @@ BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_2 = VerificationMethod(
         ),
     ),
 )
-BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3_NOT_IN_SECRETS = VerificationMethod(
+BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3 = VerificationMethod(
     id="did:example:bob#key-x25519-3",
     controller="did:example:bob#key-x25519-3",
+    type=VerificationMethodType.JSON_WEB_KEY_2020,
+    verification_material=VerificationMaterial(
+        format=VerificationMaterialFormat.JWK,
+        value=json_dumps(
+            {
+                "kty": "OKP",
+                "crv": "X25519",
+                "x": "82k2BTUiywKv49fKLZa-WwDi8RBf0tB0M8bvSAUQ3yY",
+            }
+        ),
+    ),
+)
+BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRETS_1 = VerificationMethod(
+    id="did:example:bob#key-x25519-not-secrets-1",
+    controller="did:example:bob#key-x25519-not-secrets-1",
     type=VerificationMethodType.JSON_WEB_KEY_2020,
     verification_material=VerificationMaterial(
         format=VerificationMaterialFormat.JWK,
@@ -64,10 +79,25 @@ BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_1 = VerificationMethod(
         ),
     ),
 )
-
-BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2_NOT_IN_SECRETS = VerificationMethod(
+BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2 = VerificationMethod(
     id="did:example:bob#key-p256-2",
     controller="did:example:bob#key-p256-2",
+    type=VerificationMethodType.JSON_WEB_KEY_2020,
+    verification_material=VerificationMaterial(
+        format=VerificationMaterialFormat.JWK,
+        value=json_dumps(
+            {
+                "kty": "EC",
+                "crv": "P-256",
+                "x": "n0yBsGrwGZup9ywKhzD4KoORGicilzIUyfcXb1CSwe0",
+                "y": "ov0buZJ8GHzV128jmCw1CaFbajZoFFmiJDbMrceCXIw",
+            }
+        ),
+    ),
+)
+BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_NOT_IN_SECRETS_1 = VerificationMethod(
+    id="did:example:bob#key-p256-not-secrets-1",
+    controller="did:example:bob#key-p256-not-secrets-1",
     type=VerificationMethodType.JSON_WEB_KEY_2020,
     verification_material=VerificationMaterial(
         format=VerificationMaterialFormat.JWK,
@@ -97,9 +127,25 @@ BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_1 = VerificationMethod(
         ),
     ),
 )
-BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_2_NOT_IN_SECRETS = VerificationMethod(
+BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_2 = VerificationMethod(
     id="did:example:bob#key-p384-2",
     controller="did:example:bob#key-p384-2",
+    type=VerificationMethodType.JSON_WEB_KEY_2020,
+    verification_material=VerificationMaterial(
+        format=VerificationMaterialFormat.JWK,
+        value=json_dumps(
+            {
+                "kty": "EC",
+                "crv": "P-384",
+                "x": "2x3HOTvR8e-Tu6U4UqMd1wUWsNXMD0RgIunZTMcZsS-zWOwDgsrhYVHmv3k_DjV3",
+                "y": "W9LLaBjlWYcXUxOf6ECSfcXKaC3-K9z4hCoP0PS87Q_4ExMgIwxVCXUEB6nf0GDd",
+            }
+        ),
+    ),
+)
+BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_NOT_IN_SECRETS_1 = VerificationMethod(
+    id="did:example:bob#key-p384-not-secrets-1",
+    controller="did:example:bob#key-p384-not-secrets-1",
     type=VerificationMethodType.JSON_WEB_KEY_2020,
     verification_material=VerificationMaterial(
         format=VerificationMaterialFormat.JWK,
@@ -129,7 +175,7 @@ BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_1 = VerificationMethod(
         ),
     ),
 )
-BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_2_NOT_IN_SECRETS = VerificationMethod(
+BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_2 = VerificationMethod(
     id="did:example:bob#key-p521-2",
     controller="did:example:bob#key-p521-2",
     type=VerificationMethodType.JSON_WEB_KEY_2020,
@@ -145,8 +191,24 @@ BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_2_NOT_IN_SECRETS = VerificationMethod(
         ),
     ),
 )
+BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_NOT_IN_SECRETS_1 = VerificationMethod(
+    id="did:example:bob#key-p521-not-secrets-1",
+    controller="did:example:bob#key-p521-not-secrets-1",
+    type=VerificationMethodType.JSON_WEB_KEY_2020,
+    verification_material=VerificationMaterial(
+        format=VerificationMaterialFormat.JWK,
+        value=json_dumps(
+            {
+                "kty": "EC",
+                "crv": "P-521",
+                "x": "ATp_WxCfIK_SriBoStmA0QrJc2pUR1djpen0VdpmogtnKxJbitiPq-HJXYXDKriXfVnkrl2i952MsIOMfD2j0Ots",
+                "y": "AEJipR0Dc-aBZYDqN51SKHYSWs9hM58SmRY1MxgXANgZrPaq1EeGMGOjkbLMEJtBThdjXhkS5VlXMkF0cYhZELiH",
+            }
+        ),
+    ),
+)
 
-DID_DOC_BOB = DIDDoc(
+DID_DOC_BOB_SPEC_TEST_VECTORS = DIDDoc(
     did="did:example:bob",
     authentication_kids=[],
     key_agreement_kids=[
@@ -164,12 +226,48 @@ DID_DOC_BOB = DIDDoc(
     verification_methods=[
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_2,
-        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3_NOT_IN_SECRETS,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_1,
-        BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2_NOT_IN_SECRETS,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_1,
-        BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_2_NOT_IN_SECRETS,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_1,
-        BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_2_NOT_IN_SECRETS,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_2,
+    ],
+)
+
+DID_DOC_BOB = DIDDoc(
+    did="did:example:bob",
+    authentication_kids=[],
+    key_agreement_kids=[
+        "did:example:bob#key-x25519-1",
+        "did:example:bob#key-x25519-2",
+        "did:example:bob#key-x25519-3",
+        "did:example:bob#key-x25519-not-secrets-1",
+        "did:example:bob#key-p256-1",
+        "did:example:bob#key-p256-2",
+        "did:example:bob#key-p256-not-secrets-1",
+        "did:example:bob#key-p384-1",
+        "did:example:bob#key-p384-2",
+        "did:example:bob#key-p384-not-secrets-1",
+        "did:example:bob#key-p521-1",
+        "did:example:bob#key-p521-2",
+        "did:example:bob#key-p521-not-secrets-1"
+    ],
+    didcomm_services=[],
+    verification_methods=[
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_2,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRETS_1,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_1,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_NOT_IN_SECRETS_1,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_1,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_2,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_NOT_IN_SECRETS_1,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_1,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_2,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_NOT_IN_SECRETS_1,
     ],
 )

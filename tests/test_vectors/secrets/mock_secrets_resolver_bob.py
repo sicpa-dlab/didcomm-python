@@ -40,6 +40,22 @@ BOB_SECRET_KEY_AGREEMENT_KEY_X25519_2 = Secret(
     ),
 )
 
+BOB_SECRET_KEY_AGREEMENT_KEY_X25519_3 = Secret(
+    kid="did:example:bob#key-x25519-3",
+    type=VerificationMethodType.JSON_WEB_KEY_2020,
+    verification_material=VerificationMaterial(
+        format=VerificationMaterialFormat.JWK,
+        value=json_dumps(
+            {
+                "kty": "OKP",
+                "d": "f9WJeuQXEItkGM8shN4dqFr5fLQLBasHnWZ-8dPaSo0",
+                "crv": "X25519",
+                "x": "82k2BTUiywKv49fKLZa-WwDi8RBf0tB0M8bvSAUQ3yY",
+            }
+        ),
+    ),
+)
+
 BOB_SECRET_KEY_AGREEMENT_KEY_P256_1 = Secret(
     kid="did:example:bob#key-p256-1",
     type=VerificationMethodType.JSON_WEB_KEY_2020,
@@ -52,6 +68,23 @@ BOB_SECRET_KEY_AGREEMENT_KEY_P256_1 = Secret(
                 "crv": "P-256",
                 "x": "FQVaTOksf-XsCUrt4J1L2UGvtWaDwpboVlqbKBY2AIo",
                 "y": "6XFB9PYo7dyC5ViJSO9uXNYkxTJWn0d_mqJ__ZYhcNY",
+            }
+        ),
+    ),
+)
+
+BOB_SECRET_KEY_AGREEMENT_KEY_P256_2 = Secret(
+    kid="did:example:bob#key-p256-2",
+    type=VerificationMethodType.JSON_WEB_KEY_2020,
+    verification_material=VerificationMaterial(
+        format=VerificationMaterialFormat.JWK,
+        value=json_dumps(
+            {
+                "kty": "EC",
+                "d": "agKz7HS8mIwqO40Q2dwm_Zi70IdYFtonN5sZecQoxYU",
+                "crv": "P-256",
+                "x": "n0yBsGrwGZup9ywKhzD4KoORGicilzIUyfcXb1CSwe0",
+                "y": "ov0buZJ8GHzV128jmCw1CaFbajZoFFmiJDbMrceCXIw",
             }
         ),
     ),
@@ -74,6 +107,23 @@ BOB_SECRET_KEY_AGREEMENT_KEY_P384_1 = Secret(
     ),
 )
 
+BOB_SECRET_KEY_AGREEMENT_KEY_P384_2 = Secret(
+    kid="did:example:bob#key-p384-2",
+    type=VerificationMethodType.JSON_WEB_KEY_2020,
+    verification_material=VerificationMaterial(
+        format=VerificationMaterialFormat.JWK,
+        value=json_dumps(
+            {
+                "kty": "EC",
+                "d": "OiwhRotK188BtbQy0XBO8PljSKYI6CCD-nE_ZUzK7o81tk3imDOuQ-jrSWaIkI-T",
+                "crv": "P-384",
+                "x": "2x3HOTvR8e-Tu6U4UqMd1wUWsNXMD0RgIunZTMcZsS-zWOwDgsrhYVHmv3k_DjV3",
+                "y": "W9LLaBjlWYcXUxOf6ECSfcXKaC3-K9z4hCoP0PS87Q_4ExMgIwxVCXUEB6nf0GDd",
+            }
+        ),
+    ),
+)
+
 BOB_SECRET_KEY_AGREEMENT_KEY_P521_1 = Secret(
     kid="did:example:bob#key-p521-1",
     type=VerificationMethodType.JSON_WEB_KEY_2020,
@@ -91,6 +141,23 @@ BOB_SECRET_KEY_AGREEMENT_KEY_P521_1 = Secret(
     ),
 )
 
+BOB_SECRET_KEY_AGREEMENT_KEY_P521_2 = Secret(
+    kid="did:example:bob#key-p521-2",
+    type=VerificationMethodType.JSON_WEB_KEY_2020,
+    verification_material=VerificationMaterial(
+        format=VerificationMaterialFormat.JWK,
+        value=json_dumps(
+            {
+                "kty": "EC",
+                "d": "ABixMEZHsyT7SRw-lY5HxdNOofTZLlwBHwPEJ3spEMC2sWN1RZQylZuvoyOBGJnPxg4-H_iVhNWf_OtgYODrYhCk",
+                "crv": "P-521",
+                "x": "ATp_WxCfIK_SriBoStmA0QrJc2pUR1djpen0VdpmogtnKxJbitiPq-HJXYXDKriXfVnkrl2i952MsIOMfD2j0Ots",
+                "y": "AEJipR0Dc-aBZYDqN51SKHYSWs9hM58SmRY1MxgXANgZrPaq1EeGMGOjkbLMEJtBThdjXhkS5VlXMkF0cYhZELiH",
+            }
+        ),
+    ),
+)
+
 
 class MockSecretsResolverBob(MockSecretsResolverInMemory):
     def __init__(self):
@@ -98,8 +165,12 @@ class MockSecretsResolverBob(MockSecretsResolverInMemory):
             secrets=[
                 BOB_SECRET_KEY_AGREEMENT_KEY_X25519_1,
                 BOB_SECRET_KEY_AGREEMENT_KEY_X25519_2,
+                BOB_SECRET_KEY_AGREEMENT_KEY_X25519_3,
                 BOB_SECRET_KEY_AGREEMENT_KEY_P256_1,
+                BOB_SECRET_KEY_AGREEMENT_KEY_P256_2,
                 BOB_SECRET_KEY_AGREEMENT_KEY_P384_1,
-                BOB_SECRET_KEY_AGREEMENT_KEY_P521_1
+                BOB_SECRET_KEY_AGREEMENT_KEY_P384_2,
+                BOB_SECRET_KEY_AGREEMENT_KEY_P521_1,
+                BOB_SECRET_KEY_AGREEMENT_KEY_P521_2
             ]
         )

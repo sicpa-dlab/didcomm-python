@@ -129,6 +129,31 @@ ALICE_AUTH_METHOD_SECPP256K1 = VerificationMethod(
     ),
 )
 
+DID_DOC_ALICE_SPEC_TEST_VECTORS = DIDDoc(
+    did="did:example:alice",
+    authentication_kids=[
+        "did:example:alice#key-1",
+        "did:example:alice#key-2",
+        "did:example:alice#key-3",
+    ],
+    key_agreement_kids=[
+        "did:example:alice#key-x25519-not-in-secrets-1",
+        "did:example:alice#key-x25519-1",
+        "did:example:alice#key-p256-1",
+        "did:example:alice#key-p521-1",
+    ],
+    didcomm_services=[],
+    verification_methods=[
+        ALICE_VERIFICATION_METHOD_KEY_AGREEM_X25519,
+        ALICE_VERIFICATION_METHOD_KEY_AGREEM_P256,
+        ALICE_VERIFICATION_METHOD_KEY_AGREEM_P521,
+        ALICE_AUTH_METHOD_25519_NOT_IN_SECRET,
+        ALICE_AUTH_METHOD_25519,
+        ALICE_AUTH_METHOD_P256,
+        ALICE_AUTH_METHOD_SECPP256K1,
+    ],
+)
+
 DID_DOC_ALICE = DIDDoc(
     did="did:example:alice",
     authentication_kids=[

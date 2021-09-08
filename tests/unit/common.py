@@ -32,7 +32,7 @@ def remove_signed_msg(metadata: Metadata) -> Metadata:
     return metadata
 
 
-async def unpack_test_vector(test_vector: TestVector, resolvers_config):
+async def check_unpack_test_vector(test_vector: TestVector, resolvers_config):
     unpack_result = await unpack(resolvers_config, test_vector.value)
     assert unpack_result.message == TEST_MESSAGE
     assert unpack_result.metadata == test_vector.metadata

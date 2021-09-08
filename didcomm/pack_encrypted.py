@@ -69,6 +69,7 @@ async def pack_encrypted(
           a private key in the _secrets resolver is found
         - If `sign_frm` is a key ID, then the sender's `authentication` verification method identified by the given key ID is used.
 
+    :rtype: object
     :param resolvers_config: secrets and DIDDoc resolvers
     :param message: The message to be packed into a DIDComm message
     :param to: A target DID or key ID the message will be encrypted for.

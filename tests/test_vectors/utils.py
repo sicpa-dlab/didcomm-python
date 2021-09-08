@@ -5,7 +5,9 @@ from didcomm.common.types import VerificationMethodType, VerificationMaterialFor
 from didcomm.core.serialization import json_str_to_dict
 from didcomm.did_doc.did_doc import VerificationMethod
 from didcomm.secrets.secrets_resolver import Secret
-from tests.test_vectors.did_doc.mock_did_resolver import DID_DOC_ALICE, DID_DOC_BOB, DID_DOC_CHARLIE
+from tests.test_vectors.did_doc.did_doc_alice import DID_DOC_ALICE
+from tests.test_vectors.did_doc.did_doc_bob import DID_DOC_BOB
+from tests.test_vectors.did_doc.mock_did_resolver import DID_DOC_CHARLIE
 from tests.test_vectors.secrets.mock_secrets_resolver_alice import MockSecretsResolverAlice
 from tests.test_vectors.secrets.mock_secrets_resolver_bob import MockSecretsResolverBob
 from tests.test_vectors.secrets.mock_secrets_resolver_charlie import MockSecretsResolverCharlie
@@ -43,7 +45,7 @@ def _get_secrets_resolver(person: Person):
         return MockSecretsResolverCharlie()
 
 
-def get_auth_verification_methods_in_secrets(person: Person) -> List[VerificationMethod]:
+def get_auth_methods_in_secrets(person: Person) -> List[VerificationMethod]:
     did_doc = _get_did_doc(person)
     secrets_resolver = _get_secrets_resolver(person)
     return [
@@ -52,7 +54,7 @@ def get_auth_verification_methods_in_secrets(person: Person) -> List[Verificatio
     ]
 
 
-def get_auth_verification_methods_not_in_secrets(person: Person) -> List[VerificationMethod]:
+def get_auth_methods_not_in_secrets(person: Person) -> List[VerificationMethod]:
     did_doc = _get_did_doc(person)
     secrets_resolver = _get_secrets_resolver(person)
     return [
@@ -61,7 +63,7 @@ def get_auth_verification_methods_not_in_secrets(person: Person) -> List[Verific
     ]
 
 
-def get_key_agreement_verification_methods_in_secrets(
+def get_key_agreement_methods_in_secrets(
         person: Person,
         type: KeyAgreementCurveType = KeyAgreementCurveType.ALL
 ) -> List[VerificationMethod]:
@@ -75,7 +77,7 @@ def get_key_agreement_verification_methods_in_secrets(
     ]
 
 
-def get_key_agreement_verification_methods_not_in_secrets(
+def get_key_agreement_methods_not_in_secrets(
         person: Person,
         type: KeyAgreementCurveType = KeyAgreementCurveType.ALL
 ) -> List[VerificationMethod]:
@@ -89,7 +91,7 @@ def get_key_agreement_verification_methods_not_in_secrets(
     ]
 
 
-def get_authentication_secrets(person: Person) -> List[Secret]:
+def get_auth_secrets(person: Person) -> List[Secret]:
     did_doc = _get_did_doc(person)
     secrets_resolver = _get_secrets_resolver(person)
     return [
@@ -111,7 +113,7 @@ def get_key_agreement_secrets(
     ]
 
 
-def get_authentication_methods(person: Person) -> List[VerificationMethod]:
+def get_auth_methods(person: Person) -> List[VerificationMethod]:
     did_doc = _get_did_doc(person)
     return [vm for vm in did_doc.verification_methods if vm.id in did_doc.authentication_kids]
 
