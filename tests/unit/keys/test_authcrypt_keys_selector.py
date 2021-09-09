@@ -23,6 +23,7 @@ from tests.test_vectors.utils import (
     Person,
     KeyAgreementCurveType,
     get_key_agreement_methods_not_in_secrets,
+    get_key_agreement_methods_in_secrets,
 )
 
 
@@ -182,6 +183,40 @@ async def test_find_authcrypt_pack_sender_and_recipient_keys_sender_kid_not_in_s
         sender_kid = get_key_agreement_methods_not_in_secrets(Person.ALICE)[0].id
         await find_authcrypt_pack_sender_and_recipient_keys(
             sender_kid, BOB_DID, resolvers_config_alice
+        )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "curve_type_sender",
+    [
+        KeyAgreementCurveType.X25519,
+        KeyAgreementCurveType.P256,
+        KeyAgreementCurveType.P521,
+    ],
+)
+@pytest.mark.parametrize(
+    "curve_type_recipient",
+    [
+        KeyAgreementCurveType.X25519,
+        KeyAgreementCurveType.P256,
+        KeyAgreementCurveType.P521,
+    ],
+)
+async def test_find_authcrypt_pack_sender_and_recipient_keys_different_curve_types(
+    curve_type_sender, curve_type_recipient, resolvers_config_alice
+):
+    if curve_type_sender == curve_type_recipient:
+        return
+    frm_kid = get_key_agreement_methods_in_secrets(Person.ALICE, curve_type_sender)[
+        0
+    ].id
+    to_kid = get_key_agreement_methods_in_secrets(Person.BOB, curve_type_recipient)[
+        0
+    ].id
+    with pytest.raises(IncompatibleCryptoError):
+        await find_authcrypt_pack_sender_and_recipient_keys(
+            frm_kid, to_kid, resolvers_config_alice
         )
 
 

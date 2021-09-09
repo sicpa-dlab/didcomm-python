@@ -24,73 +24,65 @@ from tests.test_vectors.didcomm_messages.spec.spec_test_vectors_plaintext import
 
 
 @pytest.mark.asyncio
-async def test_unpack_simple_plaintext(resolvers_config_bob_spec_test_vectors):
+async def test_unpack_simple_plaintext(resolvers_config_bob):
     unpack_result = await unpack(
-        resolvers_config_bob_spec_test_vectors, TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE
+        resolvers_config_bob, TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE
     )
     assert unpack_result.metadata == PLAINTEXT_EXPECTED_METADATA
     assert unpack_result.message == TEST_MESSAGE
 
 
 @pytest.mark.asyncio
-async def test_unpack_attachments_base64(resolvers_config_bob_spec_test_vectors):
-    unpack_result = await unpack(
-        resolvers_config_bob_spec_test_vectors, TEST_PLAINTEXT_ATTACHMENT_BASE64
-    )
+async def test_unpack_attachments_base64(resolvers_config_bob):
+    unpack_result = await unpack(resolvers_config_bob, TEST_PLAINTEXT_ATTACHMENT_BASE64)
     assert unpack_result.metadata == PLAINTEXT_EXPECTED_METADATA
     assert unpack_result.message == create_attachment_base64_msg()
 
 
 @pytest.mark.asyncio
-async def test_unpack_attachments_links(resolvers_config_bob_spec_test_vectors):
-    unpack_result = await unpack(
-        resolvers_config_bob_spec_test_vectors, TEST_PLAINTEXT_ATTACHMENT_LINKS
-    )
+async def test_unpack_attachments_links(resolvers_config_bob):
+    unpack_result = await unpack(resolvers_config_bob, TEST_PLAINTEXT_ATTACHMENT_LINKS)
     assert unpack_result.metadata == PLAINTEXT_EXPECTED_METADATA
     assert unpack_result.message == create_attachment_links_msg()
 
 
 @pytest.mark.asyncio
-async def test_unpack_attachments_json(resolvers_config_bob_spec_test_vectors):
-    unpack_result = await unpack(
-        resolvers_config_bob_spec_test_vectors, TEST_PLAINTEXT_ATTACHMENT_JSON
-    )
+async def test_unpack_attachments_json(resolvers_config_bob):
+    unpack_result = await unpack(resolvers_config_bob, TEST_PLAINTEXT_ATTACHMENT_JSON)
     assert unpack_result.metadata == PLAINTEXT_EXPECTED_METADATA
     assert unpack_result.message == create_attachment_json_msg()
 
 
 @pytest.mark.asyncio
-async def test_unpack_attachments_multi_1(resolvers_config_bob_spec_test_vectors):
+async def test_unpack_attachments_multi_1(resolvers_config_bob):
     unpack_result = await unpack(
-        resolvers_config_bob_spec_test_vectors, TEST_PLAINTEXT_ATTACHMENT_MULTI_1
+        resolvers_config_bob, TEST_PLAINTEXT_ATTACHMENT_MULTI_1
     )
     assert unpack_result.metadata == PLAINTEXT_EXPECTED_METADATA
     assert unpack_result.message == create_attachment_multi_1_msg()
 
 
 @pytest.mark.asyncio
-async def test_unpack_attachments_multi_2(resolvers_config_bob_spec_test_vectors):
+async def test_unpack_attachments_multi_2(resolvers_config_bob):
     unpack_result = await unpack(
-        resolvers_config_bob_spec_test_vectors, TEST_PLAINTEXT_ATTACHMENT_MULTI_2
+        resolvers_config_bob, TEST_PLAINTEXT_ATTACHMENT_MULTI_2
     )
     assert unpack_result.metadata == PLAINTEXT_EXPECTED_METADATA
     assert unpack_result.message == create_attachment_multi_2_msg()
 
 
 @pytest.mark.asyncio
-async def test_pack_simple_plaintext(resolvers_config_bob_spec_test_vectors):
-    packed_msg = await pack_plaintext(
-        resolvers_config_bob_spec_test_vectors, TEST_MESSAGE
-    )
+async def test_pack_simple_plaintext(resolvers_config_bob):
+    packed_msg = await pack_plaintext(resolvers_config_bob, TEST_MESSAGE)
     assert json_str_to_dict(packed_msg) == json_str_to_dict(
         TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE
     )
 
 
 @pytest.mark.asyncio
-async def test_pack_attachments_base64(resolvers_config_bob_spec_test_vectors):
+async def test_pack_attachments_base64(resolvers_config_bob):
     packed_msg = await pack_plaintext(
-        resolvers_config_bob_spec_test_vectors, create_attachment_base64_msg()
+        resolvers_config_bob, create_attachment_base64_msg()
     )
     assert json_str_to_dict(packed_msg) == json_str_to_dict(
         TEST_PLAINTEXT_ATTACHMENT_BASE64
@@ -98,9 +90,9 @@ async def test_pack_attachments_base64(resolvers_config_bob_spec_test_vectors):
 
 
 @pytest.mark.asyncio
-async def test_pack_attachments_links(resolvers_config_bob_spec_test_vectors):
+async def test_pack_attachments_links(resolvers_config_bob):
     packed_msg = await pack_plaintext(
-        resolvers_config_bob_spec_test_vectors, create_attachment_links_msg()
+        resolvers_config_bob, create_attachment_links_msg()
     )
     assert json_str_to_dict(packed_msg) == json_str_to_dict(
         TEST_PLAINTEXT_ATTACHMENT_LINKS
@@ -108,9 +100,9 @@ async def test_pack_attachments_links(resolvers_config_bob_spec_test_vectors):
 
 
 @pytest.mark.asyncio
-async def test_pack_attachments_json(resolvers_config_bob_spec_test_vectors):
+async def test_pack_attachments_json(resolvers_config_bob):
     packed_msg = await pack_plaintext(
-        resolvers_config_bob_spec_test_vectors, create_attachment_json_msg()
+        resolvers_config_bob, create_attachment_json_msg()
     )
     assert json_str_to_dict(packed_msg) == json_str_to_dict(
         TEST_PLAINTEXT_ATTACHMENT_JSON
@@ -118,9 +110,9 @@ async def test_pack_attachments_json(resolvers_config_bob_spec_test_vectors):
 
 
 @pytest.mark.asyncio
-async def test_pack_attachments_multi1(resolvers_config_bob_spec_test_vectors):
+async def test_pack_attachments_multi1(resolvers_config_bob):
     packed_msg = await pack_plaintext(
-        resolvers_config_bob_spec_test_vectors, create_attachment_multi_1_msg()
+        resolvers_config_bob, create_attachment_multi_1_msg()
     )
     assert json_str_to_dict(packed_msg) == json_str_to_dict(
         TEST_PLAINTEXT_ATTACHMENT_MULTI_1
@@ -128,9 +120,9 @@ async def test_pack_attachments_multi1(resolvers_config_bob_spec_test_vectors):
 
 
 @pytest.mark.asyncio
-async def test_pack_attachments_multi2(resolvers_config_bob_spec_test_vectors):
+async def test_pack_attachments_multi2(resolvers_config_bob):
     packed_msg = await pack_plaintext(
-        resolvers_config_bob_spec_test_vectors, create_attachment_multi_2_msg()
+        resolvers_config_bob, create_attachment_multi_2_msg()
     )
     assert json_str_to_dict(packed_msg) == json_str_to_dict(
         TEST_PLAINTEXT_ATTACHMENT_MULTI_2

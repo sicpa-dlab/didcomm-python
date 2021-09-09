@@ -14,7 +14,7 @@ from tests.test_vectors.did_doc.did_doc_bob import (
     BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_1,
     BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_1,
     BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_1,
-    DID_DOC_BOB,
+    DID_DOC_BOB_WITH_NO_SECRETS,
     BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_NOT_IN_SECRETS_1,
     BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRETS_1,
     BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_NOT_IN_SECRETS_1,
@@ -24,7 +24,7 @@ from tests.test_vectors.did_doc.did_doc_bob import (
     BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_2,
     BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2,
 )
-from tests.test_vectors.did_doc.mock_did_resolver import DID_DOC_ALICE
+from tests.test_vectors.did_doc.mock_did_resolver import DID_DOC_ALICE_WITH_NO_SECRETS
 from tests.test_vectors.secrets.mock_secrets_resolver_alice import (
     ALICE_SECRET_AUTH_KEY_ED25519,
     ALICE_SECRET_KEY_AGREEMENT_KEY_X25519,
@@ -253,7 +253,7 @@ def test_get_alice_authentication_methods():
 def test_alice_first_key_agreement_is_x25519():
     assert (
         get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.X25519)[0]
-        == DID_DOC_ALICE.verification_methods[0]
+        == DID_DOC_ALICE_WITH_NO_SECRETS.verification_methods[0]
     )
 
 
@@ -492,5 +492,5 @@ def test_get_bob_authentication_methods():
 def test_bob_first_key_agreement_is_x25519():
     assert (
         get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.X25519)[0]
-        == DID_DOC_BOB.verification_methods[0]
+        == DID_DOC_BOB_WITH_NO_SECRETS.verification_methods[0]
     )

@@ -11,18 +11,18 @@ from tests.unit.common import check_unpack_test_vector, decode_jwe_headers
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("test_vector", TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON)
-async def test_unpack_anoncrypt(test_vector, resolvers_config_bob_spec_test_vectors):
-    await check_unpack_test_vector(test_vector, resolvers_config_bob_spec_test_vectors)
+async def test_unpack_anoncrypt(test_vector, resolvers_config_bob):
+    await check_unpack_test_vector(test_vector, resolvers_config_bob)
 
 
 @pytest.mark.asyncio
 async def test_pack_anoncrypt_recipient_as_did(
-    resolvers_config_alice_spec_test_vectors, resolvers_config_bob_spec_test_vectors
+    resolvers_config_alice, resolvers_config_bob
 ):
     test_vector = TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON[0]
     expected_metadata = test_vector.metadata
     pack_result = await pack_encrypted(
-        resolvers_config_alice_spec_test_vectors,
+        resolvers_config_alice,
         TEST_MESSAGE,
         to=BOB_DID,
         pack_config=PackEncryptedConfig(
@@ -36,8 +36,6 @@ async def test_pack_anoncrypt_recipient_as_did(
     assert pack_result.from_kid == expected_metadata.encrypted_from
     assert pack_result.sign_from_kid == expected_metadata.sign_from
 
-    unpack_result = await unpack(
-        resolvers_config_bob_spec_test_vectors, pack_result.packed_msg
-    )
+    unpack_result = await unpack(resolvers_config_bob, pack_result.packed_msg)
     assert unpack_result.message == TEST_MESSAGE
     assert unpack_result.metadata == expected_metadata

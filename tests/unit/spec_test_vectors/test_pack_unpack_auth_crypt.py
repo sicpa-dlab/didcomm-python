@@ -18,13 +18,13 @@ from tests.unit.common import (
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("test_vector", TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH)
-async def test_unpack_authcrypt(test_vector, resolvers_config_bob_spec_test_vectors):
-    await check_unpack_test_vector(test_vector, resolvers_config_bob_spec_test_vectors)
+async def test_unpack_authcrypt(test_vector, resolvers_config_bob_all_in_secrets):
+    await check_unpack_test_vector(test_vector, resolvers_config_bob_all_in_secrets)
 
 
 @pytest.mark.asyncio
 async def test_pack_authcrypt_sender_as_did_recipient_as_did(
-    resolvers_config_alice_spec_test_vectors, resolvers_config_bob_spec_test_vectors
+    resolvers_config_alice, resolvers_config_bob
 ):
     await check_pack_authcrypt(
         frm=ALICE_DID,
@@ -32,14 +32,14 @@ async def test_pack_authcrypt_sender_as_did_recipient_as_did(
         sign_frm=None,
         pack_config=PackEncryptedConfig(forward=False),
         test_vector=TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH[0],
-        resolvers_config_alice=resolvers_config_alice_spec_test_vectors,
-        resolvers_config_bob=resolvers_config_bob_spec_test_vectors,
+        resolvers_config_alice=resolvers_config_alice,
+        resolvers_config_bob=resolvers_config_bob,
     )
 
 
 @pytest.mark.asyncio
 async def test_pack_authcrypt_signed_sender_as_kid_recipient_as_did(
-    resolvers_config_alice_spec_test_vectors, resolvers_config_bob_spec_test_vectors
+    resolvers_config_alice, resolvers_config_bob
 ):
     test_vector = TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH[1]
     await check_pack_authcrypt(
@@ -48,14 +48,14 @@ async def test_pack_authcrypt_signed_sender_as_kid_recipient_as_did(
         sign_frm=ALICE_DID,
         pack_config=PackEncryptedConfig(forward=False),
         test_vector=test_vector,
-        resolvers_config_alice=resolvers_config_alice_spec_test_vectors,
-        resolvers_config_bob=resolvers_config_bob_spec_test_vectors,
+        resolvers_config_alice=resolvers_config_alice,
+        resolvers_config_bob=resolvers_config_bob,
     )
 
 
 @pytest.mark.asyncio
 async def test_pack_authcrypt_signed_protect_sender_sender_as_kid_recipient_as_did(
-    resolvers_config_alice_spec_test_vectors, resolvers_config_bob_spec_test_vectors
+    resolvers_config_alice, resolvers_config_bob
 ):
     test_vector = TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH[2]
     await check_pack_authcrypt(
@@ -64,8 +64,8 @@ async def test_pack_authcrypt_signed_protect_sender_sender_as_kid_recipient_as_d
         sign_frm=test_vector.metadata.sign_from,
         pack_config=PackEncryptedConfig(protect_sender_id=True, forward=False),
         test_vector=test_vector,
-        resolvers_config_alice=resolvers_config_alice_spec_test_vectors,
-        resolvers_config_bob=resolvers_config_bob_spec_test_vectors,
+        resolvers_config_alice=resolvers_config_alice,
+        resolvers_config_bob=resolvers_config_bob,
     )
 
 

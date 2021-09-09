@@ -7,10 +7,15 @@ from didcomm.errors import (
     DIDDocNotResolvedError,
     SecretNotFoundError,
     DIDUrlNotFoundError,
+    IncompatibleCryptoError,
 )
 from didcomm.pack_encrypted import pack_encrypted
 from tests.test_vectors.common import TEST_MESSAGE, BOB_DID, CHARLIE_DID, ALICE_DID
-from tests.test_vectors.utils import get_key_agreement_methods_in_secrets, Person
+from tests.test_vectors.utils import (
+    get_key_agreement_methods_in_secrets,
+    Person,
+    KeyAgreementCurveType,
+)
 
 
 @pytest.mark.asyncio
@@ -185,4 +190,41 @@ async def test_to_unknown_did_url(resolvers_config_alice):
             message=TEST_MESSAGE,
             frm=ALICE_DID,
             to=BOB_DID + "#unknown-key",
+        )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "curve_type_sender",
+    [
+        KeyAgreementCurveType.X25519,
+        KeyAgreementCurveType.P256,
+        KeyAgreementCurveType.P521,
+    ],
+)
+@pytest.mark.parametrize(
+    "curve_type_recipient",
+    [
+        KeyAgreementCurveType.X25519,
+        KeyAgreementCurveType.P256,
+        KeyAgreementCurveType.P521,
+    ],
+)
+async def test_frm_to_different_curves(
+    curve_type_sender, curve_type_recipient, resolvers_config_alice
+):
+    if curve_type_sender == curve_type_recipient:
+        return
+    frm_kid = get_key_agreement_methods_in_secrets(Person.ALICE, curve_type_sender)[
+        0
+    ].id
+    to_kid = get_key_agreement_methods_in_secrets(Person.BOB, curve_type_recipient)[
+        0
+    ].id
+    with pytest.raises(IncompatibleCryptoError):
+        await pack_encrypted(
+            resolvers_config=resolvers_config_alice,
+            message=TEST_MESSAGE,
+            frm=frm_kid,
+            to=to_kid,
         )

@@ -6,7 +6,7 @@ from didcomm.core.keys.anoncrypt_keys_selector import (
 )
 from didcomm.errors import DIDDocNotResolvedError, DIDUrlNotFoundError
 from tests.test_vectors.common import BOB_DID
-from tests.test_vectors.did_doc.did_doc_bob import DID_DOC_BOB
+from tests.test_vectors.did_doc.did_doc_bob import DID_DOC_BOB_WITH_NO_SECRETS
 from tests.test_vectors.utils import (
     Person,
     get_key_agreement_secrets,
@@ -24,14 +24,14 @@ async def test_find_anoncrypt_pack_recipient_public_keys_by_did_positive(
     expected = get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.X25519)
     res = await find_anoncrypt_pack_recipient_public_keys(BOB_DID, resolvers_config_bob)
     assert res == expected
-    assert expected[0] == DID_DOC_BOB.verification_methods[0]
+    assert expected[0] == DID_DOC_BOB_WITH_NO_SECRETS.verification_methods[0]
 
 
 @pytest.mark.asyncio
 async def test_find_anoncrypt_pack_recipient_public_keys_by_kid_positive(
     resolvers_config_bob,
 ):
-    for vm in DID_DOC_BOB.verification_methods:
+    for vm in DID_DOC_BOB_WITH_NO_SECRETS.verification_methods:
         res = await find_anoncrypt_pack_recipient_public_keys(
             vm.id, resolvers_config_bob
         )

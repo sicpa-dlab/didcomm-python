@@ -163,7 +163,7 @@ class ServiceMetadata:
     service_endpoint: str
 
 
-@dataclass(frozen=True)
+@dataclass
 class PackEncryptedConfig:
     """
     Pack configuration.
@@ -187,7 +187,7 @@ class PackEncryptedConfig:
     forward: bool = True
 
 
-@dataclass(frozen=True)
+@dataclass
 class PackEncryptedParameters:
     """
     Optional parameters for pack.

@@ -14,19 +14,17 @@ from tests.unit.common import check_unpack_test_vector, decode_and_remove_jws_si
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("test_vector", TEST_SIGNED_DIDCOMM_MESSAGE)
-async def test_unpack_signed(test_vector, resolvers_config_bob_spec_test_vectors):
-    await check_unpack_test_vector(test_vector, resolvers_config_bob_spec_test_vectors)
+async def test_unpack_signed(test_vector, resolvers_config_bob):
+    await check_unpack_test_vector(test_vector, resolvers_config_bob)
 
 
 @pytest.mark.asyncio
-async def test_pack_signed_by_did(
-    resolvers_config_alice_spec_test_vectors, resolvers_config_bob_spec_test_vectors
-):
+async def test_pack_signed_by_did(resolvers_config_alice, resolvers_config_bob):
     await check_pack_signed(
         ALICE_DID,
         TEST_SIGNED_DIDCOMM_MESSAGE[0],
-        resolvers_config_alice_spec_test_vectors,
-        resolvers_config_bob_spec_test_vectors,
+        resolvers_config_alice,
+        resolvers_config_bob,
     )
 
 
@@ -34,14 +32,14 @@ async def test_pack_signed_by_did(
 @pytest.mark.parametrize("test_vector", TEST_SIGNED_DIDCOMM_MESSAGE)
 async def test_pack_signed_by_kid(
     test_vector,
-    resolvers_config_alice_spec_test_vectors,
-    resolvers_config_bob_spec_test_vectors,
+    resolvers_config_alice,
+    resolvers_config_bob,
 ):
     await check_pack_signed(
         test_vector.metadata.sign_from,
         test_vector,
-        resolvers_config_alice_spec_test_vectors,
-        resolvers_config_bob_spec_test_vectors,
+        resolvers_config_alice,
+        resolvers_config_bob,
     )
 
 
