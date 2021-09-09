@@ -6,6 +6,7 @@ from didcomm.message import (
     AttachmentDataBase64,
     AttachmentDataLinks,
     AttachmentDataJson,
+    FromPrior,
 )
 from tests.test_vectors.common import ALICE_DID, BOB_DID
 
@@ -17,6 +18,38 @@ TEST_MESSAGE: Message = Message(
     created_time=1516269022,
     expires_time=1516385931,
     body={"messagespecificattribute": "and its value"},
+)
+
+TEST_ATTACHMENT = Attachment(
+    id="123",
+    data=AttachmentDataBase64(base64="qwerty"),
+    description="abc",
+    filename="abc",
+    media_type="abc",
+    format="abc",
+    lastmod_time=123,
+    byte_count=1234,
+)
+
+TEST_ATTACHMENT_MINIMAL = Attachment(
+    id="123",
+    data=AttachmentDataBase64(base64="qwerty"),
+)
+
+TEST_FROM_PRIOR = FromPrior(
+    iss="did:example1",
+    sub="did:example2",
+    aud="123",
+    exp=1234,
+    nbf=12345,
+    iat=123456,
+    jti="dfg",
+    iss_kid="did:example1#key1",
+)
+
+TEST_FROM_PRIOR_MINIMAL = FromPrior(
+    iss="did:example1",
+    sub="did:example2",
 )
 
 

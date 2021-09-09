@@ -219,6 +219,9 @@ def __validate(
     if sign_frm is not None and not is_did(sign_frm):
         raise DIDCommValueError()
 
+    if message.to is not None and not isinstance(message.to, List):
+        raise DIDCommValueError()
+
     if message.to is not None and get_did(to) not in message.to:
         raise DIDCommValueError()
 

@@ -4,8 +4,12 @@ from dataclasses import dataclass
 from typing import Optional, List, Union, Dict, TypeVar, Generic
 
 from didcomm.common.types import JSON_VALUE, DID, DID_URL, JSON_OBJ, DIDCommMessageTypes
-from didcomm.core.utils import dataclass_to_dict
-from didcomm.errors import MalformedMessageError, MalformedMessageCode
+from didcomm.core.utils import dataclass_to_dict, is_did, is_did_url
+from didcomm.errors import (
+    MalformedMessageError,
+    MalformedMessageCode,
+    DIDCommValueError,
+)
 
 Header = Dict[str, JSON_VALUE]
 T = TypeVar("T")
@@ -38,8 +42,69 @@ class GenericMessage(Generic[T]):
     attachments: Optional[List[Attachment]] = None
     custom_headers: Optional[List[Header]] = None
 
+    # TODO: refactor
+    __DEFAULT_FIELDS = {
+        "id",
+        "type",
+        "body",
+        "frm",
+        "to",
+        "created_time",
+        "expires_time",
+        "from_prior",
+        "please_ack",
+        "ack",
+        "thid",
+        "pthid",
+        "attachments",
+    }
+
     def as_dict(self) -> dict:
         d = dataclass_to_dict(self)
+
+        if (
+            not isinstance(self.id, str)
+            or not isinstance(self.type, str)
+            or self.frm is not None
+            and not isinstance(self.frm, str)
+            or self.to is not None
+            and not isinstance(self.to, List)
+            or self.created_time is not None
+            and not isinstance(self.created_time, int)
+            or self.expires_time is not None
+            and not isinstance(self.expires_time, int)
+            or self.please_ack is not None
+            and not isinstance(self.please_ack, bool)
+            or self.ack is not None
+            and not isinstance(self.ack, str)
+            or self.thid is not None
+            and not isinstance(self.thid, str)
+            or self.pthid is not None
+            and not isinstance(self.pthid, str)
+            or self.from_prior is not None
+            and not isinstance(self.from_prior, FromPrior)
+            or self.attachments is not None
+            and not isinstance(self.attachments, List)
+            or self.custom_headers is not None
+            and not isinstance(self.custom_headers, List)
+        ):
+            raise DIDCommValueError()
+
+        if self.to is not None:
+            for to in self.to:
+                if not isinstance(to, str):
+                    raise DIDCommValueError()
+        if self.attachments is not None:
+            for attachment in self.attachments:
+                if not isinstance(attachment, Attachment):
+                    raise DIDCommValueError()
+        if self.custom_headers is not None:
+            for custom_header in self.custom_headers:
+                if not isinstance(custom_header, Dict):
+                    raise DIDCommValueError()
+                for k in custom_header.keys():
+                    if k in self.__DEFAULT_FIELDS:
+                        raise DIDCommValueError()
 
         if "frm" in d:
             d["from"] = d["frm"]
@@ -81,10 +146,14 @@ class GenericMessage(Generic[T]):
         return msg
 
 
-Message = GenericMessage[JSON_OBJ]
+class Message(GenericMessage[JSON_OBJ]):
+    def as_dict(self) -> dict:
+        if not isinstance(self.body, Dict):
+            raise DIDCommValueError()
+        return super().as_dict()
 
 
-@dataclass(frozen=True)
+@dataclass
 class Attachment:
     """Plaintext attachment"""
 
@@ -98,6 +167,27 @@ class Attachment:
     byte_count: Optional[int] = None
 
     def as_dict(self) -> dict:
+        if (
+            not isinstance(self.id, str)
+            or not isinstance(
+                self.data,
+                (AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson),
+            )
+            or self.description is not None
+            and not isinstance(self.description, str)
+            or self.filename is not None
+            and not isinstance(self.filename, str)
+            or self.media_type is not None
+            and not isinstance(self.media_type, str)
+            or self.format is not None
+            and not isinstance(self.format, str)
+            or self.lastmod_time is not None
+            and not isinstance(self.lastmod_time, int)
+            or self.byte_count is not None
+            and not isinstance(self.byte_count, int)
+        ):
+            raise DIDCommValueError()
+
         d = dataclass_to_dict(self)
         d["data"] = self.data.as_dict()
         return d
@@ -115,13 +205,24 @@ class Attachment:
         return Attachment(**d)
 
 
-@dataclass(frozen=True)
+@dataclass
 class AttachmentDataLinks:
     links: List[str]
     hash: str
     jws: Optional[JSON_OBJ] = None
 
     def as_dict(self) -> dict:
+        if (
+            not isinstance(self.links, List)
+            or not isinstance(self.hash, str)
+            or self.jws is not None
+            and not isinstance(self.jws, Dict)
+        ):
+            raise DIDCommValueError()
+        for link in self.links:
+            if not isinstance(link, str):
+                raise DIDCommValueError()
+
         return dataclass_to_dict(self)
 
     @staticmethod
@@ -130,13 +231,22 @@ class AttachmentDataLinks:
         return AttachmentDataLinks(**d)
 
 
-@dataclass(frozen=True)
+@dataclass
 class AttachmentDataBase64:
     base64: str
     hash: Optional[str] = None
     jws: Optional[JSON_OBJ] = None
 
     def as_dict(self) -> dict:
+        if (
+            not isinstance(self.base64, str)
+            or self.hash
+            and not isinstance(self.hash, str)
+            or self.jws is not None
+            and not isinstance(self.jws, Dict)
+        ):
+            raise DIDCommValueError()
+
         return dataclass_to_dict(self)
 
     @staticmethod
@@ -145,13 +255,22 @@ class AttachmentDataBase64:
         return AttachmentDataBase64(**d)
 
 
-@dataclass(frozen=True)
+@dataclass
 class AttachmentDataJson:
     json: JSON_VALUE
     hash: Optional[str] = None
     jws: Optional[JSON_OBJ] = None
 
     def as_dict(self) -> dict:
+        if (
+            not isinstance(self.json, (str, int, bool, float, Dict, List))
+            or self.hash
+            and not isinstance(self.hash, str)
+            or self.jws is not None
+            and not isinstance(self.jws, Dict)
+        ):
+            raise DIDCommValueError()
+
         return dataclass_to_dict(self)
 
     @staticmethod
@@ -169,9 +288,28 @@ class FromPrior:
     nbf: Optional[int] = None
     iat: Optional[int] = None
     jti: Optional[str] = None
-    iss_kid: DID_URL = None
+    iss_kid: Optional[DID_URL] = None
 
     def as_dict(self) -> dict:
+        if (
+            not is_did(self.iss)
+            or not is_did(self.sub)
+            or not isinstance(self.sub, str)
+            or self.aud is not None
+            and not isinstance(self.aud, str)
+            or self.exp is not None
+            and not isinstance(self.exp, int)
+            or self.nbf is not None
+            and not isinstance(self.nbf, int)
+            or self.iat is not None
+            and not isinstance(self.iat, int)
+            or self.jti is not None
+            and not isinstance(self.jti, str)
+            or self.iss_kid is not None
+            and not is_did_url(self.iss_kid)
+        ):
+            raise DIDCommValueError()
+
         return dataclass_to_dict(self)
 
     @staticmethod
