@@ -6,7 +6,7 @@ from didcomm.common.types import (
     VerificationMaterialFormat,
 )
 from didcomm.secrets.secrets_resolver import Secret
-from didcomm.secrets.secrets_resolver_in_memory import SecretsResolverInMemory
+from tests.test_vectors.secrets.mock_secrets_resolver import MockSecretsResolverInMemory
 
 BOB_SECRET_KEY_AGREEMENT_KEY_X25519_1 = Secret(
     kid="did:example:bob#key-x25519-1",
@@ -159,7 +159,7 @@ BOB_SECRET_KEY_AGREEMENT_KEY_P521_2 = Secret(
 )
 
 
-class MockSecretsResolverBob(SecretsResolverInMemory):
+class MockSecretsResolverBob(MockSecretsResolverInMemory):
     def __init__(self):
         super().__init__(
             secrets=[

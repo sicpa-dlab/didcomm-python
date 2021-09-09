@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, AsyncGenerator, Any
 
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import DID_OR_DID_URL, DID_URL, DID
@@ -9,6 +9,7 @@ from didcomm.errors import (
     DIDUrlNotFoundError,
     SecretNotFoundError,
 )
+from didcomm.secrets.secrets_resolver import Secret
 
 
 async def find_anoncrypt_pack_recipient_public_keys(
@@ -26,7 +27,7 @@ async def find_anoncrypt_pack_recipient_public_keys(
 
 async def find_anoncrypt_unpack_recipient_private_keys(
     to_kids: List[DID_URL], resolvers_config: ResolversConfig
-):
+) -> AsyncGenerator[Secret, Any]:
     secret_ids = await resolvers_config.secrets_resolver.get_keys(to_kids)
     if not secret_ids:
         raise DIDUrlNotFoundError()
@@ -67,8 +68,6 @@ async def _find_anoncrypt_pack_recipient_public_keys_by_did(
     if did_doc is None:
         raise DIDDocNotResolvedError()
 
-    if not did_doc.key_agreement_kids:
-        raise DIDUrlNotFoundError()
     kids = did_doc.key_agreement_kids
     if not kids:
         raise DIDUrlNotFoundError()

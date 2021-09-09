@@ -92,6 +92,7 @@ async def pack_encrypted(
 
     :return: A pack result consisting of a packed message as a JSON string
              and an optional service metadata with an endpoint to be used to transport the packed message.
+    :rtype: PackEncryptedResult
     """
 
     pack_config = pack_config or PackEncryptedConfig()

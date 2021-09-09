@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, AsyncGenerator, Any
 
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import DID_OR_DID_URL, DID_URL
@@ -73,15 +73,15 @@ async def find_authcrypt_pack_sender_and_recipient_keys(
         if verification_methods:
             return AuthcryptPackKeys(secret, verification_methods)
 
-    raise IncompatibleCryptoError()
+    raise SecretNotFoundError()
 
 
 async def find_authcrypt_unpack_sender_and_recipient_keys(
     frm_kid: DID_URL, to_kids: List[DID_URL], resolvers_config: ResolversConfig
-):
+) -> AsyncGenerator[AuthcryptUnpackKeys, Any]:
     secret_ids = await resolvers_config.secrets_resolver.get_keys(to_kids)
     if not secret_ids:
-        raise SecretNotFoundError()
+        raise DIDUrlNotFoundError()
 
     frm_did = get_did(frm_kid)
     sender_did_doc = await resolvers_config.did_resolver.resolve(frm_did)
@@ -104,4 +104,4 @@ async def find_authcrypt_unpack_sender_and_recipient_keys(
         yield AuthcryptUnpackKeys(secret, sender_verification_method)
 
     if not found:
-        raise DIDUrlNotFoundError()
+        raise IncompatibleCryptoError()
