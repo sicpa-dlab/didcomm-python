@@ -25,6 +25,8 @@ async def find_anoncrypt_pack_recipient_public_keys(
     )
 
 
+# TODO: async generators require Python 3.6.
+# Think about alternative approach with the same properties that can work on Python 3.5
 async def find_anoncrypt_unpack_recipient_private_keys(
     to_kids: List[DID_URL], resolvers_config: ResolversConfig
 ) -> AsyncGenerator[Secret, Any]:

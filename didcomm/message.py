@@ -11,6 +11,8 @@ Header = Dict[str, JSON_VALUE]
 T = TypeVar("T")
 
 
+# TODO: dataclasses require Python 3.7.
+# Think about alternative approach with the same properties (attrs lib for example) that can work on Python 3.5
 @dataclass
 class GenericMessage(Generic[T]):
     """

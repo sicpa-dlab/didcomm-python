@@ -81,6 +81,8 @@ async def find_authcrypt_pack_sender_and_recipient_keys(
         raise IncompatibleCryptoError()
 
 
+# TODO: async generators require Python 3.6.
+# Think about alternative approach with the same properties that can work on Python 3.5
 async def find_authcrypt_unpack_sender_and_recipient_keys(
     frm_kid: DID_URL, to_kids: List[DID_URL], resolvers_config: ResolversConfig
 ) -> AsyncGenerator[AuthcryptUnpackKeys, Any]:
