@@ -1,13 +1,13 @@
 from didcomm.did_doc.did_resolver_in_memory import DIDResolverInMemory
-from tests.test_vectors.did_doc.did_doc_alice import (
+from tests.test_vectors.did_doc import (
     DID_DOC_ALICE_WITH_NO_SECRETS,
     DID_DOC_ALICE_SPEC_TEST_VECTORS,
-)
-from tests.test_vectors.did_doc.did_doc_bob import (
     DID_DOC_BOB_WITH_NO_SECRETS,
     DID_DOC_BOB_SPEC_TEST_VECTORS,
+    DID_DOC_CHARLIE,
+    DID_DOC_MEDIATOR1,
+    DID_DOC_MEDIATOR2
 )
-from tests.test_vectors.did_doc.did_doc_charlie import DID_DOC_CHARLIE
 
 
 class MockDIDResolverAllInSecrets(DIDResolverInMemory):
@@ -17,6 +17,8 @@ class MockDIDResolverAllInSecrets(DIDResolverInMemory):
                 DID_DOC_ALICE_SPEC_TEST_VECTORS,
                 DID_DOC_BOB_SPEC_TEST_VECTORS,
                 DID_DOC_CHARLIE,
+                DID_DOC_MEDIATOR1,
+                DID_DOC_MEDIATOR2
             ]
         )
 

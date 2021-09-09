@@ -1,23 +1,41 @@
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass
-from typing import Optional, List, Union, Dict, TypeVar, Generic
+import attr
+from typing import (
+    Optional, List, Union, Dict, TypeVar, Generic, Callable
+)
 
-from didcomm.common.types import JSON_VALUE, DID, DID_URL, JSON_OBJ, DIDCommMessageTypes
-from didcomm.core.utils import dataclass_to_dict, is_did, is_did_url
+from didcomm.common.types import (
+    JSON_VALUE,
+    DID,
+    DID_URL,
+    JSON_OBJ,
+    DIDCommMessageTypes
+)
+from didcomm.core.utils import (
+    dataclass_to_dict,
+    attrs_to_dict,
+    is_did,
+    is_did_url
+)
+from didcomm.core.converters import (
+    converter__id
+)
 from didcomm.errors import (
     MalformedMessageError,
     MalformedMessageCode,
-    DIDCommValueError,
+    DIDCommValueError
 )
 
 Header = Dict[str, JSON_VALUE]
 T = TypeVar("T")
 
 
-# TODO: dataclasses require Python 3.7.
-# Think about alternative approach with the same properties (attrs lib for example) that can work on Python 3.5
-@dataclass
+# TODO use attrs' API (validators, converters, helpers) to improve
+#      validation and from_dict routine
+@attr.s(auto_attribs=True)
 class GenericMessage(Generic[T]):
     """
     Message consisting of headers and application/protocol specific data (body).
@@ -59,8 +77,22 @@ class GenericMessage(Generic[T]):
         "attachments",
     }
 
+    def _body_as_dict(self):
+        if dataclasses.is_dataclass(self.body):
+            return dataclass_to_dict(self.body)
+        elif attr.has(type(self.body)):
+            return attrs_to_dict(self.body)
+        else:
+            return self.body
+
+    @staticmethod
+    def _body_from_dict(body: dict) -> T:
+        return body
+
     def as_dict(self) -> dict:
-        d = dataclass_to_dict(self)
+        d = attrs_to_dict(self)
+
+        d["body"] = self._body_as_dict()
 
         self._validate()
 
@@ -77,8 +109,8 @@ class GenericMessage(Generic[T]):
 
         return d
 
-    @staticmethod
-    def from_dict(d: dict) -> Message:
+    @classmethod
+    def from_dict(cls, d: dict) -> Message:
         if not isinstance(d, Dict):
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
 
@@ -93,11 +125,17 @@ class GenericMessage(Generic[T]):
 
         del d["typ"]
 
-        if "from_prior" in d:
+        d["body"] = cls._body_from_dict(d["body"])
+
+        # XXX do we expect undefined from_prior ???
+        if d.get("from_prior"):
             d["from_prior"] = FromPrior.from_dict(d["from_prior"])
 
-        if "attachments" in d:
-            d["attachments"] = [Attachment.from_dict(e) for e in d["attachments"]]
+        # XXX do we expect undefined or empty attachments ???
+        if d.get("attachments"):
+            d["attachments"] = [
+                Attachment.from_dict(e) for e in d["attachments"]
+            ]
 
         try:
             msg = Message(**d)
@@ -160,12 +198,16 @@ class Message(GenericMessage[JSON_OBJ]):
         return super().as_dict()
 
 
-@dataclass
+@attr.s(auto_attribs=True)
 class Attachment:
     """Plaintext attachment"""
 
-    id: str
     data: Union[AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson]
+    id: Optional[Union[str, Callable]] = attr.ib(
+        converter=converter__id,
+        validator=attr.validators.instance_of(str),
+        default=None
+    )
     description: Optional[str] = None
     filename: Optional[str] = None
     media_type: Optional[str] = None
@@ -175,7 +217,7 @@ class Attachment:
 
     def as_dict(self) -> dict:
         self._validate()
-        d = dataclass_to_dict(self)
+        d = attrs_to_dict(self)
         d["data"] = self.data.as_dict()
         return d
 

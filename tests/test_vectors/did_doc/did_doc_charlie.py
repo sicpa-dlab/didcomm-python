@@ -5,7 +5,7 @@ from didcomm.common.types import (
     VerificationMaterial,
     VerificationMaterialFormat,
 )
-from didcomm.did_doc.did_doc import DIDDoc, VerificationMethod
+from didcomm.did_doc.did_doc import DIDDoc, VerificationMethod, DIDCommService
 
 CHARLIE_VERIFICATION_METHOD_KEY_AGREEM_X25519 = VerificationMethod(
     id="did:example:charlie#key-x25519-1",
@@ -43,7 +43,19 @@ DID_DOC_CHARLIE = DIDDoc(
     did="did:example:charlie",
     authentication_kids=["did:example:charlie#key-1"],
     key_agreement_kids=["did:example:charlie#key-x25519-1"],
-    didcomm_services=[],
+    didcomm_services=[
+        DIDCommService(
+            id="did:example:123456789abcdefghi#didcomm-1",
+            service_endpoint="did:example:mediator2",
+            accept=[
+                "didcomm/v2",
+                "didcomm/aip2;env=rfc587"
+            ],
+            routing_keys=[
+                "did:example:mediator2#key-p521-1",
+            ]
+        )
+    ],
     verification_methods=[
         CHARLIE_VERIFICATION_METHOD_KEY_AGREEM_X25519,
         CHARLIE_AUTH_METHOD_25519,

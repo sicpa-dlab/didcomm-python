@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import attr
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -9,6 +10,7 @@ from didcomm.common.types import (
     VerificationMaterial,
     VerificationMethodType,
 )
+from didcomm.common.utils import search_first_in_iterable
 
 
 @dataclass
@@ -42,10 +44,18 @@ class DIDDoc:
         :param id: an identifier of a verification method
         :return: the verification method or None of there is no one for the given identifier
         """
-        for m in self.verification_methods:
-            if m.id == id:
-                return m
-        return None
+        return search_first_in_iterable(
+            self.verification_methods, lambda x: x.id == id)
+
+    def get_didcomm_service(self, id: str) -> Optional[DIDCommService]:
+        """
+        Returns DID Document service endpoint with the given identifier.
+
+        :param id: an identifier of a service endpoint
+        :return: the service endpoint or None of there is no one for the given identifier
+        """
+        return search_first_in_iterable(
+            self.didcomm_services, lambda x: x.id == id)
 
 
 @dataclass
@@ -68,7 +78,15 @@ class VerificationMethod:
     verification_material: VerificationMaterial
 
 
-@dataclass
+# might makes sense for future
+# def converter__DIDDocServiceTypes(service_t: Union[str, Any]):
+#     return (
+#         DIDDocServiceTypes(service_t)
+#         if isinstance(service_t, str) else service_t
+#     )
+
+
+@attr.s(auto_attribs=True)
 class DIDCommService:
     """
     DID DOC Service of 'DIDCommMessaging' type.
@@ -86,7 +104,17 @@ class DIDCommService:
            A possibly empty ordered array of strings representing accepted didcomm specification versions.
     """
 
-    id: str
-    service_endpoint: str
-    routing_keys: List[DID_URL]
-    accept: List[str]
+    id: str = attr.ib(
+        validator=attr.validators.instance_of(str)
+    )
+    service_endpoint: str = attr.ib(
+        validator=attr.validators.instance_of(str)
+    )
+    # TODO validate each item (should be did-url)
+    routing_keys: List[DID_URL] = attr.ib(
+        validator=attr.validators.instance_of(list)
+    )
+    # TODO validate each item (should be str)
+    accept: List[str] = attr.ib(
+        validator=attr.validators.instance_of(list)
+    )

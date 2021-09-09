@@ -1,19 +1,29 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JSON, DID_OR_DID_URL
+from didcomm.common.types import JSON, JSON_OBJ, DID_OR_DID_URL
+from didcomm.core.defaults import DEF_ENC_ALG_AUTH, DEF_ENC_ALG_ANON
 from didcomm.core.anoncrypt import anoncrypt, find_keys_and_anoncrypt
 from didcomm.core.authcrypt import find_keys_and_authcrypt
 from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
-from didcomm.core.types import EncryptResult, SignResult
-from didcomm.core.utils import get_did, is_did
+from didcomm.core.types import EncryptResult, SignResult, DIDCommGeneratorType
+from didcomm.core.utils import get_did, is_did, didcomm_id_generator_default
 from didcomm.errors import DIDCommValueError
 from didcomm.message import Message, Header
+from didcomm.did_doc.did_doc import DIDCommService
+from didcomm.protocols.forward.forward import (
+    wrap_in_forward,
+    resolve_did_services_chain,
+    ForwardPackResult
+)
+
+logger = logging.getLogger(__name__)
 
 
 async def pack_encrypted(
@@ -119,18 +129,35 @@ async def pack_encrypted(
     # 5. protected sender ID if needed
     encrypt_res_protected = __protected_sender_id_if_needed(encrypt_res, pack_config)
 
-    # 6. do forward if needed
-    await __forward_if_needed()  # TBD
-
     packed_msg = dict_to_json(
         encrypt_res_protected.msg if encrypt_res_protected else encrypt_res.msg
     )
+
+    # 6. resolve service information
+    did_services_chain = await resolve_did_services_chain(
+        resolvers_config, to, pack_params.forward_service_id
+    )
+
+    # 7. do forward if needed
+    fwd_res = await __forward_if_needed(
+        resolvers_config,
+        packed_msg,
+        to,
+        did_services_chain,
+        pack_config,
+        pack_params
+    )
+    if fwd_res:
+        packed_msg = dict_to_json(fwd_res.msg_encrypted.msg)
+
     return PackEncryptedResult(
         packed_msg=packed_msg,
-        service_metadata=ServiceMetadata("", ""),
         to_kids=encrypt_res.to_kids,
         from_kid=encrypt_res.from_kid,
         sign_from_kid=sign_res.sign_frm_kid if sign_res else None,
+        service_metadata=ServiceMetadata(
+            did_services_chain[0].id, did_services_chain[-1].service_endpoint
+        ) if did_services_chain else None,
     )
 
 
@@ -151,38 +178,51 @@ class PackEncryptedResult:
     """
 
     packed_msg: JSON
-    service_metadata: Optional[ServiceMetadata]
     to_kids: List[DID_OR_DID_URL]
     from_kid: Optional[DID_OR_DID_URL]
     sign_from_kid: Optional[DID_OR_DID_URL]
+    service_metadata: Optional[ServiceMetadata] = None
 
 
 @dataclass(frozen=True)
 class ServiceMetadata:
+    """
+    Resolved DID DOC Service metadata.
+
+    Attributes:
+        id (str): service's 'id' field of the final recipient DID Doc Service
+        service_endpoint (str): resolved URI to be used for transport
+    """
+
     id: str
     service_endpoint: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class PackEncryptedConfig:
     """
     Pack configuration.
 
     Default config performs repudiable authentication encryption (auth_crypt)
-    and prepares a message ready to be forwarded to the returned endpoint (via Forward protocol).
+    and prepares a message ready to be forwarded to the returned endpoint
+    (via Forward protocol).
 
     Attributes:
-        enc_alg_auth (AuthCryptAlg): The encryption algorithm to be used for authentication encryption (auth_crypt).
-                                     `A256CBC_HS512_ECDH_1PU_A256KW` by default.
-        enc_alg_anon (AnonCryptAlg): The encryption algorithm to be used for anonymous encryption (anon_crypt).
-                                     `XC20P_ECDH_ES_A256KW` by default.
-        protect_sender_id (bool): Whether the sender's identity needs to be protected during authentication encryption.
-        forward (bool): Whether the packed messages need to be wrapped into Forward messages to be sent to Mediators
-                        as defined by the Forward protocol. True by default.
+        enc_alg_auth (AuthCryptAlg): The encryption algorithm to be used for
+            authentication encryption (auth_crypt).
+            `A256CBC_HS512_ECDH_1PU_A256KW` by default.
+        enc_alg_anon (AnonCryptAlg): The encryption algorithm to be used for
+            anonymous encryption (anon_crypt).
+            `XC20P_ECDH_ES_A256KW` by default.
+        protect_sender_id (bool): Whether the sender's identity needs to be
+            protected during authentication encryption.
+        forward (bool): Whether the packed messages need to be wrapped into
+            Forward messages to be sent to Mediators as defined by the Forward
+            protocol. True by default.
     """
 
-    enc_alg_auth: AuthCryptAlg = AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW
-    enc_alg_anon: AnonCryptAlg = AnonCryptAlg.XC20P_ECDH_ES_A256KW
+    enc_alg_auth: AuthCryptAlg = DEF_ENC_ALG_AUTH
+    enc_alg_anon: AnonCryptAlg = DEF_ENC_ALG_ANON
     protect_sender_id: bool = False
     forward: bool = True
 
@@ -193,15 +233,22 @@ class PackEncryptedParameters:
     Optional parameters for pack.
 
     Attributes:
-        forward_headers (MessageOptionalHeaders): If forward is enabled (true by default),
-                                                  optional headers can be passed to the wrapping Forward messages.
+        forward_headers (MessageOptionalHeaders): If forward is enabled
+            (true by default), optional headers can be passed to the wrapping
+            Forward messages.
         forward_service_id (str): If forward is enabled (true by default),
-                                  optional service ID from recipient's DID Doc to be used for Forwarding.
-
+            optional service ID from recipient's DID Doc to be used for
+            Forwarding.
+        forward_didcomm_id_generator (Callable): optional callable to use
+            for forward messages ``id`` generation, ``didcomm_id_generator_default``
+            is used by default
     """
 
-    forward_headers: Optional[List[Header]] = None
+    forward_headers: Optional[Header] = None
     forward_service_id: Optional[str] = None
+    forward_didcomm_id_generator: Optional[DIDCommGeneratorType] = (
+        didcomm_id_generator_default
+    )
 
 
 def __validate(
@@ -265,6 +312,44 @@ def __protected_sender_id_if_needed(
     )
 
 
-async def __forward_if_needed():
-    # TBD
-    pass
+async def __forward_if_needed(
+    resolvers_config: ResolversConfig,
+    packed_msg: Union[JSON_OBJ, JSON],
+    to: DID_OR_DID_URL,
+    did_services_chain: List[DIDCommService],
+    pack_config: Optional[PackEncryptedConfig] = None,
+    pack_params: Optional[PackEncryptedParameters] = None,
+) -> Optional[ForwardPackResult]:
+    routing_keys = []
+
+    if not pack_config.forward:
+        logger.debug("forwrad is turned off")
+        return None
+
+    # build routing keys them using recipient service information
+    if not did_services_chain:
+        logger.debug("No service endpoint found: skipping forward wrapping")
+        return None
+
+    # first service is for 'to' DID
+    routing_keys = did_services_chain[0].routing_keys
+
+    # prepend routing with alternative endpoints
+    # cases:
+    #   ==1 usual sender forward process
+    #   >1 alternative endpoints
+    #   >2 alternative endpoints recursion
+    if len(did_services_chain) > 1:
+        routing_keys[:0] = [
+            s.service_endpoint for s in did_services_chain[:-1]
+        ]
+
+    return await wrap_in_forward(
+        resolvers_config=resolvers_config,
+        packed_msg=packed_msg,
+        to=to,
+        routing_keys=routing_keys,
+        enc_alg_anon=pack_config.enc_alg_anon,
+        headers=pack_params.forward_headers,
+        didcomm_id_generator=pack_params.forward_didcomm_id_generator
+    )

@@ -1,4 +1,6 @@
 import dataclasses
+import attr
+import uuid
 from typing import Union, Optional, Any
 
 from authlib.common.encoding import to_unicode, urlsafe_b64decode, to_bytes
@@ -19,6 +21,17 @@ from didcomm.errors import DIDCommValueError
 from didcomm.secrets.secrets_resolver import Secret
 
 
+def id_generator_default() -> str:
+    return str(uuid.uuid4())
+
+
+def didcomm_id_generator_default(did: Optional[DID_OR_DID_URL] = None) -> str:
+    res = id_generator_default()
+    if did:
+        res = f"{did}:{res}"
+    return res
+
+
 def extract_key(
     verification_method: Union[VerificationMethod, Secret]
 ) -> AsymmetricKey:
@@ -34,7 +47,9 @@ def extract_key(
             return OKPKey.import_key(jwk)
         raise DIDCommValueError()
     elif (
-        verification_method.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018
+        verification_method.type == (
+            VerificationMethodType.ED25519_VERIFICATION_KEY_2018
+        )
     ):
         # FIXME
         raise NotImplementedError()
@@ -42,7 +57,9 @@ def extract_key(
     raise DIDCommValueError()
 
 
-def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> SignAlg:
+def extract_sign_alg(
+    verification_method: Union[VerificationMethod, Secret]
+) -> SignAlg:
     if (
         verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020
         and verification_method.verification_material.format
@@ -59,7 +76,9 @@ def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> 
         raise DIDCommValueError()
 
     elif (
-        verification_method.type == VerificationMethodType.ED25519_VERIFICATION_KEY_2018
+        verification_method.type == (
+            VerificationMethodType.ED25519_VERIFICATION_KEY_2018
+        )
     ):
         return SignAlg.ED25519
 
@@ -74,18 +93,22 @@ def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> 
 
 def is_did(v: Any) -> bool:
     # TODO
-    #   - condider other presentations (e.g bytes)
+    #   - consider other presentations (e.g bytes)
     #   - strict verifications for parts
     #     (https://www.w3.org/TR/did-core/#did-syntax)
     if isinstance(v, (str, DID)):
-        parts = str(v).split(":")
-        return len(parts) == 3 and parts[0] == "did" and all(parts)
+        parts = str(v).split(':')
+        return (
+            len(parts) == 3
+            and parts[0] == "did"
+            and all(parts)
+        )
     return False
 
 
 def is_did_url(v: Any) -> bool:
     # TODO
-    #   - condider other presentations (e.g bytes)
+    #   - consider other presentations (e.g bytes)
     #   - verifications for after-did parts
     #     (https://www.w3.org/TR/did-core/#did-url-syntax)
     if isinstance(v, (str, DID_URL)):
@@ -98,7 +121,9 @@ def get_did(did_or_did_url: DID_OR_DID_URL) -> DID:
     return did_or_did_url.partition("#")[0]
 
 
-def get_did_and_optionally_kid(did_or_kid: DID_OR_DID_URL) -> (DID, Optional[DID_URL]):
+def get_did_and_optionally_kid(
+    did_or_kid: DID_OR_DID_URL
+) -> (DID, Optional[DID_URL]):
     if is_did_url(did_or_kid):
         did = get_did(did_or_kid)
         kid = did_or_kid
@@ -113,9 +138,15 @@ def are_keys_compatible(
 ) -> bool:
     if (
         method1.type == method2.type
-        and method1.verification_material.format == method2.verification_material.format
+        and (
+            method1.verification_material.format ==
+            method2.verification_material.format
+        )
     ):
-        if method1.verification_material.format == VerificationMaterialFormat.JWK:
+        if (
+            method1.verification_material.format ==
+            VerificationMaterialFormat.JWK
+        ):
             private_jwk = json_str_to_dict(method1.verification_material.value)
             public_jwk = json_str_to_dict(method2.verification_material.value)
             return (
@@ -144,9 +175,16 @@ def get_jwe_alg(jwe: dict) -> Optional[str]:
     return protected.get("alg")
 
 
-def dataclass_to_dict(msg) -> dict:
-    d = dataclasses.asdict(msg)
+def dict_cleanup(d: dict) -> dict:
     for k in set(d.keys()):
         if d[k] is None:
             del d[k]
     return d
+
+
+def dataclass_to_dict(msg) -> dict:
+    return dict_cleanup(dataclasses.asdict(msg))
+
+
+def attrs_to_dict(attrs_inst: Any) -> dict:
+    return dict_cleanup(attr.asdict(attrs_inst))

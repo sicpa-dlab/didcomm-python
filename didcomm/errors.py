@@ -25,6 +25,10 @@ class IncompatibleCryptoError(DIDCommError):
     pass
 
 
+class InvalidDIDDocError(DIDCommValueError):
+    pass
+
+
 class MalformedMessageCode(Enum):
     CAN_NOT_DECRYPT = 1
     INVALID_SIGNATURE = 2

@@ -1,13 +1,16 @@
 import pytest as pytest
 
 from didcomm.message import Attachment, Message, AttachmentDataJson
-from didcomm.pack_encrypted import pack_encrypted
+from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
+from didcomm.protocols.forward.forward import unpack_forward
 from didcomm.unpack import unpack
 from tests.test_vectors.common import ALICE_DID, BOB_DID
 
 
 @pytest.mark.asyncio
-async def test_demo_attachments(resolvers_config_alice, resolvers_config_bob):
+async def test_demo_attachments(
+    resolvers_config_alice, resolvers_config_bob, resolvers_config_mediator1
+):
     # ALICE
     attachment = Attachment(
         id="123",
@@ -30,10 +33,17 @@ async def test_demo_attachments(resolvers_config_alice, resolvers_config_bob):
         message=message,
         frm=ALICE_DID,
         to=BOB_DID,
+        pack_config=PackEncryptedConfig(forward=True)
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
+    # BOB's MEDIATOR
+    forward_bob = await unpack_forward(
+        resolvers_config_mediator1, packed_msg, True
+    )
+    print(f"Got {forward_bob.forwarded_msg}")
+
     # BOB
-    unpack_result = await unpack(resolvers_config_bob, packed_msg)
+    unpack_result = await unpack(resolvers_config_bob, forward_bob.forwarded_msg)
     print(f"Got ${unpack_result.message}")

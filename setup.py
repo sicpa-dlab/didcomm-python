@@ -23,8 +23,10 @@ setup(
     ],
     packages=["didcomm"],
     install_requires=[
-        "Authlib@git+https://github.com/sicpa-dlab/authlib.git@json-serialization-and-multi-recipient",
+        # TODO switch to pypi once necessary authlib version is released
+        "Authlib@git+https://github.com/lepture/authlib.git",
         "pycryptodomex>=3.10,<4",
+        "attrs>=21.2.0"  # TODO explore lowest acceptable version
     ],
-    extras_require={"tests": ["pytest", "pytest-asyncio"]},
+    extras_require={"tests": ["pytest", "pytest-asyncio", "flake8"]},
 )
