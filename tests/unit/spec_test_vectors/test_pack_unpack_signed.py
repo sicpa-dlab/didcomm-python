@@ -5,7 +5,8 @@ import pytest
 from didcomm.common.types import DID_OR_DID_URL
 from didcomm.pack_signed import pack_signed
 from didcomm.unpack import unpack
-from tests.test_vectors.common import ALICE_DID, TestVector, TEST_MESSAGE
+from tests.test_vectors.common import ALICE_DID, TestVector
+from tests.test_vectors.didcomm_messages.messages import TEST_MESSAGE
 from tests.test_vectors.didcomm_messages.spec.spec_test_vectors_signed import (
     TEST_SIGNED_DIDCOMM_MESSAGE,
 )

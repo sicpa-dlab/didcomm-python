@@ -4,7 +4,13 @@ from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.core.utils import is_did_url
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.unpack import unpack
-from tests.test_vectors.common import BOB_DID, ALICE_DID, TEST_MESSAGE
+from tests.test_vectors.common import BOB_DID, ALICE_DID
+from tests.test_vectors.didcomm_messages.messages import (
+    TEST_MESSAGE,
+    minimal_msg,
+    attachment_multi_1_msg,
+    attachment_json_msg,
+)
 from tests.test_vectors.utils import (
     get_key_agreement_methods_in_secrets,
     Person,
@@ -29,14 +35,22 @@ CURVES_TYPES = [
     KeyAgreementCurveType.P521,
     KeyAgreementCurveType.P384,
 ]
+MESSAGES = [
+    TEST_MESSAGE,
+    minimal_msg(),
+    attachment_multi_1_msg(),
+    attachment_json_msg(),
+]
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("msg", MESSAGES)
 @pytest.mark.parametrize("auth_alg", AUTH_ALG_PARAMS)
 @pytest.mark.parametrize("anon_alg", ANON_ALG_PARAMS)
 @pytest.mark.parametrize("sign_frm", SIGN_FRM_PARAMS)
 @pytest.mark.parametrize("protect_sender_id", [True, False])
 async def test_authcrypt_sender_did_recipient_did(
+    msg,
     auth_alg,
     anon_alg,
     sign_frm,
@@ -45,6 +59,7 @@ async def test_authcrypt_sender_did_recipient_did(
     resolvers_config_bob,
 ):
     await check_authcrypt(
+        msg=msg,
         frm=ALICE_DID,
         to=BOB_DID,
         sign_frm=sign_frm,
@@ -58,6 +73,7 @@ async def test_authcrypt_sender_did_recipient_did(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("msg", MESSAGES)
 @pytest.mark.parametrize(
     "to",
     [
@@ -72,6 +88,7 @@ async def test_authcrypt_sender_did_recipient_did(
 @pytest.mark.parametrize("sign_frm", SIGN_FRM_PARAMS)
 @pytest.mark.parametrize("protect_sender_id", [True, False])
 async def test_authcrypt_sender_did_recipient_kid(
+    msg,
     to,
     auth_alg,
     anon_alg,
@@ -81,6 +98,7 @@ async def test_authcrypt_sender_did_recipient_kid(
     resolvers_config_bob,
 ):
     await check_authcrypt(
+        msg=msg,
         frm=ALICE_DID,
         to=to,
         sign_frm=sign_frm,
@@ -94,12 +112,14 @@ async def test_authcrypt_sender_did_recipient_kid(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("msg", MESSAGES)
 @pytest.mark.parametrize("curve_type", CURVES_TYPES)
 @pytest.mark.parametrize("auth_alg", AUTH_ALG_PARAMS)
 @pytest.mark.parametrize("anon_alg", ANON_ALG_PARAMS)
 @pytest.mark.parametrize("sign_frm", SIGN_FRM_PARAMS)
 @pytest.mark.parametrize("protect_sender_id", [True, False])
 async def test_authcrypt_sender_kid_recipient_did(
+    msg,
     curve_type,
     auth_alg,
     anon_alg,
@@ -112,6 +132,7 @@ async def test_authcrypt_sender_kid_recipient_did(
         vm.id for vm in get_key_agreement_methods_in_secrets(Person.ALICE, curve_type)
     ]:
         await check_authcrypt(
+            msg=msg,
             frm=frm,
             to=BOB_DID,
             sign_frm=sign_frm,
@@ -125,12 +146,14 @@ async def test_authcrypt_sender_kid_recipient_did(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("msg", MESSAGES)
 @pytest.mark.parametrize("curve_type", CURVES_TYPES)
 @pytest.mark.parametrize("auth_alg", AUTH_ALG_PARAMS)
 @pytest.mark.parametrize("anon_alg", ANON_ALG_PARAMS)
 @pytest.mark.parametrize("sign_frm", SIGN_FRM_PARAMS)
 @pytest.mark.parametrize("protect_sender_id", [True, False])
 async def test_authcrypt_sender_kid_recipient_kid(
+    msg,
     curve_type,
     auth_alg,
     anon_alg,
@@ -146,6 +169,7 @@ async def test_authcrypt_sender_kid_recipient_kid(
             vm.id for vm in get_key_agreement_methods_in_secrets(Person.BOB, curve_type)
         ]:
             await check_authcrypt(
+                msg=msg,
                 frm=frm,
                 to=to,
                 sign_frm=sign_frm,
@@ -159,6 +183,7 @@ async def test_authcrypt_sender_kid_recipient_kid(
 
 
 async def check_authcrypt(
+    msg,
     frm,
     to,
     sign_frm,
@@ -176,7 +201,7 @@ async def check_authcrypt(
         pack_config.enc_alg_anon = anon_alg
     pack_result = await pack_encrypted(
         resolvers_config=resolvers_config_alice,
-        message=TEST_MESSAGE,
+        message=msg,
         frm=frm,
         to=to,
         sign_frm=sign_frm,
@@ -212,7 +237,7 @@ async def check_authcrypt(
     expected_anon_alg = anon_alg or AnonCryptAlg.XC20P_ECDH_ES_A256KW
     if not protect_sender_id:
         expected_anon_alg = None
-    assert unpack_res.message == TEST_MESSAGE
+    assert unpack_res.message == msg
     assert unpack_res.metadata.enc_alg_anon == expected_anon_alg
     assert unpack_res.metadata.enc_alg_auth == expected_alg
     assert unpack_res.metadata.anonymous_sender == protect_sender_id

@@ -5,7 +5,8 @@ import pytest
 from didcomm.common.types import DID_OR_DID_URL
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.unpack import unpack
-from tests.test_vectors.common import ALICE_DID, BOB_DID, TestVector, TEST_MESSAGE
+from tests.test_vectors.common import ALICE_DID, BOB_DID, TestVector
+from tests.test_vectors.didcomm_messages.messages import TEST_MESSAGE
 from tests.test_vectors.didcomm_messages.spec.spec_test_vectors_auth_encrypted import (
     TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH,
 )

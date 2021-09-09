@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Union, Optional
+from typing import Union, Optional, Any
 
 from authlib.common.encoding import to_unicode, urlsafe_b64decode, to_bytes
 from authlib.jose import ECKey, OKPKey
@@ -72,8 +72,26 @@ def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> 
     raise DIDCommValueError()
 
 
-def is_did_url(did_or_did_url: DID_OR_DID_URL) -> bool:
-    return "#" in did_or_did_url and len(did_or_did_url.partition("#")) == 3
+def is_did(v: Any) -> bool:
+    # TODO
+    #   - condider other presentations (e.g bytes)
+    #   - strict verifications for parts
+    #     (https://www.w3.org/TR/did-core/#did-syntax)
+    if isinstance(v, (str, DID)):
+        parts = str(v).split(":")
+        return len(parts) == 3 and parts[0] == "did" and all(parts)
+    return False
+
+
+def is_did_url(v: Any) -> bool:
+    # TODO
+    #   - condider other presentations (e.g bytes)
+    #   - verifications for after-did parts
+    #     (https://www.w3.org/TR/did-core/#did-url-syntax)
+    if isinstance(v, (str, DID_URL)):
+        before, sep, after = str(v).partition("#")  # always 3-tuple
+        return sep and after and is_did(before)
+    return False
 
 
 def get_did(did_or_did_url: DID_OR_DID_URL) -> DID:

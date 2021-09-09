@@ -2,7 +2,8 @@ import pytest
 
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.unpack import unpack
-from tests.test_vectors.common import TEST_MESSAGE, BOB_DID
+from tests.test_vectors.common import BOB_DID
+from tests.test_vectors.didcomm_messages.messages import TEST_MESSAGE
 from tests.test_vectors.didcomm_messages.spec.spec_test_vectors_anon_encrypted import (
     TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON,
 )

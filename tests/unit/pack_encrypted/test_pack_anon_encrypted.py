@@ -3,7 +3,13 @@ import pytest
 from didcomm.common.algorithms import AnonCryptAlg
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.unpack import unpack
-from tests.test_vectors.common import TEST_MESSAGE, BOB_DID, ALICE_DID
+from tests.test_vectors.common import BOB_DID, ALICE_DID
+from tests.test_vectors.didcomm_messages.messages import (
+    TEST_MESSAGE,
+    attachment_json_msg,
+    attachment_multi_1_msg,
+    minimal_msg,
+)
 from tests.test_vectors.utils import (
     get_key_agreement_methods,
     Person,
@@ -14,6 +20,10 @@ from tests.test_vectors.utils import (
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "msg",
+    [TEST_MESSAGE, minimal_msg(), attachment_multi_1_msg(), attachment_json_msg()],
+)
 @pytest.mark.parametrize(
     "alg",
     [
@@ -32,14 +42,20 @@ from tests.test_vectors.utils import (
 )
 @pytest.mark.parametrize("protect_sender_id", [True, False])
 async def test_anoncrypt(
-    alg, to, sign_frm, protect_sender_id, resolvers_config_alice, resolvers_config_bob
+    msg,
+    alg,
+    to,
+    sign_frm,
+    protect_sender_id,
+    resolvers_config_alice,
+    resolvers_config_bob,
 ):
     pack_config = PackEncryptedConfig(protect_sender_id=protect_sender_id)
     if alg:
         pack_config.enc_alg_anon = alg
     pack_result = await pack_encrypted(
         resolvers_config=resolvers_config_alice,
-        message=TEST_MESSAGE,
+        message=msg,
         to=to,
         sign_frm=sign_frm,
         pack_config=pack_config,
@@ -68,7 +84,7 @@ async def test_anoncrypt(
         resolvers_config=resolvers_config_bob, packed_msg=pack_result.packed_msg
     )
     expected_alg = alg or AnonCryptAlg.XC20P_ECDH_ES_A256KW
-    assert unpack_res.message == TEST_MESSAGE
+    assert unpack_res.message == msg
     assert unpack_res.metadata.enc_alg_anon == expected_alg
     assert unpack_res.metadata.enc_alg_auth is None
     assert unpack_res.metadata.anonymous_sender
