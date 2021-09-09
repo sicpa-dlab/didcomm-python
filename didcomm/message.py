@@ -62,6 +62,52 @@ class GenericMessage(Generic[T]):
     def as_dict(self) -> dict:
         d = dataclass_to_dict(self)
 
+        self._validate()
+
+        if "frm" in d:
+            d["from"] = d["frm"]
+            del d["frm"]
+
+        d["typ"] = DIDCommMessageTypes.PLAINTEXT.value
+
+        if self.attachments:
+            d["attachments"] = [a.as_dict() for a in self.attachments]
+        if self.from_prior:
+            d["from_prior"] = self.from_prior.as_dict()
+
+        return d
+
+    @staticmethod
+    def from_dict(d: dict) -> Message:
+        if not isinstance(d, Dict):
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        if "from" in d:
+            d["frm"] = d["from"]
+            del d["from"]
+
+        if "typ" not in d:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+        if d["typ"] != DIDCommMessageTypes.PLAINTEXT.value:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        del d["typ"]
+
+        if "from_prior" in d:
+            d["from_prior"] = FromPrior.from_dict(d["from_prior"])
+
+        if "attachments" in d:
+            d["attachments"] = [Attachment.from_dict(e) for e in d["attachments"]]
+
+        try:
+            msg = Message(**d)
+            msg._validate()
+        except Exception:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        return msg
+
+    def _validate(self):
         if (
             not isinstance(self.id, str)
             or not isinstance(self.type, str)
@@ -106,45 +152,6 @@ class GenericMessage(Generic[T]):
                     if k in self.__DEFAULT_FIELDS:
                         raise DIDCommValueError()
 
-        if "frm" in d:
-            d["from"] = d["frm"]
-            del d["frm"]
-
-        d["typ"] = DIDCommMessageTypes.PLAINTEXT.value
-
-        if self.attachments:
-            d["attachments"] = [a.as_dict() for a in self.attachments]
-        if self.from_prior:
-            d["from_prior"] = self.from_prior.as_dict()
-
-        return d
-
-    @staticmethod
-    def from_dict(d: dict) -> Message:
-        if "from" in d:
-            d["frm"] = d["from"]
-            del d["from"]
-        del d["typ"]
-
-        if "from_prior" in d:
-            d["from_prior"] = FromPrior.from_dict(d["from_prior"])
-
-        if "attachments" in d:
-            d["attachments"] = [Attachment.from_dict(e) for e in d["attachments"]]
-
-        msg = Message(**d)
-
-        # TODO: consider using attrs lib and its validators
-        if msg.id is None:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-        if msg.type is None:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-        if msg.body is None:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-        # TODO: more validation
-
-        return msg
-
 
 class Message(GenericMessage[JSON_OBJ]):
     def as_dict(self) -> dict:
@@ -167,6 +174,35 @@ class Attachment:
     byte_count: Optional[int] = None
 
     def as_dict(self) -> dict:
+        self._validate()
+        d = dataclass_to_dict(self)
+        d["data"] = self.data.as_dict()
+        return d
+
+    @staticmethod
+    def from_dict(d: dict) -> Attachment:
+        if not isinstance(d, Dict):
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        if "data" in d:
+            if not isinstance(d["data"], Dict):
+                raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+            if "links" in d["data"]:
+                d["data"] = AttachmentDataLinks.from_dict(d["data"])
+            elif "base64" in d["data"]:
+                d["data"] = AttachmentDataBase64.from_dict(d["data"])
+            elif "json" in d["data"]:
+                d["data"] = AttachmentDataJson.from_dict(d["data"])
+
+        try:
+            msg = Attachment(**d)
+            msg._validate()
+        except Exception:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        return msg
+
+    def _validate(self):
         if (
             not isinstance(self.id, str)
             or not isinstance(
@@ -188,22 +224,6 @@ class Attachment:
         ):
             raise DIDCommValueError()
 
-        d = dataclass_to_dict(self)
-        d["data"] = self.data.as_dict()
-        return d
-
-    @staticmethod
-    def from_dict(d: dict) -> Attachment:
-        # TODO: validation
-        if "data" in d:
-            if "links" in d["data"]:
-                d["data"] = AttachmentDataLinks.from_dict(d["data"])
-            elif "base64" in d["data"]:
-                d["data"] = AttachmentDataBase64.from_dict(d["data"])
-            elif "json" in d["data"]:
-                d["data"] = AttachmentDataJson.from_dict(d["data"])
-        return Attachment(**d)
-
 
 @dataclass
 class AttachmentDataLinks:
@@ -212,6 +232,20 @@ class AttachmentDataLinks:
     jws: Optional[JSON_OBJ] = None
 
     def as_dict(self) -> dict:
+        self._validate()
+        return dataclass_to_dict(self)
+
+    @staticmethod
+    def from_dict(d: dict) -> AttachmentDataLinks:
+        try:
+            msg = AttachmentDataLinks(**d)
+            msg._validate()
+        except Exception:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        return msg
+
+    def _validate(self):
         if (
             not isinstance(self.links, List)
             or not isinstance(self.hash, str)
@@ -223,13 +257,6 @@ class AttachmentDataLinks:
             if not isinstance(link, str):
                 raise DIDCommValueError()
 
-        return dataclass_to_dict(self)
-
-    @staticmethod
-    def from_dict(d: dict) -> AttachmentDataLinks:
-        # TODO: validation
-        return AttachmentDataLinks(**d)
-
 
 @dataclass
 class AttachmentDataBase64:
@@ -238,6 +265,20 @@ class AttachmentDataBase64:
     jws: Optional[JSON_OBJ] = None
 
     def as_dict(self) -> dict:
+        self._validate()
+        return dataclass_to_dict(self)
+
+    @staticmethod
+    def from_dict(d: dict) -> AttachmentDataBase64:
+        try:
+            msg = AttachmentDataBase64(**d)
+            msg._validate()
+        except Exception:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        return msg
+
+    def _validate(self):
         if (
             not isinstance(self.base64, str)
             or self.hash
@@ -247,13 +288,6 @@ class AttachmentDataBase64:
         ):
             raise DIDCommValueError()
 
-        return dataclass_to_dict(self)
-
-    @staticmethod
-    def from_dict(d: dict) -> AttachmentDataBase64:
-        # TODO: validation
-        return AttachmentDataBase64(**d)
-
 
 @dataclass
 class AttachmentDataJson:
@@ -262,6 +296,20 @@ class AttachmentDataJson:
     jws: Optional[JSON_OBJ] = None
 
     def as_dict(self) -> dict:
+        self._validate()
+        return dataclass_to_dict(self)
+
+    @staticmethod
+    def from_dict(d: dict) -> AttachmentDataJson:
+        try:
+            msg = AttachmentDataJson(**d)
+            msg._validate()
+        except Exception:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        return msg
+
+    def _validate(self):
         if (
             not isinstance(self.json, (str, int, bool, float, Dict, List))
             or self.hash
@@ -270,13 +318,6 @@ class AttachmentDataJson:
             and not isinstance(self.jws, Dict)
         ):
             raise DIDCommValueError()
-
-        return dataclass_to_dict(self)
-
-    @staticmethod
-    def from_dict(d: dict) -> AttachmentDataJson:
-        # TODO: validation
-        return AttachmentDataJson(**d)
 
 
 @dataclass(frozen=True)
@@ -291,6 +332,20 @@ class FromPrior:
     iss_kid: Optional[DID_URL] = None
 
     def as_dict(self) -> dict:
+        self._validate()
+        return dataclass_to_dict(self)
+
+    @staticmethod
+    def from_dict(d: dict) -> FromPrior:
+        try:
+            msg = FromPrior(**d)
+            msg._validate()
+        except Exception:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        return msg
+
+    def _validate(self):
         if (
             not is_did(self.iss)
             or not is_did(self.sub)
@@ -309,10 +364,3 @@ class FromPrior:
             and not is_did_url(self.iss_kid)
         ):
             raise DIDCommValueError()
-
-        return dataclass_to_dict(self)
-
-    @staticmethod
-    def from_dict(d: dict) -> FromPrior:
-        # TODO: validation
-        return FromPrior(**d)

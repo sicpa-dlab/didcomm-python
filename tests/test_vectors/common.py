@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 from didcomm.common.types import JSON
 from didcomm.unpack import Metadata
@@ -12,3 +13,9 @@ CHARLIE_DID = "did:example:charlie"
 class TestVector:
     value: JSON
     metadata: Metadata
+
+
+@dataclass
+class TestVectorNegative:
+    value: JSON
+    exc: Any
