@@ -1,13 +1,6 @@
-import copy
-
 from didcomm.message import (
-    Attachment,
-    AttachmentDataJson,
-    AttachmentDataBase64,
-    AttachmentDataLinks,
     Message,
 )
-from tests.test_vectors.common import TEST_MESSAGE
 
 
 def create_minimal_msg():
