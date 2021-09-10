@@ -5,7 +5,7 @@ class DIDCommError(Exception):
     pass
 
 
-class DIDCommValueError(DIDCommError):
+class DIDCommValueError(DIDCommError, ValueError):
     pass
 
 

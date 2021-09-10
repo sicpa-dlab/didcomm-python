@@ -6,6 +6,8 @@ from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON, DID_OR_DID_URL, DID_URL
 from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
+from didcomm.core.utils import is_did
+from didcomm.errors import DIDCommValueError
 from didcomm.message import Message
 
 
@@ -46,6 +48,7 @@ async def pack_signed(
 
     :return: A packed message as a JSON string.
     """
+    __validate(sign_frm)
     sign_result = await sign(message.as_dict(), sign_frm, resolvers_config)
     packed_msg = dict_to_json(sign_result.msg)
     return PackSignedResult(
@@ -65,3 +68,8 @@ class PackSignedResult:
 
     packed_msg: JSON
     sign_from_kid: DID_URL
+
+
+def __validate(sign_frm: DID_OR_DID_URL):
+    if not is_did(sign_frm):
+        raise DIDCommValueError()

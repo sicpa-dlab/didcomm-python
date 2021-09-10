@@ -4,7 +4,8 @@ from authlib.common.encoding import json_loads
 
 from didcomm.core.utils import parse_base64url_encoded_json
 from didcomm.unpack import unpack, Metadata
-from tests.test_vectors.common import TestVector, TEST_MESSAGE
+from tests.test_vectors.common import TestVector
+from tests.test_vectors.didcomm_messages.messages import TEST_MESSAGE
 
 
 def decode_and_remove_jws_signatures(jws: str) -> dict:

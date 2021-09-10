@@ -158,7 +158,7 @@ DID_DOC_ALICE_SPEC_TEST_VECTORS = DIDDoc(
     ],
 )
 
-DID_DOC_ALICE = DIDDoc(
+DID_DOC_ALICE_WITH_NO_SECRETS = DIDDoc(
     did="did:example:alice",
     authentication_kids=[
         "did:example:alice#key-not-in-secrets-1",

@@ -11,7 +11,7 @@ from didcomm.core.authcrypt import find_keys_and_authcrypt
 from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
 from didcomm.core.types import EncryptResult, SignResult
-from didcomm.core.utils import get_did
+from didcomm.core.utils import get_did, is_did
 from didcomm.errors import DIDCommValueError
 from didcomm.message import Message, Header
 
@@ -99,7 +99,7 @@ async def pack_encrypted(
     pack_params = pack_params or PackEncryptedParameters()
 
     # 1. validate message
-    _validate(message, to, frm)
+    __validate(message, to, frm, sign_frm)
 
     # 2. message as dict
     msg_as_dict = message.as_dict()
@@ -163,7 +163,7 @@ class ServiceMetadata:
     service_endpoint: str
 
 
-@dataclass(frozen=True)
+@dataclass
 class PackEncryptedConfig:
     """
     Pack configuration.
@@ -187,7 +187,7 @@ class PackEncryptedConfig:
     forward: bool = True
 
 
-@dataclass(frozen=True)
+@dataclass
 class PackEncryptedParameters:
     """
     Optional parameters for pack.
@@ -204,9 +204,24 @@ class PackEncryptedParameters:
     forward_service_id: Optional[str] = None
 
 
-def _validate(
-    message: Message, to: DID_OR_DID_URL, frm: Optional[DID_OR_DID_URL] = None
+def __validate(
+    message: Message,
+    to: DID_OR_DID_URL,
+    frm: Optional[DID_OR_DID_URL] = None,
+    sign_frm: Optional[DID_OR_DID_URL] = None,
 ):
+    if not is_did(to):
+        raise DIDCommValueError()
+
+    if frm is not None and not is_did(frm):
+        raise DIDCommValueError()
+
+    if sign_frm is not None and not is_did(sign_frm):
+        raise DIDCommValueError()
+
+    if message.to is not None and not isinstance(message.to, List):
+        raise DIDCommValueError()
+
     if message.to is not None and get_did(to) not in message.to:
         raise DIDCommValueError()
 

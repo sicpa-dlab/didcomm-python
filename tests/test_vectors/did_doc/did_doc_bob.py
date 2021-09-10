@@ -240,7 +240,7 @@ DID_DOC_BOB_SPEC_TEST_VECTORS = DIDDoc(
     ],
 )
 
-DID_DOC_BOB = DIDDoc(
+DID_DOC_BOB_WITH_NO_SECRETS = DIDDoc(
     did="did:example:bob",
     authentication_kids=[],
     key_agreement_kids=[

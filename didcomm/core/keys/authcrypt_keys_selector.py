@@ -57,11 +57,13 @@ async def find_authcrypt_pack_sender_and_recipient_keys(
             raise DIDUrlNotFoundError()
         recipient_kids = [to_kid]
 
+    secret_found = False
     for skid in sender_kids:
         secret = await resolvers_config.secrets_resolver.get_key(skid)
         if secret is None:
             continue
 
+        secret_found = True
         verification_methods = []
         for kid in recipient_kids:
             verification_method = recipient_did_doc.get_verification_method(kid)
@@ -73,9 +75,14 @@ async def find_authcrypt_pack_sender_and_recipient_keys(
         if verification_methods:
             return AuthcryptPackKeys(secret, verification_methods)
 
-    raise SecretNotFoundError()
+    if not secret_found:
+        raise SecretNotFoundError()
+    else:
+        raise IncompatibleCryptoError()
 
 
+# TODO: async generators require Python 3.6.
+# Think about alternative approach with the same properties that can work on Python 3.5
 async def find_authcrypt_unpack_sender_and_recipient_keys(
     frm_kid: DID_URL, to_kids: List[DID_URL], resolvers_config: ResolversConfig
 ) -> AsyncGenerator[AuthcryptUnpackKeys, Any]:

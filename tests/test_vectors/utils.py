@@ -5,8 +5,8 @@ from didcomm.common.types import VerificationMethodType, VerificationMaterialFor
 from didcomm.core.serialization import json_str_to_dict
 from didcomm.did_doc.did_doc import VerificationMethod
 from didcomm.secrets.secrets_resolver import Secret
-from tests.test_vectors.did_doc.did_doc_alice import DID_DOC_ALICE
-from tests.test_vectors.did_doc.did_doc_bob import DID_DOC_BOB
+from tests.test_vectors.did_doc.did_doc_alice import DID_DOC_ALICE_WITH_NO_SECRETS
+from tests.test_vectors.did_doc.did_doc_bob import DID_DOC_BOB_WITH_NO_SECRETS
 from tests.test_vectors.did_doc.mock_did_resolver import DID_DOC_CHARLIE
 from tests.test_vectors.secrets.mock_secrets_resolver_alice import (
     MockSecretsResolverAlice,
@@ -33,9 +33,9 @@ class KeyAgreementCurveType(Enum):
 
 def _get_did_doc(person: Person):
     if person == Person.ALICE:
-        return DID_DOC_ALICE
+        return DID_DOC_ALICE_WITH_NO_SECRETS
     if person == Person.BOB:
-        return DID_DOC_BOB
+        return DID_DOC_BOB_WITH_NO_SECRETS
     if person == Person.CHARLIE:
         return DID_DOC_CHARLIE
 
