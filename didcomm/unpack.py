@@ -1,16 +1,21 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from authlib.common.encoding import to_unicode, to_bytes
 
+from didcomm.errors import DIDCommValueError
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JWS, JSON, DID_URL
+from didcomm.common.types import JWS, JSON, JSON_OBJ, DID_URL
 from didcomm.core.anoncrypt import unpack_anoncrypt, is_anoncrypted
 from didcomm.core.authcrypt import is_authcrypted, unpack_authcrypt
-from didcomm.core.serialization import json_bytes_to_dict, json_str_to_dict
+from didcomm.core.serialization import (
+    json_bytes_to_dict,
+    json_str_to_dict,
+    dict_to_json_bytes
+)
 from didcomm.core.sign import is_signed, unpack_sign
 from didcomm.protocols.forward.forward import unpack_forward, is_forward
 from didcomm.message import Message
@@ -18,14 +23,14 @@ from didcomm.message import Message
 
 async def unpack(
     resolvers_config: ResolversConfig,
-    packed_msg: JSON,
+    packed_msg: Union[JSON, JSON_OBJ],
     unpack_config: Optional[UnpackConfig] = None,
 ) -> UnpackResult:
     """
     Unpacks the packed DIDComm message by doing decryption and verifying the signatures.
 
     :param resolvers_config: secrets and DIDDoc resolvers
-    :param packed_msg: packed DIDComm message as JSON string to be unpacked
+    :param packed_msg: packed DIDComm message as JSON string of JSON_OBJ to be unpacked
     :param unpack_config: configuration for unpack. Default parameters are used if not specified.
 
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
@@ -37,8 +42,16 @@ async def unpack(
     """
     unpack_config = unpack_config or UnpackConfig()
 
-    msg = to_bytes(packed_msg)
-    msg_as_dict = json_str_to_dict(packed_msg)
+    if isinstance(packed_msg, str):
+        msg = to_bytes(packed_msg)
+        msg_as_dict = json_str_to_dict(packed_msg)
+    elif isinstance(packed_msg, dict):
+        msg = dict_to_json_bytes(packed_msg)
+        msg_as_dict = packed_msg
+    else:
+        # FIXME in python it should be a kind of TypeError instead
+        raise DIDCommValueError(
+            "unexpected type of packed_message: '{type(packed_msg)}'")
 
     metadata = Metadata(
         encrypted=False,

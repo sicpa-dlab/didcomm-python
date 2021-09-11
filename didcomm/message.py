@@ -23,6 +23,9 @@ from didcomm.core.utils import (
 from didcomm.core.converters import (
     converter__id
 )
+from didcomm.core.validators import (
+    validator__instance_of
+)
 from didcomm.errors import (
     MalformedMessageError,
     MalformedMessageCode,
@@ -125,6 +128,9 @@ class GenericMessage(Generic[T]):
 
         del d["typ"]
 
+        if "body" not in d:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
         d["body"] = cls._body_from_dict(d["body"])
 
         # XXX do we expect undefined from_prior ???
@@ -198,14 +204,14 @@ class Message(GenericMessage[JSON_OBJ]):
         return super().as_dict()
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, frozen=True)
 class Attachment:
     """Plaintext attachment"""
 
     data: Union[AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson]
     id: Optional[Union[str, Callable]] = attr.ib(
         converter=converter__id,
-        validator=attr.validators.instance_of(str),
+        validator=validator__instance_of(str),
         default=None
     )
     description: Optional[str] = None

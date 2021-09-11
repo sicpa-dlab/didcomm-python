@@ -129,8 +129,9 @@ async def pack_encrypted(
     # 5. protected sender ID if needed
     encrypt_res_protected = __protected_sender_id_if_needed(encrypt_res, pack_config)
 
-    packed_msg = dict_to_json(
-        encrypt_res_protected.msg if encrypt_res_protected else encrypt_res.msg
+    packed_msg_dict = (
+        encrypt_res_protected.msg if encrypt_res_protected
+        else encrypt_res.msg
     )
 
     # 6. resolve service information
@@ -141,14 +142,16 @@ async def pack_encrypted(
     # 7. do forward if needed
     fwd_res = await __forward_if_needed(
         resolvers_config,
-        packed_msg,
+        packed_msg_dict,
         to,
         did_services_chain,
         pack_config,
         pack_params
     )
-    if fwd_res:
-        packed_msg = dict_to_json(fwd_res.msg_encrypted.msg)
+
+    packed_msg = dict_to_json(
+        fwd_res.msg_encrypted.msg if fwd_res else packed_msg_dict
+    )
 
     return PackEncryptedResult(
         packed_msg=packed_msg,
@@ -198,7 +201,7 @@ class ServiceMetadata:
     service_endpoint: str
 
 
-@dataclass(frozen=True)
+@dataclass
 class PackEncryptedConfig:
     """
     Pack configuration.
@@ -314,7 +317,7 @@ def __protected_sender_id_if_needed(
 
 async def __forward_if_needed(
     resolvers_config: ResolversConfig,
-    packed_msg: Union[JSON_OBJ, JSON],
+    packed_msg: JSON_OBJ,
     to: DID_OR_DID_URL,
     did_services_chain: List[DIDCommService],
     pack_config: Optional[PackEncryptedConfig] = None,

@@ -56,7 +56,7 @@ DIDCommMessageMediaTypes = DIDCommMessageTypes
 
 
 class DIDCommMessageProtocolTypes(Enum):
-    FORWARD = "https://didcomm.org/routing/2.0/forward",
+    FORWARD = "https://didcomm.org/routing/2.0/forward"
 
 
 class JOSEFields:

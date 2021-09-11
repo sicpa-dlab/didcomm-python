@@ -30,5 +30,7 @@ class MockDIDResolverWithNonSecrets(DIDResolverInMemory):
                 DID_DOC_ALICE_WITH_NO_SECRETS,
                 DID_DOC_BOB_WITH_NO_SECRETS,
                 DID_DOC_CHARLIE,
+                DID_DOC_MEDIATOR1,
+                DID_DOC_MEDIATOR2
             ]
         )

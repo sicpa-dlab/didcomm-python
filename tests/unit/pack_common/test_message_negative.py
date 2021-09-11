@@ -1,6 +1,7 @@
 import copy
 import dataclasses
 
+import attr
 import pytest
 
 from didcomm.errors import DIDCommValueError
@@ -24,6 +25,8 @@ from tests.test_vectors.didcomm_messages.messages import (
 
 
 async def check_invalid_pack_msg(msg: Message, resolvers_config_alice):
+    # TODO all these pack API will fail at `msg.as_dict` call, likely
+    #      better instead just to check that particular msg API once
     with pytest.raises(DIDCommValueError):
         await pack_plaintext(resolvers_config_alice, msg)
     with pytest.raises(DIDCommValueError):
@@ -32,26 +35,36 @@ async def check_invalid_pack_msg(msg: Message, resolvers_config_alice):
         await pack_encrypted(resolvers_config_alice, msg, BOB_DID)
 
 
-def update_msg_field(field_name, value):
-    msg = copy.deepcopy(TEST_MESSAGE)
-    return dataclasses.replace(msg, **{field_name: value})
-
-
 def update_attachment_field(attcmnt, field_name, value):
     msg = copy.deepcopy(TEST_MESSAGE)
-    msg.attachments = [update_field(attcmnt, field_name, value)]
+    attcmnt = copy.deepcopy(attcmnt)
+    # to hack / workaround Attachment frozen setting
+    object.__setattr__(attcmnt, field_name, value)
+    msg.attachments = [attcmnt]
     return msg
 
 
 def update_from_prior_field(from_prior, field_name, value):
     msg = copy.deepcopy(TEST_MESSAGE)
-    msg.from_prior = update_field(from_prior, field_name, value)
+    from_prior = copy.deepcopy(from_prior)
+    # to hack / workaround FromPrior frozen setting
+    object.__setattr__(from_prior, field_name, value)
+    msg.from_prior = from_prior
     return msg
 
 
 def update_field(msg, field_name, value):
     msg = copy.deepcopy(msg)
-    return dataclasses.replace(msg, **{field_name: value})
+    if dataclasses.is_dataclass(msg):
+        return dataclasses.replace(msg, **{field_name: value})
+    elif attr.has(type(msg)):
+        return attr.evolve(msg, **{field_name: value})
+    else:
+        raise TypeError(f"unexpected type `{type(msg)}`")
+
+
+def update_msg_field(field_name, value):
+    return update_field(TEST_MESSAGE, field_name, value)
 
 
 @pytest.mark.asyncio

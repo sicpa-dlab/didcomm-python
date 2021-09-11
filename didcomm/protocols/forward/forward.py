@@ -32,6 +32,7 @@ from didcomm.core.types import (
 )
 from didcomm.core.defaults import DEF_ENC_ALG_ANON
 from didcomm.core.converters import converter__didcomm_id
+from didcomm.core.validators import validator__instance_of
 from didcomm.core.serialization import (
     json_str_to_dict,
     json_bytes_to_dict
@@ -57,7 +58,7 @@ class ForwardMessage(GenericMessage[ForwardBody]):
     # if not specified would be auto-generated
     id: Optional[Union[str, Callable]] = attr.ib(
         converter=converter__didcomm_id,
-        validator=attr.validators.instance_of(str),
+        validator=validator__instance_of(str),
         default=None
     )
 
@@ -75,7 +76,7 @@ class ForwardPackResult:
 @dataclass
 class ForwardResult:
     forward_msg: ForwardMessage
-    forwarded_msg: JSON
+    forwarded_msg: JSON_OBJ
     forwarded_msg_encrypted_to: Optional[List[DID_URL]] = None
 
 
@@ -164,7 +165,7 @@ async def resolve_did_services_chain(
 
 async def wrap_in_forward(
     resolvers_config: ResolversConfig,
-    packed_msg: Union[JSON_OBJ, JSON],
+    packed_msg: JSON_OBJ,
     to: DID_OR_DID_URL,
     routing_keys: List[DID_OR_DID_URL],
     enc_alg_anon: Optional[AnonCryptAlg] = DEF_ENC_ALG_ANON,
@@ -261,28 +262,30 @@ async def unpack_forward(
         )
 
     fwd_msg = ForwardMessage.from_dict(fwd_msg_dict)
-    msg = fwd_msg.attachments[0].data.json
+    forwarded_msg_dict = fwd_msg.attachments[0].data.json  # JSON_VALUE
 
     logger.debug(
-        f"unpacked Forward: forwarded msg {msg}, to_kids"
+        f"unpacked Forward: forwarded msg {forwarded_msg_dict}, to_kids"
         f" {fwd_unpack_res.to_kids}"
     )
 
     return ForwardResult(
         forward_msg=fwd_msg,
-        forwarded_msg=msg,
+        forwarded_msg=forwarded_msg_dict,
         forwarded_msg_encrypted_to=fwd_unpack_res.to_kids
     )
 
 
 # TODO CONSIDER forward validation might be a part of ForwardMessage
-def is_forward(msg: dict) -> bool:
+def is_forward(msg: List) -> bool:
     """
     A helper method to check if the given message is a Forward message.
 
     :param message: the message to be checked
     :return: True if the plaintext is a valid Forward message and false otherwise
     """
+    if not isinstance(msg, dict):
+        return False
     # 'next' is required
     if DIDCommFields.NEXT not in msg.get(DIDCommFields.BODY, {}):
         return False
