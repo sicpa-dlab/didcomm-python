@@ -12,6 +12,7 @@ from didcomm.common.types import (
     DID,
     DID_URL,
     JSON_OBJ,
+    JSON,
     DIDCommMessageTypes
 )
 from didcomm.core.utils import (
@@ -19,6 +20,10 @@ from didcomm.core.utils import (
     attrs_to_dict,
     is_did,
     is_did_url
+)
+from didcomm.core.serialization import (
+    json_str_to_dict,
+    json_bytes_to_dict
 )
 from didcomm.core.converters import (
     converter__id
@@ -88,10 +93,6 @@ class GenericMessage(Generic[T]):
         else:
             return self.body
 
-    @staticmethod
-    def _body_from_dict(body: dict) -> T:
-        return body
-
     def as_dict(self) -> dict:
         d = attrs_to_dict(self)
 
@@ -112,39 +113,54 @@ class GenericMessage(Generic[T]):
 
         return d
 
+    @staticmethod
+    def _body_from_dict(body: dict) -> T:
+        return body
+
+    # TODO TEST
+    @classmethod
+    def from_json(cls, msg: Union[JSON, bytes]) -> Message:
+        return cls.from_dict(
+            json_bytes_to_dict(msg) if isinstance(msg, bytes)
+            else json_str_to_dict(msg)
+        )
+
     @classmethod
     def from_dict(cls, d: dict) -> Message:
+        # WARNING: that API shouldn't be called with a dict
+        #          referenced from other places, from_json is better for that
         if not isinstance(d, Dict):
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        # TODO TEST missed fields
+        for f in ('id', 'type', 'body', 'typ'):
+            if f not in d:
+                raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        if d["typ"] != DIDCommMessageTypes.PLAINTEXT.value:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+        del d["typ"]
 
         if "from" in d:
             d["frm"] = d["from"]
             del d["from"]
 
-        if "typ" not in d:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-        if d["typ"] != DIDCommMessageTypes.PLAINTEXT.value:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-
-        del d["typ"]
-
         if "body" not in d:
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-
         d["body"] = cls._body_from_dict(d["body"])
 
-        # XXX do we expect undefined from_prior ???
+        # XXX do we expect undefined () from_prior ???
         if d.get("from_prior"):
             d["from_prior"] = FromPrior.from_dict(d["from_prior"])
 
-        # XXX do we expect undefined or empty attachments ???
+        # XXX do we expect undefined (None) or empty attachments ???
         if d.get("attachments"):
             d["attachments"] = [
                 Attachment.from_dict(e) for e in d["attachments"]
             ]
 
         try:
-            msg = Message(**d)
+            msg = cls(**d)
             msg._validate()
         except Exception:
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)

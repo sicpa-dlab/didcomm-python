@@ -91,6 +91,7 @@ def extract_sign_alg(
     raise DIDCommValueError()
 
 
+# TODO TEST
 def is_did(v: Any) -> bool:
     # TODO
     #   - consider other presentations (e.g bytes)
@@ -105,7 +106,7 @@ def is_did(v: Any) -> bool:
         )
     return False
 
-
+# TODO TEST
 def is_did_url(v: Any) -> bool:
     # TODO
     #   - consider other presentations (e.g bytes)
@@ -115,6 +116,11 @@ def is_did_url(v: Any) -> bool:
         before, sep, after = str(v).partition("#")  # always 3-tuple
         return sep and after and is_did(before)
     return False
+
+
+# TODO TEST
+def is_did_or_did_url(v: Any) -> bool:
+    return is_did(v) or is_did_url(v)
 
 
 def get_did(did_or_did_url: DID_OR_DID_URL) -> DID:

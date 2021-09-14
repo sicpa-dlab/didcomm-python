@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import deepcopy
 
 import logging
 import attr
@@ -11,16 +12,17 @@ from didcomm.errors import (
     MalformedMessageError,
     MalformedMessageCode,
     DIDDocNotResolvedError,
-    InvalidDIDDocError
+    InvalidDIDDocError,
+    DIDCommValueError
 )
-from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.algorithms import AnonCryptAlg
 from didcomm.common.types import (
     JSON,
     DID_OR_DID_URL,
     JSON_OBJ, DID_URL,
     DIDCommMessageProtocolTypes,
 )
+from didcomm.common.resolvers import ResolversConfig
+from didcomm.common.algorithms import AnonCryptAlg
 from didcomm.message import (
     GenericMessage,
     Header,
@@ -28,7 +30,6 @@ from didcomm.message import (
     AttachmentDataJson
 )
 from didcomm.core.types import (
-    DIDCommFields,
     EncryptResult,
     DIDCommGeneratorType,
     DIDCOMM_ORG_DOMAIN
@@ -37,23 +38,24 @@ from didcomm.core.defaults import DEF_ENC_ALG_ANON
 from didcomm.core.converters import converter__didcomm_id
 from didcomm.core.validators import (
     validator__instance_of,
-    validator__didcomm_protocol_mturi
+    validator__didcomm_protocol_mturi,
+    validator__did_or_did_url
 )
 from didcomm.core.serialization import (
     json_str_to_dict,
-    json_bytes_to_dict
 )
 from didcomm.core.anoncrypt import (
     find_keys_and_anoncrypt,
     unpack_anoncrypt
 )
-from didcomm.core.utils import get_did, is_did, is_did_url
+from didcomm.core.utils import get_did, is_did_or_did_url
 from didcomm.did_doc.did_doc import DIDCommService
 
 
 logger = logging.getLogger(__name__)
 
 
+# TODO move to some ../routing/types.py
 ROUTING_PROTOCOL_NAME = "routing"
 ROUTING_PROTOCOL_VER_CURRENT = "2.0"
 ROUTING_PROTOCOL_VER_COMPATIBILITY = SpecifierSet("~=2.0")
@@ -63,9 +65,12 @@ class ROUTING_PROTOCOL_MSG_TYPES(Enum):
     FORWARD = "forward"
 
 
-@dataclass
+@attr.s(auto_attribs=True)
 class ForwardBody:
-    next: DID_OR_DID_URL
+    # TODO TEST
+    next: DID_OR_DID_URL = attr.ib(
+        validator=validator__did_or_did_url,
+    )
 
 
 @attr.s(auto_attribs=True)
@@ -77,7 +82,6 @@ class ForwardMessage(GenericMessage[ForwardBody]):
         default=None
     )
     type: Optional[str] = attr.ib(
-        converter=converter__didcomm_id,
         validator=[
             validator__instance_of(str),
             validator__didcomm_protocol_mturi(
@@ -92,10 +96,26 @@ class ForwardMessage(GenericMessage[ForwardBody]):
             f"/{ROUTING_PROTOCOL_MSG_TYPES.FORWARD.value}"
         )
     )
+    attachments: List[Attachment] = attr.ib(kw_only=True)
+
+    # TODO TEST
+    @attachments.validator
+    def _check_attachments(self, attribute, value):
+        if not (
+            isinstance(value, list)
+            and len(value) == 1
+            and isinstance(value[0], Attachment)
+            and isinstance(value[0].data, AttachmentDataJson)
+        ):
+            raise DIDCommValueError("'{attribute.name}': bad value '{value}'")
 
     @staticmethod
     def _body_from_dict(body: dict) -> ForwardBody:
-        return ForwardBody(**body)
+        try:
+            return ForwardBody(**body)
+        except Exception as exc:
+            raise MalformedMessageError(
+                MalformedMessageCode.INVALID_PLAINTEXT) from exc
 
 
 @attr.s(auto_attribs=True)
@@ -161,7 +181,7 @@ async def resolve_did_services_chain(
     res.append(to_did_service)
 
     # alternative endpoints
-    while is_did(service_uri) or is_did_url(service_uri):
+    while is_did_or_did_url(service_uri):
         mediator_did = service_uri
 
         if len(res) > 1:
@@ -200,7 +220,7 @@ async def wrap_in_forward(
     to: DID_OR_DID_URL,
     routing_keys: List[DID_OR_DID_URL],
     enc_alg_anon: Optional[AnonCryptAlg] = DEF_ENC_ALG_ANON,
-    headers: Optional[List[Header]] = None,
+    headers: Optional[Header] = None,
     didcomm_id_generator: Optional[DIDCommGeneratorType] = None,
 ) -> Optional[ForwardPackResult]:
     """
@@ -285,14 +305,12 @@ async def unpack_forward(
     fwd_unpack_res = await unpack_anoncrypt(
         json_str_to_dict(packed_msg), resolvers_config, decrypt_by_all_keys)
 
-    fwd_msg_dict = json_bytes_to_dict(fwd_unpack_res.msg)
-
-    if not is_forward(fwd_msg_dict):
+    if not is_forward(fwd_unpack_res.msg):
         raise MalformedMessageError(
             MalformedMessageCode.INVALID_PLAINTEXT
         )
 
-    fwd_msg = ForwardMessage.from_dict(fwd_msg_dict)
+    fwd_msg = ForwardMessage.from_json(fwd_unpack_res.msg)
     forwarded_msg_dict = fwd_msg.attachments[0].data.json  # JSON_VALUE
 
     logger.debug(
@@ -308,22 +326,20 @@ async def unpack_forward(
 
 
 # TODO CONSIDER forward validation might be a part of ForwardMessage
-def is_forward(msg: List) -> bool:
+def is_forward(msg: Union[dict, JSON, bytes]) -> bool:
     """
     A helper method to check if the given message is a Forward message.
 
     :param message: the message to be checked
     :return: True if the plaintext is a valid Forward message and false otherwise
     """
-    if not isinstance(msg, dict):
+    try:
+        (
+            ForwardMessage.from_dict(deepcopy(msg))
+            if isinstance(msg, dict) else
+            ForwardMessage.from_json(msg)
+        )
+    except Exception:
         return False
-    # 'next' is required
-    if DIDCommFields.NEXT not in msg.get(DIDCommFields.BODY, {}):
-        return False
-    # non-empty 'attachments' is required
-    if not msg.get(DIDCommFields.ATTACHMENTS, []):
-        return False
-    # TODO other constraints ???
-    #   - single item list of attachments
-    #   - json AttachmentDataJson as data
-    return True
+    else:
+        return True

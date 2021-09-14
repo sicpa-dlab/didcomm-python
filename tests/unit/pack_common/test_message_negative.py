@@ -154,6 +154,31 @@ async def test_message_invalid_types(msg, resolvers_config_alice):
 @pytest.mark.parametrize(
     "msg",
     [
+        update_msg_field("id", 123),
+        update_msg_field("type", 123),
+        update_msg_field("frm", 123),
+        update_msg_field("to", 123),
+        update_msg_field("to", [123]),
+        update_msg_field("created_time", "123"),
+        update_msg_field("expires_time", "123"),
+        update_msg_field("please_ack", 1),
+        update_msg_field("ack", 1),
+        update_msg_field("thid", 1),
+        update_msg_field("pthid", 1),
+        update_msg_field("from_prior", {}),
+        update_msg_field("attachments", {}),
+        update_msg_field("attachments", [{}]),
+        update_msg_field("custom_headers", {}),
+    ],
+)
+async def test_message_invalid_types(msg, resolvers_config_alice):
+    await check_invalid_pack_msg(msg, resolvers_config_alice)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "msg",
+    [
         update_msg_field("body", 123),
         update_msg_field("body", "123"),
         update_msg_field("body", []),
