@@ -9,13 +9,16 @@ BOB_DID = "did:example:bob"
 CHARLIE_DID = "did:example:charlie"
 
 
+# Note. additional prefix `T` is to hide the clases
+#       from pytest tests collector
+
 @dataclass
-class TestVector:
+class TTestVector:
     value: JSON
     metadata: Metadata
 
 
 @dataclass
-class TestVectorNegative:
+class TTestVectorNegative:
     value: JSON
     exc: Any

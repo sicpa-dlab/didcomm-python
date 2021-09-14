@@ -4,7 +4,7 @@ from authlib.common.encoding import json_loads
 
 from didcomm.core.utils import parse_base64url_encoded_json
 from didcomm.unpack import unpack, Metadata
-from tests.test_vectors.common import TestVector
+from tests.test_vectors.common import TTestVector
 from tests.test_vectors.didcomm_messages.messages import TEST_MESSAGE
 
 
@@ -33,7 +33,7 @@ def remove_signed_msg(metadata: Metadata) -> Metadata:
     return metadata
 
 
-async def check_unpack_test_vector(test_vector: TestVector, resolvers_config):
+async def check_unpack_test_vector(test_vector: TTestVector, resolvers_config):
     unpack_result = await unpack(resolvers_config, test_vector.value)
     assert unpack_result.message == TEST_MESSAGE
     assert unpack_result.metadata == test_vector.metadata

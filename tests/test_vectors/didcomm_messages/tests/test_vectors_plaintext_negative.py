@@ -1,7 +1,7 @@
 from authlib.common.encoding import json_dumps
 
 from didcomm.errors import MalformedMessageError
-from tests.test_vectors.common import TestVectorNegative
+from tests.test_vectors.common import TTestVectorNegative
 
 INVALID_MESSAGES = [
     json_dumps({}),
@@ -136,5 +136,5 @@ INVALID_MESSAGES = [
 ]
 
 INVALID_PLAINTEXT_TEST_VECTORS = [
-    TestVectorNegative(value, MalformedMessageError) for value in INVALID_MESSAGES
+    TTestVectorNegative(value, MalformedMessageError) for value in INVALID_MESSAGES
 ]

@@ -5,7 +5,7 @@ import pytest
 from didcomm.common.types import DID_OR_DID_URL
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.unpack import unpack
-from tests.test_vectors.common import ALICE_DID, BOB_DID, TestVector
+from tests.test_vectors.common import ALICE_DID, BOB_DID, TTestVector
 from tests.test_vectors.didcomm_messages.messages import TEST_MESSAGE
 from tests.test_vectors.didcomm_messages.spec.spec_test_vectors_auth_encrypted import (
     TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH,
@@ -75,7 +75,7 @@ async def check_pack_authcrypt(
     to: DID_OR_DID_URL,
     sign_frm: Optional[DID_OR_DID_URL],
     pack_config: PackEncryptedConfig,
-    test_vector: TestVector,
+    test_vector: TTestVector,
     resolvers_config_alice,
     resolvers_config_bob,
 ):
