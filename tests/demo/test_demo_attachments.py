@@ -33,7 +33,7 @@ async def test_demo_attachments(
         message=message,
         frm=ALICE_DID,
         to=BOB_DID,
-        pack_config=PackEncryptedConfig(forward=True)
+        pack_config=PackEncryptedConfig()
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")

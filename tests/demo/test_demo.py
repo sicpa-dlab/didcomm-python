@@ -26,7 +26,7 @@ async def test_demo_repudiable_authentication_encryption(
         message=message,
         frm=ALICE_DID,
         to=BOB_DID,
-        pack_config=PackEncryptedConfig(forward=True)
+        pack_config=PackEncryptedConfig()
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
@@ -56,7 +56,7 @@ async def test_demo_repudiable_non_authenticated_encryption(
     )
     pack_result = await pack_encrypted(
         resolvers_config=resolvers_config_alice, message=message, to=BOB_DID,
-        pack_config=PackEncryptedConfig(forward=True)
+        pack_config=PackEncryptedConfig()
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
@@ -90,7 +90,7 @@ async def test_demo_non_repudiable_encryption(
         frm=ALICE_DID,
         sign_frm=ALICE_DID,
         to=BOB_DID,
-        pack_config=PackEncryptedConfig(forward=True)
+        pack_config=PackEncryptedConfig()
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
