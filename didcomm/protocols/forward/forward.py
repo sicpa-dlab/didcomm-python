@@ -4,6 +4,8 @@ import logging
 import attr
 from dataclasses import dataclass
 from typing import List, Union, Optional, Callable
+from packaging.specifiers import SpecifierSet
+from enum import Enum
 
 from didcomm.errors import (
     MalformedMessageError,
@@ -28,11 +30,15 @@ from didcomm.message import (
 from didcomm.core.types import (
     DIDCommFields,
     EncryptResult,
-    DIDCommGeneratorType
+    DIDCommGeneratorType,
+    DIDCOMM_ORG_DOMAIN
 )
 from didcomm.core.defaults import DEF_ENC_ALG_ANON
 from didcomm.core.converters import converter__didcomm_id
-from didcomm.core.validators import validator__instance_of
+from didcomm.core.validators import (
+    validator__instance_of,
+    validator__didcomm_protocol_mturi
+)
 from didcomm.core.serialization import (
     json_str_to_dict,
     json_bytes_to_dict
@@ -48,6 +54,15 @@ from didcomm.did_doc.did_doc import DIDCommService
 logger = logging.getLogger(__name__)
 
 
+ROUTING_PROTOCOL_NAME = "routing"
+ROUTING_PROTOCOL_VER_CURRENT = "2.0"
+ROUTING_PROTOCOL_VER_COMPATIBILITY = SpecifierSet("~=2.0")
+
+
+class ROUTING_PROTOCOL_MSG_TYPES(Enum):
+    FORWARD = "forward"
+
+
 @dataclass
 class ForwardBody:
     next: DID_OR_DID_URL
@@ -60,6 +75,22 @@ class ForwardMessage(GenericMessage[ForwardBody]):
         converter=converter__didcomm_id,
         validator=validator__instance_of(str),
         default=None
+    )
+    type: Optional[str] = attr.ib(
+        converter=converter__didcomm_id,
+        validator=[
+            validator__instance_of(str),
+            validator__didcomm_protocol_mturi(
+                ROUTING_PROTOCOL_NAME,
+                ROUTING_PROTOCOL_VER_COMPATIBILITY,
+                ROUTING_PROTOCOL_MSG_TYPES.FORWARD.value
+            )
+        ],
+        default=(
+            f"https://{DIDCOMM_ORG_DOMAIN}"
+            f"/{ROUTING_PROTOCOL_NAME}/{ROUTING_PROTOCOL_VER_CURRENT}"
+            f"/{ROUTING_PROTOCOL_MSG_TYPES.FORWARD.value}"
+        )
     )
 
     @staticmethod

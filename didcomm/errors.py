@@ -34,6 +34,7 @@ class MalformedMessageCode(Enum):
     INVALID_SIGNATURE = 2
     INVALID_PLAINTEXT = 3
     INVALID_MESSAGE = 4
+    NOT_SUPPORTED_FWD_PROTOCOL = 5
 
 
 class MalformedMessageError(DIDCommError):

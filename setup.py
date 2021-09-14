@@ -26,12 +26,13 @@ setup(
         # TODO switch to pypi once necessary authlib version is released
         "Authlib@git+https://github.com/lepture/authlib.git",
         "pycryptodomex>=3.10,<4",
-        "attrs>=21.2.0"  # TODO explore lowest acceptable version
+        "attrs>=21.2.0",  # TODO explore lowest acceptable version
+        "packaging>=21.0"  # TODO explore lowest acceptable version
     ],
     extras_require={"tests": [
         "pytest==6.2.5",
         "pytest-asyncio==0.15.1",
         "pytest-xdist==2.3.0",
-        "flake8==3.9.2"
+        "flake8==3.9.2",
     ]},
 )

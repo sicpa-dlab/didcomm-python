@@ -6,6 +6,8 @@ from authlib.jose.rfc7517 import AsymmetricKey
 from didcomm.common.algorithms import SignAlg, AnonCryptAlg, AuthCryptAlg
 from didcomm.common.types import DID_URL, DID_OR_DID_URL
 
+DIDCOMM_ORG_DOMAIN = "didcomm.org"
+
 
 class JWMFields:
     # https://datatracker.ietf.org/doc/html/draft-looker-jwm-01#page-10
