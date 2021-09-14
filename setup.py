@@ -28,5 +28,10 @@ setup(
         "pycryptodomex>=3.10,<4",
         "attrs>=21.2.0"  # TODO explore lowest acceptable version
     ],
-    extras_require={"tests": ["pytest", "pytest-asyncio", "flake8"]},
+    extras_require={"tests": [
+        "pytest==6.2.5",
+        "pytest-asyncio==0.15.1",
+        "pytest-xdist==2.3.0",
+        "flake8==3.9.2"
+    ]},
 )
