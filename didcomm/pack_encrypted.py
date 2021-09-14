@@ -17,7 +17,7 @@ from didcomm.core.utils import get_did, is_did, didcomm_id_generator_default
 from didcomm.errors import DIDCommValueError
 from didcomm.message import Message, Header
 from didcomm.did_doc.did_doc import DIDCommService
-from didcomm.protocols.forward.forward import (
+from didcomm.protocols.routing.forward import (
     wrap_in_forward,
     resolve_did_services_chain,
     ForwardPackResult

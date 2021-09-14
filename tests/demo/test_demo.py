@@ -4,7 +4,7 @@ from didcomm.message import Message
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.pack_plaintext import pack_plaintext
 from didcomm.pack_signed import pack_signed
-from didcomm.protocols.forward.forward import unpack_forward
+from didcomm.protocols.routing.forward import unpack_forward
 from didcomm.unpack import unpack
 from tests.test_vectors.common import ALICE_DID, BOB_DID
 

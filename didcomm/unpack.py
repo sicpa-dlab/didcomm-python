@@ -17,7 +17,7 @@ from didcomm.core.serialization import (
     dict_to_json_bytes
 )
 from didcomm.core.sign import is_signed, unpack_sign
-from didcomm.protocols.forward.forward import unpack_forward, is_forward
+from didcomm.protocols.routing.forward import unpack_forward, is_forward
 from didcomm.message import Message
 
 

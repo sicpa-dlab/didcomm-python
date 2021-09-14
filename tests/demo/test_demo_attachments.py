@@ -2,7 +2,7 @@ import pytest as pytest
 
 from didcomm.message import Attachment, Message, AttachmentDataJson
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
-from didcomm.protocols.forward.forward import unpack_forward
+from didcomm.protocols.routing.forward import unpack_forward
 from didcomm.unpack import unpack
 from tests.test_vectors.common import ALICE_DID, BOB_DID
 

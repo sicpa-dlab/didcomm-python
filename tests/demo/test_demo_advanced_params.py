@@ -7,7 +7,7 @@ from didcomm.pack_encrypted import (
     PackEncryptedParameters,
     pack_encrypted,
 )
-from didcomm.protocols.forward.forward import unpack_forward
+from didcomm.protocols.routing.forward import unpack_forward
 from didcomm.unpack import unpack, UnpackConfig
 from tests.test_vectors.common import ALICE_DID, BOB_DID
 

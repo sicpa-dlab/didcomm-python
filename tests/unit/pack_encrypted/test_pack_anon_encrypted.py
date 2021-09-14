@@ -3,7 +3,7 @@ import pytest
 from didcomm.common.algorithms import AnonCryptAlg
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.unpack import unpack
-from didcomm.protocols.forward.forward import unpack_forward
+from didcomm.protocols.routing.forward import unpack_forward
 from tests.test_vectors.common import BOB_DID, ALICE_DID
 from tests.test_vectors.didcomm_messages.messages import (
     TEST_MESSAGE,

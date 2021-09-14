@@ -5,7 +5,7 @@ from didcomm.message import Message, FromPrior
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.secrets.secrets_resolver_in_memory import SecretsResolverInMemory
 from didcomm.unpack import unpack
-from didcomm.protocols.forward.forward import unpack_forward
+from didcomm.protocols.routing.forward import unpack_forward
 from tests.test_vectors.common import CHARLIE_DID, BOB_DID, ALICE_DID
 from tests.test_vectors.secrets.mock_secrets_resolver_alice import (
     MockSecretsResolverAlice,
