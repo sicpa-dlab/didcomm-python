@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Optional, List, Union
+from typing import Optional, List
 
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.common.resolvers import ResolversConfig

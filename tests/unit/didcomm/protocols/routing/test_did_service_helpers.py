@@ -1,7 +1,5 @@
 import pytest
-from unittest.mock import AsyncMock
 
-from didcomm.common.types import DID
 from didcomm.errors import DIDDocNotResolvedError, InvalidDIDDocError
 from didcomm.did_doc.did_doc import DIDDoc, DIDCommService
 from didcomm.protocols.routing import forward  # for patch.object mocks
@@ -9,6 +7,8 @@ from didcomm.protocols.routing.forward import (
     find_did_service,
     resolve_did_services_chain,
 )
+
+from tests import mock_module
 
 
 @pytest.fixture
@@ -87,7 +87,7 @@ async def test_find_did_service__by_service_id(mocker, resolvers_config_mock, di
 
 
 @pytest.fixture
-def find_did_service_mock(mocker) -> AsyncMock:
+def find_did_service_mock(mocker) -> mock_module.AsyncMock:
     return mocker.patch.object(forward, "find_did_service")
 
 

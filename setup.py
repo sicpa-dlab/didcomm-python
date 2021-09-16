@@ -36,7 +36,8 @@ setup(
             "pytest-xdist==2.3.0",
             "flake8==3.9.2",
             "black==21.9b0",
-            "pytest-mock==3.6.1",
+            "pytest-mock==3.6.1",  # NOTE python 3.6+
+            "mock==4.0.3",  # NOTE python 3.6+
         ]
     },
 )

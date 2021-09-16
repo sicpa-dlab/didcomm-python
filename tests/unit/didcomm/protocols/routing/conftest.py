@@ -1,9 +1,10 @@
 import pytest
-from unittest.mock import AsyncMock
 
 from didcomm.common.types import DID, DID_URL
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.protocols.routing.forward import ForwardMessage
+
+from tests import mock_module
 
 from .helper import gen_fwd_msg
 
@@ -42,5 +43,8 @@ def fwd_msg() -> ForwardMessage:
 def resolvers_config_mock(mocker) -> ResolversConfig:
     secrets_resolver = mocker.Mock()
     did_resolver = mocker.Mock()
-    did_resolver.resolve = AsyncMock()
+    # NOTE AsyncMock from unittest.mock is availble only in python 3.8+
+    #       - here we rely on PyPI backport https://pypi.org/project/mock/
+    #       - the module supports python 3.6+
+    did_resolver.resolve = mock_module.AsyncMock()
     return ResolversConfig(secrets_resolver, did_resolver)
