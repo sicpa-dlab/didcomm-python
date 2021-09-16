@@ -13,41 +13,30 @@ from didcomm.errors import (
     MalformedMessageCode,
     DIDDocNotResolvedError,
     InvalidDIDDocError,
-    DIDCommValueError
+    DIDCommValueError,
 )
 from didcomm.common.types import (
     JSON,
     DID_OR_DID_URL,
-    JSON_OBJ, DID_URL,
+    JSON_OBJ,
+    DID_URL,
     DIDCommMessageProtocolTypes,
 )
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.algorithms import AnonCryptAlg
-from didcomm.message import (
-    GenericMessage,
-    Header,
-    Attachment,
-    AttachmentDataJson
-)
-from didcomm.core.types import (
-    EncryptResult,
-    DIDCommGeneratorType,
-    DIDCOMM_ORG_DOMAIN
-)
+from didcomm.message import GenericMessage, Header, Attachment, AttachmentDataJson
+from didcomm.core.types import EncryptResult, DIDCommGeneratorType, DIDCOMM_ORG_DOMAIN
 from didcomm.core.defaults import DEF_ENC_ALG_ANON
 from didcomm.core.converters import converter__didcomm_id
 from didcomm.core.validators import (
     validator__instance_of,
     validator__didcomm_protocol_mturi,
-    validator__did_or_did_url
+    validator__did_or_did_url,
 )
 from didcomm.core.serialization import (
     json_str_to_dict,
 )
-from didcomm.core.anoncrypt import (
-    find_keys_and_anoncrypt,
-    unpack_anoncrypt
-)
+from didcomm.core.anoncrypt import find_keys_and_anoncrypt, unpack_anoncrypt
 from didcomm.core.utils import get_did, is_did_or_did_url
 from didcomm.did_doc.did_doc import DIDCommService
 
@@ -79,7 +68,7 @@ class ForwardMessage(GenericMessage[ForwardBody]):
     id: Optional[Union[str, Callable]] = attr.ib(
         converter=converter__didcomm_id,
         validator=validator__instance_of(str),
-        default=None
+        default=None,
     )
     type: Optional[str] = attr.ib(
         validator=[
@@ -87,14 +76,14 @@ class ForwardMessage(GenericMessage[ForwardBody]):
             validator__didcomm_protocol_mturi(
                 ROUTING_PROTOCOL_NAME,
                 ROUTING_PROTOCOL_VER_COMPATIBILITY,
-                ROUTING_PROTOCOL_MSG_TYPES.FORWARD.value
-            )
+                ROUTING_PROTOCOL_MSG_TYPES.FORWARD.value,
+            ),
         ],
         default=(
             f"https://{DIDCOMM_ORG_DOMAIN}"
             f"/{ROUTING_PROTOCOL_NAME}/{ROUTING_PROTOCOL_VER_CURRENT}"
             f"/{ROUTING_PROTOCOL_MSG_TYPES.FORWARD.value}"
-        )
+        ),
     )
     attachments: List[Attachment] = attr.ib(kw_only=True)
 
@@ -114,8 +103,7 @@ class ForwardMessage(GenericMessage[ForwardBody]):
         try:
             return ForwardBody(**body)
         except Exception as exc:
-            raise MalformedMessageError(
-                MalformedMessageCode.INVALID_PLAINTEXT) from exc
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT) from exc
 
 
 @attr.s(auto_attribs=True)
@@ -132,9 +120,7 @@ class ForwardResult:
 
 
 async def find_did_service(
-    resolvers_config: ResolversConfig,
-    to: DID_OR_DID_URL,
-    service_id: str = None
+    resolvers_config: ResolversConfig, to: DID_OR_DID_URL, service_id: str = None
 ) -> DIDCommService:
 
     to_did = get_did(to)
@@ -166,14 +152,12 @@ async def resolve_did_services_chain(
     resolvers_config: ResolversConfig,
     to: DID_OR_DID_URL,
     service_id: str = None,
-    did_recursion=False
+    did_recursion=False,
 ) -> List[DIDCommService]:
 
     res = []
 
-    to_did_service = await find_did_service(
-        resolvers_config, to, service_id
-    )
+    to_did_service = await find_did_service(resolvers_config, to, service_id)
     if to_did_service is None:
         return res
 
@@ -187,10 +171,7 @@ async def resolve_did_services_chain(
         if len(res) > 1:
             # TODO cover possible case of alternative endpoints in mediator's
             #      DID Doc services (it SHOULD NOT be as per spec but ...)
-            exc_t = (
-                NotImplementedError if did_recursion else
-                InvalidDIDDocError
-            )
+            exc_t = NotImplementedError if did_recursion else InvalidDIDDocError
             raise exc_t(
                 f"mediator '{res[-2].service_endpoint}' defines alternative"
                 f" endpoint '{service_uri}' recursively"
@@ -200,13 +181,9 @@ async def resolve_did_services_chain(
         #      (e.g. first one may use alternative endpoint but second - URI)
 
         # resolve until final URI is reached
-        mediator_did_service = await find_did_service(
-           resolvers_config, mediator_did
-        )
+        mediator_did_service = await find_did_service(resolvers_config, mediator_did)
         if mediator_did_service is None:
-            raise InvalidDIDDocError(
-                f"mediator '{mediator_did}' service doc not found"
-            )
+            raise InvalidDIDDocError(f"mediator '{mediator_did}' service doc not found")
 
         service_uri = mediator_did_service.service_endpoint
         res.append(mediator_did_service)
@@ -255,19 +232,15 @@ async def wrap_in_forward(
 
     # wrap forward msgs in reversed order so the message to final
     # recipient 'to' will be the innermost one
-    for _to, _next in zip(
-        routing_keys[::-1], (routing_keys[1:] + [to])[::-1]
-    ):
-        fwd_attach = Attachment(
-            data=AttachmentDataJson(packed_msg)
-        )
+    for _to, _next in zip(routing_keys[::-1], (routing_keys[1:] + [to])[::-1]):
+        fwd_attach = Attachment(data=AttachmentDataJson(packed_msg))
 
         fwd_msg = ForwardMessage(
             id=didcomm_id_generator,
             body=ForwardBody(next=_next),
             type=DIDCommMessageProtocolTypes.FORWARD.value,
             attachments=[fwd_attach],
-            **headers
+            **headers,
         )
 
         fwd_msg_encrypted = await find_keys_and_anoncrypt(
@@ -278,16 +251,11 @@ async def wrap_in_forward(
 
     logger.debug(f"forward wrapping result: {fwd_msg_encrypted.msg}")
 
-    return ForwardPackResult(
-        fwd_msg,
-        fwd_msg_encrypted
-    )
+    return ForwardPackResult(fwd_msg, fwd_msg_encrypted)
 
 
 async def unpack_forward(
-    resolvers_config: ResolversConfig,
-    packed_msg: JSON,
-    decrypt_by_all_keys: bool
+    resolvers_config: ResolversConfig, packed_msg: JSON, decrypt_by_all_keys: bool
 ) -> ForwardResult:
     """
     Can be called by a Mediator who expects a Forward message to be unpacked
@@ -303,12 +271,11 @@ async def unpack_forward(
     :return: Forward plaintext
     """
     fwd_unpack_res = await unpack_anoncrypt(
-        json_str_to_dict(packed_msg), resolvers_config, decrypt_by_all_keys)
+        json_str_to_dict(packed_msg), resolvers_config, decrypt_by_all_keys
+    )
 
     if not is_forward(fwd_unpack_res.msg):
-        raise MalformedMessageError(
-            MalformedMessageCode.INVALID_PLAINTEXT
-        )
+        raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
 
     fwd_msg = ForwardMessage.from_json(fwd_unpack_res.msg)
     forwarded_msg_dict = fwd_msg.attachments[0].data.json  # JSON_VALUE
@@ -321,7 +288,7 @@ async def unpack_forward(
     return ForwardResult(
         forward_msg=fwd_msg,
         forwarded_msg=forwarded_msg_dict,
-        forwarded_msg_encrypted_to=fwd_unpack_res.to_kids
+        forwarded_msg_encrypted_to=fwd_unpack_res.to_kids,
     )
 
 
@@ -336,8 +303,8 @@ def is_forward(msg: Union[dict, JSON, bytes]) -> bool:
     try:
         (
             ForwardMessage.from_dict(deepcopy(msg))
-            if isinstance(msg, dict) else
-            ForwardMessage.from_json(msg)
+            if isinstance(msg, dict)
+            else ForwardMessage.from_json(msg)
         )
     except Exception:
         return False

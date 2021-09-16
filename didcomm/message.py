@@ -3,9 +3,7 @@ from __future__ import annotations
 import dataclasses
 from dataclasses import dataclass
 import attr
-from typing import (
-    Optional, List, Union, Dict, TypeVar, Generic, Callable
-)
+from typing import Optional, List, Union, Dict, TypeVar, Generic, Callable
 
 from didcomm.common.types import (
     JSON_VALUE,
@@ -13,28 +11,16 @@ from didcomm.common.types import (
     DID_URL,
     JSON_OBJ,
     JSON,
-    DIDCommMessageTypes
+    DIDCommMessageTypes,
 )
-from didcomm.core.utils import (
-    dataclass_to_dict,
-    attrs_to_dict,
-    is_did,
-    is_did_url
-)
-from didcomm.core.serialization import (
-    json_str_to_dict,
-    json_bytes_to_dict
-)
-from didcomm.core.converters import (
-    converter__id
-)
-from didcomm.core.validators import (
-    validator__instance_of
-)
+from didcomm.core.utils import dataclass_to_dict, attrs_to_dict, is_did, is_did_url
+from didcomm.core.serialization import json_str_to_dict, json_bytes_to_dict
+from didcomm.core.converters import converter__id
+from didcomm.core.validators import validator__instance_of
 from didcomm.errors import (
     MalformedMessageError,
     MalformedMessageCode,
-    DIDCommValueError
+    DIDCommValueError,
 )
 
 Header = Dict[str, JSON_VALUE]
@@ -121,8 +107,7 @@ class GenericMessage(Generic[T]):
     @classmethod
     def from_json(cls, msg: Union[JSON, bytes]) -> Message:
         return cls.from_dict(
-            json_bytes_to_dict(msg) if isinstance(msg, bytes)
-            else json_str_to_dict(msg)
+            json_bytes_to_dict(msg) if isinstance(msg, bytes) else json_str_to_dict(msg)
         )
 
     @classmethod
@@ -133,7 +118,7 @@ class GenericMessage(Generic[T]):
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
 
         # TODO TEST missed fields
-        for f in ('id', 'type', 'body', 'typ'):
+        for f in ("id", "type", "body", "typ"):
             if f not in d:
                 raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
 
@@ -155,9 +140,7 @@ class GenericMessage(Generic[T]):
 
         # XXX do we expect undefined (None) or empty attachments ???
         if d.get("attachments"):
-            d["attachments"] = [
-                Attachment.from_dict(e) for e in d["attachments"]
-            ]
+            d["attachments"] = [Attachment.from_dict(e) for e in d["attachments"]]
 
         try:
             msg = cls(**d)
@@ -226,9 +209,7 @@ class Attachment:
 
     data: Union[AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson]
     id: Optional[Union[str, Callable]] = attr.ib(
-        converter=converter__id,
-        validator=validator__instance_of(str),
-        default=None
+        converter=converter__id, validator=validator__instance_of(str), default=None
     )
     description: Optional[str] = None
     filename: Optional[str] = None

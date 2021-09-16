@@ -46,10 +46,8 @@ def extract_key(
         elif jwk["kty"] == "OKP":
             return OKPKey.import_key(jwk)
         raise DIDCommValueError()
-    elif (
-        verification_method.type == (
-            VerificationMethodType.ED25519_VERIFICATION_KEY_2018
-        )
+    elif verification_method.type == (
+        VerificationMethodType.ED25519_VERIFICATION_KEY_2018
     ):
         # FIXME
         raise NotImplementedError()
@@ -57,9 +55,7 @@ def extract_key(
     raise DIDCommValueError()
 
 
-def extract_sign_alg(
-    verification_method: Union[VerificationMethod, Secret]
-) -> SignAlg:
+def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> SignAlg:
     if (
         verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020
         and verification_method.verification_material.format
@@ -75,10 +71,8 @@ def extract_sign_alg(
 
         raise DIDCommValueError()
 
-    elif (
-        verification_method.type == (
-            VerificationMethodType.ED25519_VERIFICATION_KEY_2018
-        )
+    elif verification_method.type == (
+        VerificationMethodType.ED25519_VERIFICATION_KEY_2018
     ):
         return SignAlg.ED25519
 
@@ -98,13 +92,10 @@ def is_did(v: Any) -> bool:
     #   - strict verifications for parts
     #     (https://www.w3.org/TR/did-core/#did-syntax)
     if isinstance(v, (str, DID)):
-        parts = str(v).split(':')
-        return (
-            len(parts) == 3
-            and parts[0] == "did"
-            and all(parts)
-        )
+        parts = str(v).split(":")
+        return len(parts) == 3 and parts[0] == "did" and all(parts)
     return False
+
 
 # TODO TEST
 def is_did_url(v: Any) -> bool:
@@ -127,9 +118,7 @@ def get_did(did_or_did_url: DID_OR_DID_URL) -> DID:
     return did_or_did_url.partition("#")[0]
 
 
-def get_did_and_optionally_kid(
-    did_or_kid: DID_OR_DID_URL
-) -> (DID, Optional[DID_URL]):
+def get_did_and_optionally_kid(did_or_kid: DID_OR_DID_URL) -> (DID, Optional[DID_URL]):
     if is_did_url(did_or_kid):
         did = get_did(did_or_kid)
         kid = did_or_kid
@@ -142,17 +131,10 @@ def get_did_and_optionally_kid(
 def are_keys_compatible(
     method1: Union[Secret, VerificationMethod], method2: VerificationMethod
 ) -> bool:
-    if (
-        method1.type == method2.type
-        and (
-            method1.verification_material.format ==
-            method2.verification_material.format
-        )
+    if method1.type == method2.type and (
+        method1.verification_material.format == method2.verification_material.format
     ):
-        if (
-            method1.verification_material.format ==
-            VerificationMaterialFormat.JWK
-        ):
+        if method1.verification_material.format == VerificationMaterialFormat.JWK:
             private_jwk = json_str_to_dict(method1.verification_material.value)
             public_jwk = json_str_to_dict(method2.verification_material.value)
             return (

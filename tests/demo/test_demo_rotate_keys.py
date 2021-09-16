@@ -39,8 +39,9 @@ def resolvers_config_alice_with_new_did(
 
 @pytest.mark.asyncio
 async def test_demo_attachments(
-    resolvers_config_alice_with_new_did, resolvers_config_bob,
-    resolvers_config_mediator1
+    resolvers_config_alice_with_new_did,
+    resolvers_config_bob,
+    resolvers_config_mediator1,
 ):
     # ALICE
     frm_prior = FromPrior(iss=ALICE_DID, sub=CHARLIE_DID)
@@ -59,20 +60,15 @@ async def test_demo_attachments(
         message=message,
         frm=CHARLIE_DID,
         to=BOB_DID,
-        pack_config=PackEncryptedConfig()
+        pack_config=PackEncryptedConfig(),
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
     # BOB's MEDIATOR
-    forward_bob = await unpack_forward(
-        resolvers_config_mediator1, packed_msg, True
-    )
+    forward_bob = await unpack_forward(resolvers_config_mediator1, packed_msg, True)
     print(f"Got {forward_bob.forwarded_msg}")
 
     # BOB
-    unpack_result = await unpack(
-        resolvers_config_bob,
-        forward_bob.forwarded_msg
-    )
+    unpack_result = await unpack(resolvers_config_bob, forward_bob.forwarded_msg)
     print(f"Got ${unpack_result.message}")

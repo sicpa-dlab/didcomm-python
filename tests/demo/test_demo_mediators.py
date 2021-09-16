@@ -86,9 +86,7 @@ async def test_demo_mediators_unknown_to_sender(
 
     # BOB MEDIATOR 2
     forward_bob = await unpack_forward(
-        resolvers_config_mediator2,
-        dict_to_json(forward_bob_2.msg_encrypted.msg),
-        True
+        resolvers_config_mediator2, dict_to_json(forward_bob_2.msg_encrypted.msg), True
     )
     print(f"Sending ${forward_bob.forwarded_msg} to Bob")
 

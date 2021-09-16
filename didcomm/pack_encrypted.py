@@ -20,7 +20,7 @@ from didcomm.did_doc.did_doc import DIDCommService
 from didcomm.protocols.routing.forward import (
     wrap_in_forward,
     resolve_did_services_chain,
-    ForwardPackResult
+    ForwardPackResult,
 )
 
 logger = logging.getLogger(__name__)
@@ -130,8 +130,7 @@ async def pack_encrypted(
     encrypt_res_protected = __protected_sender_id_if_needed(encrypt_res, pack_config)
 
     packed_msg_dict = (
-        encrypt_res_protected.msg if encrypt_res_protected
-        else encrypt_res.msg
+        encrypt_res_protected.msg if encrypt_res_protected else encrypt_res.msg
     )
 
     # 6. resolve service information
@@ -146,12 +145,10 @@ async def pack_encrypted(
         to,
         did_services_chain,
         pack_config,
-        pack_params
+        pack_params,
     )
 
-    packed_msg = dict_to_json(
-        fwd_res.msg_encrypted.msg if fwd_res else packed_msg_dict
-    )
+    packed_msg = dict_to_json(fwd_res.msg_encrypted.msg if fwd_res else packed_msg_dict)
 
     return PackEncryptedResult(
         packed_msg=packed_msg,
@@ -160,7 +157,9 @@ async def pack_encrypted(
         sign_from_kid=sign_res.sign_frm_kid if sign_res else None,
         service_metadata=ServiceMetadata(
             did_services_chain[0].id, did_services_chain[-1].service_endpoint
-        ) if did_services_chain else None,
+        )
+        if did_services_chain
+        else None,
     )
 
 
@@ -249,9 +248,9 @@ class PackEncryptedParameters:
 
     forward_headers: Optional[Header] = None
     forward_service_id: Optional[str] = None
-    forward_didcomm_id_generator: Optional[DIDCommGeneratorType] = (
-        didcomm_id_generator_default
-    )
+    forward_didcomm_id_generator: Optional[
+        DIDCommGeneratorType
+    ] = didcomm_id_generator_default
 
 
 def __validate(
@@ -343,9 +342,7 @@ async def __forward_if_needed(
     #   >1 alternative endpoints
     #   >2 alternative endpoints recursion
     if len(did_services_chain) > 1:
-        routing_keys[:0] = [
-            s.service_endpoint for s in did_services_chain[:-1]
-        ]
+        routing_keys[:0] = [s.service_endpoint for s in did_services_chain[:-1]]
 
     return await wrap_in_forward(
         resolvers_config=resolvers_config,
@@ -354,5 +351,5 @@ async def __forward_if_needed(
         routing_keys=routing_keys,
         enc_alg_anon=pack_config.enc_alg_anon,
         headers=pack_params.forward_headers,
-        didcomm_id_generator=pack_params.forward_didcomm_id_generator
+        didcomm_id_generator=pack_params.forward_didcomm_id_generator,
     )

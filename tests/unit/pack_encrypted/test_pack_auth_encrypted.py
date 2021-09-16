@@ -58,7 +58,7 @@ async def test_authcrypt_sender_did_recipient_did(
     protect_sender_id,
     resolvers_config_alice,
     resolvers_config_bob,
-    resolvers_config_mediator1
+    resolvers_config_mediator1,
 ):
     await check_authcrypt(
         msg=msg,
@@ -99,7 +99,7 @@ async def test_authcrypt_sender_did_recipient_kid(
     protect_sender_id,
     resolvers_config_alice,
     resolvers_config_bob,
-    resolvers_config_mediator1
+    resolvers_config_mediator1,
 ):
     await check_authcrypt(
         msg=msg,
@@ -132,7 +132,7 @@ async def test_authcrypt_sender_kid_recipient_did(
     protect_sender_id,
     resolvers_config_alice,
     resolvers_config_bob,
-    resolvers_config_mediator1
+    resolvers_config_mediator1,
 ):
     for frm in [
         vm.id for vm in get_key_agreement_methods_in_secrets(Person.ALICE, curve_type)
@@ -168,7 +168,7 @@ async def test_authcrypt_sender_kid_recipient_kid(
     protect_sender_id,
     resolvers_config_alice,
     resolvers_config_bob,
-    resolvers_config_mediator1
+    resolvers_config_mediator1,
 ):
     for frm in [
         vm.id for vm in get_key_agreement_methods_in_secrets(Person.ALICE, curve_type)
@@ -246,8 +246,7 @@ async def check_authcrypt(
     #      (but it's actually out of current test case scope)
 
     unpack_res = await unpack(
-        resolvers_config=resolvers_config_bob,
-        packed_msg=forward_bob.forwarded_msg
+        resolvers_config=resolvers_config_bob, packed_msg=forward_bob.forwarded_msg
     )
 
     expected_alg = auth_alg or AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW

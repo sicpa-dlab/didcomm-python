@@ -10,7 +10,7 @@ from tests.test_vectors.did_doc import (
     DID_DOC_BOB_WITH_NO_SECRETS,
     DID_DOC_CHARLIE,
     DID_DOC_MEDIATOR1,
-    DID_DOC_MEDIATOR2
+    DID_DOC_MEDIATOR2,
 )
 from tests.test_vectors.secrets import (
     MockSecretsResolverAlice,
@@ -42,7 +42,7 @@ did_docs_spec = {
     Person.BOB: (DID_DOC_BOB_WITH_NO_SECRETS, MockSecretsResolverBob),
     Person.CHARLIE: (DID_DOC_CHARLIE, MockSecretsResolverCharlie),
     Person.MEDIATOR1: (DID_DOC_MEDIATOR1, MockSecretsResolverMediator1),
-    Person.MEDIATOR2: (DID_DOC_MEDIATOR2, MockSecretsResolverMediator2)
+    Person.MEDIATOR2: (DID_DOC_MEDIATOR2, MockSecretsResolverMediator2),
 }
 
 

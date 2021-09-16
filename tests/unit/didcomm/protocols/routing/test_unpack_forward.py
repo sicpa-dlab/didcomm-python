@@ -4,33 +4,26 @@ from didcomm.errors import MalformedMessageError
 from didcomm.common.types import DID
 from didcomm.core.defaults import DEF_ENC_ALG_ANON
 from didcomm.core.types import UnpackAnoncryptResult
-from didcomm.core.serialization import (
-    dict_to_json_bytes,
-    dict_to_json
-)
+from didcomm.core.serialization import dict_to_json_bytes, dict_to_json
 from didcomm.protocols.routing import forward
 from didcomm.protocols.routing.forward import (
     unpack_forward,
     ForwardMessage,
-    ForwardResult
+    ForwardResult,
 )
 
 
 @pytest.fixture
-def unpack_anoncrypt_result(
-    did: DID, fwd_msg: ForwardMessage
-) -> UnpackAnoncryptResult:
+def unpack_anoncrypt_result(did: DID, fwd_msg: ForwardMessage) -> UnpackAnoncryptResult:
     return UnpackAnoncryptResult(
         msg=dict_to_json_bytes(fwd_msg.as_dict()),
         to_kids=[did, did + "2"],
-        alg=DEF_ENC_ALG_ANON
+        alg=DEF_ENC_ALG_ANON,
     )
 
 
 @pytest.fixture
-def unpack_anoncrypt_mock(
-    mocker, unpack_anoncrypt_result: UnpackAnoncryptResult
-):
+def unpack_anoncrypt_mock(mocker, unpack_anoncrypt_result: UnpackAnoncryptResult):
     mock = mocker.patch.object(forward, "unpack_anoncrypt", autospec=True)
     mock.return_value = unpack_anoncrypt_result
     return mock
@@ -64,9 +57,7 @@ async def test_unpack_forward__unpack_anoncrypt_callspec(
 
 @pytest.mark.asyncio
 async def test_unpack_forward__no_forward_packed(
-    resolvers_config_mock,
-    unpack_anoncrypt_result,
-    unpack_anoncrypt_mock
+    resolvers_config_mock, unpack_anoncrypt_result, unpack_anoncrypt_mock
 ):
     # to hack / workaround Attachment frozen setting
     object.__setattr__(
@@ -74,7 +65,8 @@ async def test_unpack_forward__no_forward_packed(
     )
     with pytest.raises(MalformedMessageError):
         await unpack_forward(
-            resolvers_config_mock, dict_to_json({"we": "dontcare"}), True)
+            resolvers_config_mock, dict_to_json({"we": "dontcare"}), True
+        )
 
 
 @pytest.mark.asyncio
@@ -83,7 +75,7 @@ async def test_unpack_forward__return(
     unpack_anoncrypt_mock,
     unpack_anoncrypt_result,
     any_msg_json,
-    fwd_msg
+    fwd_msg,
 ):
     res = await unpack_forward(resolvers_config_mock, any_msg_json, True)
 

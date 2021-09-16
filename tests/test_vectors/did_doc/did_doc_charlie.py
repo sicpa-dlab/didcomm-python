@@ -47,13 +47,10 @@ DID_DOC_CHARLIE = DIDDoc(
         DIDCommService(
             id="did:example:123456789abcdefghi#didcomm-1",
             service_endpoint="did:example:mediator2",
-            accept=[
-                "didcomm/v2",
-                "didcomm/aip2;env=rfc587"
-            ],
+            accept=["didcomm/v2", "didcomm/aip2;env=rfc587"],
             routing_keys=[
                 "did:example:mediator2#key-p521-1",
-            ]
+            ],
         )
     ],
     verification_methods=[

@@ -3,9 +3,7 @@ from unittest.mock import AsyncMock
 
 from didcomm.common.types import DID, DID_URL
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.protocols.routing.forward import (
-    ForwardMessage
-)
+from didcomm.protocols.routing.forward import ForwardMessage
 
 from .helper import gen_fwd_msg
 

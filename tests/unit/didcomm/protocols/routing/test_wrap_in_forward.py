@@ -1,16 +1,13 @@
 import pytest
 import dataclasses
 
-from didcomm.common.types import (
-    DID,
-    DIDCommMessageProtocolTypes
-)
+from didcomm.common.types import DID, DIDCommMessageProtocolTypes
 from didcomm.core.types import EncryptResult
 from didcomm.protocols.routing import forward
 from didcomm.protocols.routing.forward import (
     wrap_in_forward,
     ForwardBody,
-    ForwardPackResult
+    ForwardPackResult,
 )
 
 
@@ -27,9 +24,7 @@ def encrypted_msg2() -> dict:
 @pytest.fixture
 def encrypt_result1(did: DID, encrypted_msg1: dict) -> EncryptResult:
     return EncryptResult(
-        msg=encrypt_result1,
-        to_kids=[did],
-        to_keys=["not", "important", "for", "now"]
+        msg=encrypt_result1, to_kids=[did], to_keys=["not", "important", "for", "now"]
     )
 
 
@@ -44,9 +39,7 @@ def encrypt_result2(
 def find_keys_and_anoncrypt_mock(
     mocker, encrypt_result1: EncryptResult, encrypt_result2: EncryptResult
 ):
-    mock = mocker.patch.object(
-        forward, "find_keys_and_anoncrypt"
-    )
+    mock = mocker.patch.object(forward, "find_keys_and_anoncrypt")
     # will help for cases with multiple routing keys (multiple calls)
     side_effect = (encrypt_result1, encrypt_result2)
     mock.side_effect = side_effect
@@ -64,7 +57,7 @@ def callspec(resolvers_config_mock, did1, did2, did3):
         routing_keys=[did1, did2],
         enc_alg_anon="some_enc_alg",
         headers={"some": "headers"},
-        didcomm_id_generator=lambda: 123
+        didcomm_id_generator=lambda: 123,
     )
 
 
@@ -78,9 +71,7 @@ async def test_wrap_in_forward__no_routing_keys(callspec):
 
 
 @pytest.mark.asyncio
-async def test_wrap_in_forward__forward_message_callspec(
-    mocker, callspec
-):
+async def test_wrap_in_forward__forward_message_callspec(mocker, callspec):
     # TODO use autospec=True need to explore why it doesn"t work
     #      (stats for calls is not callected)
     att_mock = mocker.patch.object(forward, "Attachment")
@@ -98,18 +89,14 @@ async def test_wrap_in_forward__forward_message_callspec(
             body=ForwardBody(next=callspec["to"]),
             type=DIDCommMessageProtocolTypes.FORWARD.value,
             attachments=[att_mock.return_value],
-            **callspec["headers"]
+            **callspec["headers"],
         )
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "routing_keys_num", range(1, 3), ids=["simple", "recursive"]
-)
+@pytest.mark.parametrize("routing_keys_num", range(1, 3), ids=["simple", "recursive"])
 async def test_wrap_in_forward__return(
-    mocker, did1, did2, did3,
-    find_keys_and_anoncrypt_mock, callspec,
-    routing_keys_num
+    mocker, did1, did2, did3, find_keys_and_anoncrypt_mock, callspec, routing_keys_num
 ):
     routing_keys = [did1, did2][:routing_keys_num]
     tos = routing_keys[::-1]
@@ -137,17 +124,18 @@ async def test_wrap_in_forward__return(
             body=ForwardBody(next=_next),
             type=DIDCommMessageProtocolTypes.FORWARD.value,
             attachments=[att_mock_side_effect[i]],
-            **callspec["headers"]
+            **callspec["headers"],
         )
         assert find_keys_and_anoncrypt_mock.call_args_list[i] == mocker.call(
             fw_mock_side_effect[i].as_dict.return_value,
             _to,
             callspec["enc_alg_anon"],
-            callspec["resolvers_config"]
+            callspec["resolvers_config"],
         )
 
     assert isinstance(res, ForwardPackResult)
     assert res.msg == fw_mock_side_effect[routing_keys_num - 1]
-    assert res.msg_encrypted == find_keys_and_anoncrypt_mock._side_effect[
-        routing_keys_num - 1
-    ]
+    assert (
+        res.msg_encrypted
+        == find_keys_and_anoncrypt_mock._side_effect[routing_keys_num - 1]
+    )

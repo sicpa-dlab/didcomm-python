@@ -44,8 +44,7 @@ class DIDDoc:
         :param id: an identifier of a verification method
         :return: the verification method or None of there is no one for the given identifier
         """
-        return search_first_in_iterable(
-            self.verification_methods, lambda x: x.id == id)
+        return search_first_in_iterable(self.verification_methods, lambda x: x.id == id)
 
     def get_didcomm_service(self, id: str) -> Optional[DIDCommService]:
         """
@@ -54,8 +53,7 @@ class DIDDoc:
         :param id: an identifier of a service endpoint
         :return: the service endpoint or None of there is no one for the given identifier
         """
-        return search_first_in_iterable(
-            self.didcomm_services, lambda x: x.id == id)
+        return search_first_in_iterable(self.didcomm_services, lambda x: x.id == id)
 
 
 @dataclass
@@ -104,17 +102,9 @@ class DIDCommService:
            A possibly empty ordered array of strings representing accepted didcomm specification versions.
     """
 
-    id: str = attr.ib(
-        validator=attr.validators.instance_of(str)
-    )
-    service_endpoint: str = attr.ib(
-        validator=attr.validators.instance_of(str)
-    )
+    id: str = attr.ib(validator=attr.validators.instance_of(str))
+    service_endpoint: str = attr.ib(validator=attr.validators.instance_of(str))
     # TODO validate each item (should be did-url)
-    routing_keys: List[DID_URL] = attr.ib(
-        validator=attr.validators.instance_of(list)
-    )
+    routing_keys: List[DID_URL] = attr.ib(validator=attr.validators.instance_of(list))
     # TODO validate each item (should be str)
-    accept: List[str] = attr.ib(
-        validator=attr.validators.instance_of(list)
-    )
+    accept: List[str] = attr.ib(validator=attr.validators.instance_of(list))

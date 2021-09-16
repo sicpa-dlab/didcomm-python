@@ -1,9 +1,6 @@
 from typing import Optional, Union, Any, Callable
 
-from didcomm.core.utils import (
-    id_generator_default,
-    didcomm_id_generator_default
-)
+from didcomm.core.utils import id_generator_default, didcomm_id_generator_default
 
 
 def converter__id(_id: Optional[Union[Any, Callable]] = None):

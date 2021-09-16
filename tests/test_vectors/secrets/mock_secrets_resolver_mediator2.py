@@ -6,9 +6,7 @@ from didcomm.common.types import (
     VerificationMaterialFormat,
 )
 from didcomm.secrets.secrets_resolver import Secret
-from tests.test_vectors.secrets.mock_secrets_resolver import (
-    MockSecretsResolverInMemory
-)
+from tests.test_vectors.secrets.mock_secrets_resolver import MockSecretsResolverInMemory
 
 # FIXME build verification material
 #       (currently it's a copy-paste from Bob's ones)

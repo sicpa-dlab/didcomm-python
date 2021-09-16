@@ -25,7 +25,7 @@ async def test_demo_advanced_parameters(
     # TODO replace hard-coded values
     pack_parameters = PackEncryptedParameters(
         forward_headers={"expires_time": 99999},
-        forward_service_id="did:example:123456789abcdefghi#didcomm-1"
+        forward_service_id="did:example:123456789abcdefghi#didcomm-1",
     )
     message = Message(
         body={"aaa": 1, "bbb": 2},
@@ -49,9 +49,7 @@ async def test_demo_advanced_parameters(
     print(f"Sending {packed_msg} to {pack_result.service_metadata.service_endpoint}")
 
     # BOB MEDIATOR
-    forward_bob = await unpack_forward(
-        resolvers_config_mediator1, packed_msg, True
-    )
+    forward_bob = await unpack_forward(resolvers_config_mediator1, packed_msg, True)
     packed_msg = forward_bob.forwarded_msg
     print(f"Sending {packed_msg} to Bob")
 

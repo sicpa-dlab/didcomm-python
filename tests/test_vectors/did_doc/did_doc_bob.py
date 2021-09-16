@@ -262,13 +262,8 @@ DID_DOC_BOB_WITH_NO_SECRETS = DIDDoc(
         DIDCommService(
             id="did:example:123456789abcdefghi#didcomm-1",
             service_endpoint="http://example.com/path",
-            accept=[
-                "didcomm/v2",
-                "didcomm/aip2;env=rfc587"
-            ],
-            routing_keys=[
-                "did:example:mediator1#key-x25519-1"
-            ]
+            accept=["didcomm/v2", "didcomm/aip2;env=rfc587"],
+            routing_keys=["did:example:mediator1#key-x25519-1"],
         )
     ],
     verification_methods=[

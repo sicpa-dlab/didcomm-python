@@ -6,7 +6,7 @@ from tests.test_vectors.did_doc import (
     DID_DOC_BOB_SPEC_TEST_VECTORS,
     DID_DOC_CHARLIE,
     DID_DOC_MEDIATOR1,
-    DID_DOC_MEDIATOR2
+    DID_DOC_MEDIATOR2,
 )
 
 
@@ -18,7 +18,7 @@ class MockDIDResolverAllInSecrets(DIDResolverInMemory):
                 DID_DOC_BOB_SPEC_TEST_VECTORS,
                 DID_DOC_CHARLIE,
                 DID_DOC_MEDIATOR1,
-                DID_DOC_MEDIATOR2
+                DID_DOC_MEDIATOR2,
             ]
         )
 
@@ -31,6 +31,6 @@ class MockDIDResolverWithNonSecrets(DIDResolverInMemory):
                 DID_DOC_BOB_WITH_NO_SECRETS,
                 DID_DOC_CHARLIE,
                 DID_DOC_MEDIATOR1,
-                DID_DOC_MEDIATOR2
+                DID_DOC_MEDIATOR2,
             ]
         )

@@ -50,7 +50,7 @@ async def test_anoncrypt(
     protect_sender_id,
     resolvers_config_alice,
     resolvers_config_bob,
-    resolvers_config_mediator1
+    resolvers_config_mediator1,
 ):
     pack_config = PackEncryptedConfig(protect_sender_id=protect_sender_id)
     if alg:
@@ -89,8 +89,7 @@ async def test_anoncrypt(
     #      (but it's actually out of current test case scope)
 
     unpack_res = await unpack(
-        resolvers_config=resolvers_config_bob,
-        packed_msg=forward_bob.forwarded_msg
+        resolvers_config=resolvers_config_bob, packed_msg=forward_bob.forwarded_msg
     )
     expected_alg = alg or AnonCryptAlg.XC20P_ECDH_ES_A256KW
     assert unpack_res.message == msg

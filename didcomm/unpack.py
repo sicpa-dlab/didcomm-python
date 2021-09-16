@@ -14,7 +14,7 @@ from didcomm.core.authcrypt import is_authcrypted, unpack_authcrypt
 from didcomm.core.serialization import (
     json_bytes_to_dict,
     json_str_to_dict,
-    dict_to_json_bytes
+    dict_to_json_bytes,
 )
 from didcomm.core.sign import is_signed, unpack_sign
 from didcomm.protocols.routing.forward import unpack_forward, is_forward
@@ -51,7 +51,8 @@ async def unpack(
     else:
         # FIXME in python it should be a kind of TypeError instead
         raise DIDCommValueError(
-            "unexpected type of packed_message: '{type(packed_msg)}'")
+            "unexpected type of packed_message: '{type(packed_msg)}'"
+        )
 
     metadata = Metadata(
         encrypted=False,
@@ -62,9 +63,7 @@ async def unpack(
 
     if is_forward(msg_as_dict) and unpack_config.unwrap_re_wrapping_forward:
         forward_res = await unpack_forward(
-            resolvers_config,
-            packed_msg,
-            unpack_config.expect_decrypt_by_all_keys
+            resolvers_config, packed_msg, unpack_config.expect_decrypt_by_all_keys
         )
         msg = to_bytes(forward_res.forwarded_msg)
         msg_as_dict = json_str_to_dict(forward_res.forwarded_msg)

@@ -10,7 +10,7 @@ from tests.test_vectors.secrets import (
     MockSecretsResolverBob,
     MockSecretsResolverCharlie,
     MockSecretsResolverMediator1,
-    MockSecretsResolverMediator2
+    MockSecretsResolverMediator2,
 )
 
 
@@ -63,8 +63,7 @@ def resolvers_config_bob_all_in_secrets(
     secrets_resolver_bob, did_resolver_all_in_secrets
 ):
     return ResolversConfig(
-        secrets_resolver=secrets_resolver_bob,
-        did_resolver=did_resolver_all_in_secrets
+        secrets_resolver=secrets_resolver_bob, did_resolver=did_resolver_all_in_secrets
     )
 
 

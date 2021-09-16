@@ -2,15 +2,12 @@ import pytest
 from unittest.mock import AsyncMock
 
 from didcomm.common.types import DID
-from didcomm.errors import (
-    DIDDocNotResolvedError,
-    InvalidDIDDocError
-)
+from didcomm.errors import DIDDocNotResolvedError, InvalidDIDDocError
 from didcomm.did_doc.did_doc import DIDDoc, DIDCommService
 from didcomm.protocols.routing import forward  # for patch.object mocks
 from didcomm.protocols.routing.forward import (
     find_did_service,
-    resolve_did_services_chain
+    resolve_did_services_chain,
 )
 
 
@@ -22,6 +19,7 @@ def did_doc(did) -> DIDDoc:
 # ===============
 # find_did_service
 # ===============
+
 
 @pytest.mark.asyncio
 async def test_find_did_service__no_diddoc(resolvers_config_mock, did_doc):
@@ -61,14 +59,11 @@ async def test_find_did_service__no_service_id(resolvers_config_mock, did_doc):
     resolve_mock.return_value = did_doc
 
     with pytest.raises(InvalidDIDDocError):
-        await find_did_service(
-            resolvers_config_mock, did_doc.did, service_id="did2")
+        await find_did_service(resolvers_config_mock, did_doc.did, service_id="did2")
 
 
 @pytest.mark.asyncio
-async def test_find_did_service__by_service_id(
-    mocker, resolvers_config_mock, did_doc
-):
+async def test_find_did_service__by_service_id(mocker, resolvers_config_mock, did_doc):
     resolve_mock = resolvers_config_mock.did_resolver.resolve
     resolve_mock.return_value = did_doc
 
@@ -81,13 +76,15 @@ async def test_find_did_service__by_service_id(
     did_doc.didcomm_services = [service1, service2]
 
     res = await find_did_service(
-        resolvers_config_mock, did_doc.did, service_id=service2.id)
+        resolvers_config_mock, did_doc.did, service_id=service2.id
+    )
     assert res is service2
 
 
 # ==========================
 # resolve_did_services_chain
 # ==========================
+
 
 @pytest.fixture
 def find_did_service_mock(mocker) -> AsyncMock:
@@ -147,10 +144,9 @@ async def test_resolve_did_services_chain__no_mediator_did_service(
     with pytest.raises(InvalidDIDDocError) as excinfo:
         await resolve_did_services_chain(resolvers_config_mock, did1)
 
-    assert (
-        f"mediator '{service1.service_endpoint}' "
-        "service doc not found"
-    ) in str(excinfo.value)
+    assert (f"mediator '{service1.service_endpoint}' " "service doc not found") in str(
+        excinfo.value
+    )
 
 
 @pytest.mark.asyncio
@@ -158,8 +154,8 @@ async def test_resolve_did_services_chain__no_mediator_did_service(
     "did_recursion, exc_t",
     [
         pytest.param(True, NotImplementedError, id="expected"),
-        pytest.param(False, InvalidDIDDocError, id="unexpected")
-    ]
+        pytest.param(False, InvalidDIDDocError, id="unexpected"),
+    ],
 )
 async def test_resolve_did_services_chain__did_endpoint_recursion(
     did_recursion,
@@ -181,6 +177,5 @@ async def test_resolve_did_services_chain__did_endpoint_recursion(
             resolvers_config_mock, did1, did_recursion=did_recursion
         )
     assert (
-        f"mediator '{service1.service_endpoint}' "
-        "defines alternative endpoint"
+        f"mediator '{service1.service_endpoint}' " "defines alternative endpoint"
     ) in str(excinfo.value)
