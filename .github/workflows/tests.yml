@@ -13,13 +13,29 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: pip update
+        run: python -m pip install -U pip
+
+      - name: resolve pip cache dir
+        id: pip_cache_dir
+        run: echo "::set-output name=value::$(pip cache dir)"
+
+      - name: cache pip
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip_cache_dir.outputs.value }}
+          key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}
+
       - name: Install dependencies
         run: |
           pip install -e .[tests]
+
       - name: Test with pytest
         run: |
           pytest -n auto
