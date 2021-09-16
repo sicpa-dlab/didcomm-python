@@ -22,4 +22,4 @@ jobs:
           pip install -e .[tests]
       - name: Test with pytest
         run: |
-          pytest
+          pytest -n auto

@@ -34,6 +34,7 @@ setup(
         "pytest-asyncio==0.15.1",
         "pytest-xdist==2.3.0",
         "flake8==3.9.2",
-        "pytest-mock==3.6.1"
+        "black==21.9b0",
+        "pytest-mock==3.6.1",
     ]},
 )
