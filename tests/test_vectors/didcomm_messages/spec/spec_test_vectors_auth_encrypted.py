@@ -2,7 +2,7 @@ from authlib.common.encoding import json_dumps
 
 from didcomm.common.algorithms import AuthCryptAlg, SignAlg, AnonCryptAlg
 from didcomm.unpack import Metadata
-from tests.test_vectors.common import TestVector
+from tests.test_vectors.common import TTestVector
 
 TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH_X25519 = json_dumps(
     {
@@ -92,7 +92,7 @@ TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH_P521_SIGNED = json_dumps(
 )
 
 TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH = [
-    TestVector(
+    TTestVector(
         TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH_X25519,
         Metadata(
             encrypted=True,
@@ -108,7 +108,7 @@ TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH = [
             enc_alg_auth=AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW,
         ),
     ),
-    TestVector(
+    TTestVector(
         TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH_P256,
         Metadata(
             encrypted=True,
@@ -123,7 +123,7 @@ TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH = [
             signed_message=TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH_P256_SIGNED,
         ),
     ),
-    TestVector(
+    TTestVector(
         TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH_P521,
         Metadata(
             encrypted=True,

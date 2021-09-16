@@ -5,7 +5,7 @@ from didcomm.common.types import (
     VerificationMaterial,
     VerificationMaterialFormat,
 )
-from didcomm.did_doc.did_doc import VerificationMethod, DIDDoc
+from didcomm.did_doc.did_doc import VerificationMethod, DIDDoc, DIDCommService
 
 BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1 = VerificationMethod(
     id="did:example:bob#key-x25519-1",
@@ -258,7 +258,14 @@ DID_DOC_BOB_WITH_NO_SECRETS = DIDDoc(
         "did:example:bob#key-p521-2",
         "did:example:bob#key-p521-not-secrets-1",
     ],
-    didcomm_services=[],
+    didcomm_services=[
+        DIDCommService(
+            id="did:example:123456789abcdefghi#didcomm-1",
+            service_endpoint="http://example.com/path",
+            accept=["didcomm/v2", "didcomm/aip2;env=rfc587"],
+            routing_keys=["did:example:mediator1#key-x25519-1"],
+        )
+    ],
     verification_methods=[
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_2,

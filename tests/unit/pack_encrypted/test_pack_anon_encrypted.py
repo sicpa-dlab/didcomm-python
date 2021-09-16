@@ -3,6 +3,7 @@ import pytest
 from didcomm.common.algorithms import AnonCryptAlg
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.unpack import unpack
+from didcomm.protocols.routing.forward import unpack_forward
 from tests.test_vectors.common import BOB_DID, ALICE_DID
 from tests.test_vectors.didcomm_messages.messages import (
     TEST_MESSAGE,
@@ -49,6 +50,7 @@ async def test_anoncrypt(
     protect_sender_id,
     resolvers_config_alice,
     resolvers_config_bob,
+    resolvers_config_mediator1,
 ):
     pack_config = PackEncryptedConfig(protect_sender_id=protect_sender_id)
     if alg:
@@ -80,8 +82,14 @@ async def test_anoncrypt(
     assert pack_result.sign_from_kid == expected_sign_frm
     assert pack_result.packed_msg is not None
 
+    forward_bob = await unpack_forward(
+        resolvers_config_mediator1, pack_result.packed_msg, True
+    )
+    # TODO ??? might need some checks against forward unpack result
+    #      (but it's actually out of current test case scope)
+
     unpack_res = await unpack(
-        resolvers_config=resolvers_config_bob, packed_msg=pack_result.packed_msg
+        resolvers_config=resolvers_config_bob, packed_msg=forward_bob.forwarded_msg
     )
     expected_alg = alg or AnonCryptAlg.XC20P_ECDH_ES_A256KW
     assert unpack_res.message == msg

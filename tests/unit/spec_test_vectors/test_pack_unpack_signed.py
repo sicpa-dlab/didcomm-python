@@ -5,7 +5,7 @@ import pytest
 from didcomm.common.types import DID_OR_DID_URL
 from didcomm.pack_signed import pack_signed
 from didcomm.unpack import unpack
-from tests.test_vectors.common import ALICE_DID, TestVector
+from tests.test_vectors.common import ALICE_DID, TTestVector
 from tests.test_vectors.didcomm_messages.messages import TEST_MESSAGE
 from tests.test_vectors.didcomm_messages.spec.spec_test_vectors_signed import (
     TEST_SIGNED_DIDCOMM_MESSAGE,
@@ -46,7 +46,7 @@ async def test_pack_signed_by_kid(
 
 async def check_pack_signed(
     sign_frm: DID_OR_DID_URL,
-    test_vector: TestVector,
+    test_vector: TTestVector,
     resolvers_config_alice,
     resolvers_config_bob,
 ):

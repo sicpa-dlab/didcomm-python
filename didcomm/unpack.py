@@ -1,48 +1,58 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from authlib.common.encoding import to_unicode, to_bytes
 
+from didcomm.errors import DIDCommValueError
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JWS, JSON, DID_URL
+from didcomm.common.types import JWS, JSON, JSON_OBJ, DID_URL
 from didcomm.core.anoncrypt import unpack_anoncrypt, is_anoncrypted
 from didcomm.core.authcrypt import is_authcrypted, unpack_authcrypt
-from didcomm.core.serialization import json_bytes_to_dict, json_str_to_dict
+from didcomm.core.serialization import (
+    json_bytes_to_dict,
+    json_str_to_dict,
+    dict_to_json_bytes,
+)
 from didcomm.core.sign import is_signed, unpack_sign
+from didcomm.protocols.routing.forward import unpack_forward, is_forward
 from didcomm.message import Message
 
 
 async def unpack(
     resolvers_config: ResolversConfig,
-    packed_msg: JSON,
+    packed_msg: Union[JSON, JSON_OBJ],
     unpack_config: Optional[UnpackConfig] = None,
 ) -> UnpackResult:
     """
     Unpacks the packed DIDComm message by doing decryption and verifying the signatures.
 
-    If unpack config expects the message to be packed in a particular way (for example that a message is encrypted)
-    and the packed message doesn't meet the criteria (it's not encrypted), then `UnsatisfiedConstraintError` will be raised.
-
     :param resolvers_config: secrets and DIDDoc resolvers
-    :param packed_msg: packed DIDComm message as JSON string to be unpacked
+    :param packed_msg: packed DIDComm message as JSON string of JSON_OBJ to be unpacked
     :param unpack_config: configuration for unpack. Default parameters are used if not specified.
 
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
     :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc
     :raises SecretNotFoundError: If there is no secret for the given DID or DID URL (key ID)
     :raises MalformedMessageError: if the message is invalid (can not be decrypted, signature is invalid, the message is invalid, etc.)
-    :raises UnsatisfiedConstraintError: if UnpackOpts expect the message to be packed in a particular way (for example encrypted and signed),
-                                        but the message is not
 
     :return: the message, metadata, and optionally a JWS if the message has been signed.
     """
     unpack_config = unpack_config or UnpackConfig()
 
-    msg = to_bytes(packed_msg)
-    msg_as_dict = json_str_to_dict(packed_msg)
+    if isinstance(packed_msg, str):
+        msg = to_bytes(packed_msg)
+        msg_as_dict = json_str_to_dict(packed_msg)
+    elif isinstance(packed_msg, dict):
+        msg = dict_to_json_bytes(packed_msg)
+        msg_as_dict = packed_msg
+    else:
+        # FIXME in python it should be a kind of TypeError instead
+        raise DIDCommValueError(
+            "unexpected type of packed_message: '{type(packed_msg)}'"
+        )
 
     metadata = Metadata(
         encrypted=False,
@@ -50,6 +60,13 @@ async def unpack(
         non_repudiation=False,
         anonymous_sender=False,
     )
+
+    if is_forward(msg_as_dict) and unpack_config.unwrap_re_wrapping_forward:
+        forward_res = await unpack_forward(
+            resolvers_config, packed_msg, unpack_config.expect_decrypt_by_all_keys
+        )
+        msg = to_bytes(forward_res.forwarded_msg)
+        msg_as_dict = json_str_to_dict(forward_res.forwarded_msg)
 
     if is_anoncrypted(msg_as_dict):
         unwrap_anoncrypt_result = await unpack_anoncrypt(

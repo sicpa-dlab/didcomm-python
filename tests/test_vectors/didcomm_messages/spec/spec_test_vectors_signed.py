@@ -4,7 +4,7 @@ from authlib.common.encoding import json_dumps
 
 from didcomm.common.algorithms import SignAlg
 from didcomm.unpack import Metadata
-from tests.test_vectors.common import TestVector
+from tests.test_vectors.common import TTestVector
 
 TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_1 = json_dumps(
     {
@@ -46,7 +46,7 @@ TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_3 = json_dumps(
 )
 
 TEST_SIGNED_DIDCOMM_MESSAGE = [
-    TestVector(
+    TTestVector(
         TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_1,
         Metadata(
             encrypted=False,
@@ -58,7 +58,7 @@ TEST_SIGNED_DIDCOMM_MESSAGE = [
             signed_message=copy.deepcopy(TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_1),
         ),
     ),
-    TestVector(
+    TTestVector(
         TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_2,
         Metadata(
             encrypted=False,
@@ -70,7 +70,7 @@ TEST_SIGNED_DIDCOMM_MESSAGE = [
             signed_message=TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_2,
         ),
     ),
-    TestVector(
+    TTestVector(
         TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_3,
         Metadata(
             encrypted=False,

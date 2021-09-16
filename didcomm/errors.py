@@ -25,11 +25,16 @@ class IncompatibleCryptoError(DIDCommError):
     pass
 
 
+class InvalidDIDDocError(DIDCommValueError):
+    pass
+
+
 class MalformedMessageCode(Enum):
     CAN_NOT_DECRYPT = 1
     INVALID_SIGNATURE = 2
     INVALID_PLAINTEXT = 3
     INVALID_MESSAGE = 4
+    NOT_SUPPORTED_FWD_PROTOCOL = 5
 
 
 class MalformedMessageError(DIDCommError):

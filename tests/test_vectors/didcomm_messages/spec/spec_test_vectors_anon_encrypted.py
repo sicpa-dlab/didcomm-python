@@ -2,7 +2,7 @@ from authlib.common.encoding import json_dumps
 
 from didcomm.common.algorithms import AnonCryptAlg
 from didcomm.unpack import Metadata
-from tests.test_vectors.common import TestVector
+from tests.test_vectors.common import TTestVector
 
 TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON_XC20P_1 = json_dumps(
     {
@@ -85,7 +85,7 @@ TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON_A256GCM = json_dumps(
 )
 
 TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON = [
-    TestVector(
+    TTestVector(
         TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON_XC20P_1,
         Metadata(
             encrypted=True,
@@ -100,7 +100,7 @@ TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON = [
             enc_alg_anon=AnonCryptAlg.XC20P_ECDH_ES_A256KW,
         ),
     ),
-    TestVector(
+    TTestVector(
         TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON_XC20P_2,
         Metadata(
             encrypted=True,
@@ -111,7 +111,7 @@ TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON = [
             enc_alg_anon=AnonCryptAlg.XC20P_ECDH_ES_A256KW,
         ),
     ),
-    TestVector(
+    TTestVector(
         TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON_A256CBC,
         Metadata(
             encrypted=True,
@@ -122,7 +122,7 @@ TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON = [
             enc_alg_anon=AnonCryptAlg.A256CBC_HS512_ECDH_ES_A256KW,
         ),
     ),
-    TestVector(
+    TTestVector(
         TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON_A256GCM,
         Metadata(
             encrypted=True,

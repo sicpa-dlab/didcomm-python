@@ -5,15 +5,19 @@ from didcomm.common.types import VerificationMethodType, VerificationMaterialFor
 from didcomm.core.serialization import json_str_to_dict
 from didcomm.did_doc.did_doc import VerificationMethod
 from didcomm.secrets.secrets_resolver import Secret
-from tests.test_vectors.did_doc.did_doc_alice import DID_DOC_ALICE_WITH_NO_SECRETS
-from tests.test_vectors.did_doc.did_doc_bob import DID_DOC_BOB_WITH_NO_SECRETS
-from tests.test_vectors.did_doc.mock_did_resolver import DID_DOC_CHARLIE
-from tests.test_vectors.secrets.mock_secrets_resolver_alice import (
-    MockSecretsResolverAlice,
+from tests.test_vectors.did_doc import (
+    DID_DOC_ALICE_WITH_NO_SECRETS,
+    DID_DOC_BOB_WITH_NO_SECRETS,
+    DID_DOC_CHARLIE,
+    DID_DOC_MEDIATOR1,
+    DID_DOC_MEDIATOR2,
 )
-from tests.test_vectors.secrets.mock_secrets_resolver_bob import MockSecretsResolverBob
-from tests.test_vectors.secrets.mock_secrets_resolver_charlie import (
+from tests.test_vectors.secrets import (
+    MockSecretsResolverAlice,
+    MockSecretsResolverBob,
     MockSecretsResolverCharlie,
+    MockSecretsResolverMediator1,
+    MockSecretsResolverMediator2,
 )
 
 
@@ -21,6 +25,8 @@ class Person(Enum):
     ALICE = 1
     BOB = 2
     CHARLIE = 3
+    MEDIATOR1 = 4
+    MEDIATOR2 = 5
 
 
 class KeyAgreementCurveType(Enum):
@@ -31,22 +37,23 @@ class KeyAgreementCurveType(Enum):
     P521 = 4
 
 
+did_docs_spec = {
+    Person.ALICE: (DID_DOC_ALICE_WITH_NO_SECRETS, MockSecretsResolverAlice),
+    Person.BOB: (DID_DOC_BOB_WITH_NO_SECRETS, MockSecretsResolverBob),
+    Person.CHARLIE: (DID_DOC_CHARLIE, MockSecretsResolverCharlie),
+    Person.MEDIATOR1: (DID_DOC_MEDIATOR1, MockSecretsResolverMediator1),
+    Person.MEDIATOR2: (DID_DOC_MEDIATOR2, MockSecretsResolverMediator2),
+}
+
+
 def _get_did_doc(person: Person):
-    if person == Person.ALICE:
-        return DID_DOC_ALICE_WITH_NO_SECRETS
-    if person == Person.BOB:
-        return DID_DOC_BOB_WITH_NO_SECRETS
-    if person == Person.CHARLIE:
-        return DID_DOC_CHARLIE
+    spec = did_docs_spec.get(person)
+    return spec[0] if spec else None
 
 
 def _get_secrets_resolver(person: Person):
-    if person == Person.ALICE:
-        return MockSecretsResolverAlice()
-    if person == Person.BOB:
-        return MockSecretsResolverBob()
-    if person == Person.CHARLIE:
-        return MockSecretsResolverCharlie()
+    spec = did_docs_spec.get(person)
+    return spec[1]() if spec else None
 
 
 def get_auth_methods_in_secrets(person: Person) -> List[VerificationMethod]:

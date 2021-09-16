@@ -35,7 +35,77 @@ class VerificationMaterial:
     value: str
 
 
+class DIDDocServiceTypes(Enum):
+    DID_COMM_MESSAGING = "DIDCommMessaging"
+
+
 class DIDCommMessageTypes(Enum):
     ENCRYPTED = "application/didcomm-encrypted+json"
+    ENCRYPTED_SHORT = "didcomm-encrypted+json"
     SIGNED = "application/didcomm-signed+json"
+    SIGNED_SHORT = "didcomm-signed+json"
     PLAINTEXT = "application/didcomm-plain+json"
+    PLAINTEXT_SHORT = "didcomm-plain+json"
+
+
+DIDCommMessageMediaTypes = DIDCommMessageTypes
+
+# TODO
+#   - replace DIDCommMessageTypes with DIDCommMessageMediaTypes
+#   - rename DIDCommMessageProtocolTypes to DIDCommMessageTypes
+
+
+class DIDCommMessageProtocolTypes(Enum):
+    FORWARD = "https://didcomm.org/routing/2.0/forward"
+
+
+class JOSEFields:
+
+    # JOSE Header fields as defined in JWS and JWE specs
+    # (RFCs 7515, 7516, 7518, 7519, 7797, 8225, 8555)
+    # https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-header-parameters
+    JOSE_ALG = "alg"
+    JOSE_JKU = "jku"
+    JOSE_JWK = "jwk"
+    JOSE_KID = "kid"
+    JOSE_X5U = "x5u"
+    JOSE_X5C = "x5c"
+    JOSE_X5T = "x5t"
+    JOSE_X5T_S256 = "x5t#S256"
+    JOSE_TYP = "typ"
+    JOSE_CTY = "cty"
+    JOSE_CRIT = "crit"
+    JOSE_ENC = "enc"
+    JOSE_ZIP = "zip"
+    JOSE_EPK = "epk"
+    JOSE_APU = "apu"
+    JOSE_APV = "apv"
+    JOSE_IV = "iv"
+    JOSE_TAG = "tag"
+    JOSE_P2S = "p2s"
+    JOSE_P2C = "p2c"
+    JOSE_ISS = "iss"
+    JOSE_SUB = "sub"
+    JOSE_AUD = "aud"
+    JOSE_B64 = "b64"
+    JOSE_PPT = "ppt"
+    JOSE_URL = "url"
+    JOSE_NONCE = "nonce"
+
+    # JWS (non-header) fields
+    # https://datatracker.ietf.org/doc/html/rfc7515#section-3.2
+    JWS_PROTECTED = "protected"
+    JWS_HEADER = "header"
+    JWS_PAYLOAD = "payload"
+    JWS_SIGNATURE = "signature"
+
+    # JWE (non-heder) fields
+    # https://datatracker.ietf.org/doc/html/rfc7516#section-3.2
+    JWE_PROTECTED = JWS_PROTECTED
+    JWE_UNPROTECTED = "unprotected"
+    JWE_HEADER = JWS_HEADER
+    JWE_ENCRYPTED_KEY = "encrypted_key"
+    JWE_IV = JOSE_IV
+    JWE_CIPHERTEXT = "ciphertext"
+    JWE_TAG = JOSE_TAG
+    JWE_AAD = "aad"

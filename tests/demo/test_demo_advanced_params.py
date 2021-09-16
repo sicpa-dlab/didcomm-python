@@ -7,20 +7,25 @@ from didcomm.pack_encrypted import (
     PackEncryptedParameters,
     pack_encrypted,
 )
+from didcomm.protocols.routing.forward import unpack_forward
 from didcomm.unpack import unpack, UnpackConfig
 from tests.test_vectors.common import ALICE_DID, BOB_DID
 
 
 @pytest.mark.asyncio
-async def test_demo_advanced_parameters(resolvers_config_alice, resolvers_config_bob):
+async def test_demo_advanced_parameters(
+    resolvers_config_alice, resolvers_config_bob, resolvers_config_mediator1
+):
     # ALICE
     pack_config = PackEncryptedConfig(
         protect_sender_id=True,
         forward=True,
         enc_alg_anon=AnonCryptAlg.A256GCM_ECDH_ES_A256KW,
     )
+    # TODO replace hard-coded values
     pack_parameters = PackEncryptedParameters(
-        forward_headers=[{"expires_time": 99999}], forward_service_id="service-id"
+        forward_headers={"expires_time": 99999},
+        forward_service_id="did:example:123456789abcdefghi#didcomm-1",
     )
     message = Message(
         body={"aaa": 1, "bbb": 2},
@@ -41,7 +46,12 @@ async def test_demo_advanced_parameters(resolvers_config_alice, resolvers_config
         pack_params=pack_parameters,
     )
     packed_msg = pack_result.packed_msg
-    print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
+    print(f"Sending {packed_msg} to {pack_result.service_metadata.service_endpoint}")
+
+    # BOB MEDIATOR
+    forward_bob = await unpack_forward(resolvers_config_mediator1, packed_msg, True)
+    packed_msg = forward_bob.forwarded_msg
+    print(f"Sending {packed_msg} to Bob")
 
     # BOB
     unpack_config = UnpackConfig(
