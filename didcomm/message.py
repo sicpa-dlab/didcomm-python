@@ -203,7 +203,7 @@ class Message(GenericMessage[JSON_OBJ]):
         return super().as_dict()
 
 
-@attr.s(auto_attribs=True, frozen=True)
+@attr.s(auto_attribs=True)
 class Attachment:
     """Plaintext attachment"""
 
