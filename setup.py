@@ -12,8 +12,8 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/sicpa-dlab/didcomm-python",
-    author="",
-    author_email="",
+    author="SICPA",
+    author_email="DLCHOpenSourceContrib@sicpa.com",
     license="Apache-2.0",
     python_requires=">=3.7",
     classifiers=[

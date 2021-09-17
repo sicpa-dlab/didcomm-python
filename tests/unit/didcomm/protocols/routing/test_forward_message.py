@@ -74,8 +74,12 @@ def _build_mturi(
         pytest.param(
             _build_mturi(prot="someprotocol"), DIDCommValueError, id="protocol"
         ),
-        pytest.param(_build_mturi(ver="3.0"), DIDCommValueError, id="too_old_version"),
-        pytest.param(_build_mturi(ver="1.9"), DIDCommValueError, id="too_new_version"),
+        pytest.param(
+            _build_mturi(ver="1.9"), DIDCommValueError, id="too_old_version_1.9"
+        ),
+        pytest.param(
+            _build_mturi(ver="3.0"), DIDCommValueError, id="too_new_version_3.0"
+        ),
         pytest.param(_build_mturi(msg_t="somemsg"), DIDCommValueError, id="message_t"),
     ],
 )
