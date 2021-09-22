@@ -1,4 +1,3 @@
-import hashlib
 from typing import List
 
 from authlib.common.encoding import (
@@ -18,7 +17,7 @@ from didcomm.core.keys.authcrypt_keys_selector import (
 )
 from didcomm.core.serialization import dict_to_json_bytes
 from didcomm.core.types import EncryptResult, UnpackAuthcryptResult, Key
-from didcomm.core.utils import extract_key, get_jwe_alg
+from didcomm.core.utils import extract_key, get_jwe_alg, calculate_apv
 from didcomm.core.validation import validate_authcrypt_jwe
 from didcomm.errors import MalformedMessageError, MalformedMessageCode
 
@@ -124,9 +123,7 @@ def _build_header(to: List[Key], frm: Key, alg: AuthCryptAlg):
     kids = [to_key.kid for to_key in to]
 
     apu = to_unicode(urlsafe_b64encode(to_bytes(skid)))
-    apv = to_unicode(
-        urlsafe_b64encode(hashlib.sha256(to_bytes(".".join(sorted(kids)))).digest())
-    )
+    apv = calculate_apv(kids)
     protected = {
         "typ": DIDCommMessageTypes.ENCRYPTED.value,
         "alg": alg.value.alg,

@@ -1,7 +1,5 @@
-import hashlib
 from typing import List
 
-from authlib.common.encoding import to_bytes, to_unicode, urlsafe_b64encode
 from authlib.jose import JsonWebEncryption
 
 from didcomm.common.algorithms import AnonCryptAlg, Algs
@@ -13,7 +11,7 @@ from didcomm.core.keys.anoncrypt_keys_selector import (
 )
 from didcomm.core.serialization import dict_to_json_bytes
 from didcomm.core.types import EncryptResult, UnpackAnoncryptResult, Key
-from didcomm.core.utils import extract_key, get_jwe_alg
+from didcomm.core.utils import extract_key, get_jwe_alg, calculate_apv
 from didcomm.core.validation import validate_anoncrypt_jwe
 from didcomm.errors import MalformedMessageError, MalformedMessageCode
 
@@ -95,9 +93,7 @@ async def unpack_anoncrypt(
 
 def _build_header(to: List[Key], alg: AnonCryptAlg):
     kids = [to_key.kid for to_key in to]
-    apv = to_unicode(
-        urlsafe_b64encode(hashlib.sha256(to_bytes(".".join(sorted(kids)))).digest())
-    )
+    apv = calculate_apv(kids)
     protected = {
         "typ": DIDCommMessageTypes.ENCRYPTED.value,
         "alg": alg.value.alg,

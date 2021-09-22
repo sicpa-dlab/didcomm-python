@@ -26,6 +26,18 @@ def validator__instance_of(classinfo) -> Callable:
 
 
 # TODO TEST
+def validator__in_(options) -> Callable:
+    return _attr_validator_wrapper(attr.validators.in_(options))
+
+
+# TODO TEST
+def validator__deep_iterable(member_validator: Callable, iterable_validator=None):
+    return _attr_validator_wrapper(
+        attr.validators.deep_iterable(member_validator, iterable_validator)
+    )
+
+
+# TODO TEST
 def validator__didcomm_protocol_mturi(
     p_name: str, p_version_specifier: SpecifierSet, p_msg_t: str
 ) -> Callable:
@@ -85,11 +97,4 @@ def validator__did_url(instance, attribute, value) -> None:
 def validator__did_or_did_url(instance, attribute, value) -> None:
     validator__check_f(is_did_or_did_url, "is neither a did nor a did url")(
         instance, attribute, value
-    )
-
-
-# TODO TEST
-def validator__deep_iterable(member_validator: Callable, iterable_validator=None):
-    return _attr_validator_wrapper(
-        attr.validators.deep_iterable(member_validator, iterable_validator)
     )

@@ -135,17 +135,24 @@ async def find_did_service(
             # TODO define exc attrs instead of explicit message
             raise InvalidDIDDocError(
                 f"service with service id '{service_id}' not found"
-                f" for for DID '{to}'"
+                f" for DID '{to}'"
+            )
+        if "didcomm/v2" not in did_service.accept:
+            raise InvalidDIDDocError(
+                f"service with service id '{service_id}'"
+                f" for DID '{to}' does not accept didcomm/v2 profile"
             )
         return did_service
     else:
-        try:
-            # using the first as per spec
-            # >Entries are SHOULD be specified in order of receiver preference
-            # https://identity.foundation/didcomm-messaging/spec/#multiple-endpoints
-            return did_doc.didcomm_services[0]
-        except IndexError:
-            return None
+        # Find the first service accepting `didcomm/v2` profile because the spec states:
+        # > Entries SHOULD be specified in order of receiver preference,
+        # > but any endpoint MAY be selected by the sender, typically
+        # > by protocol availability or preference.
+        # https://identity.foundation/didcomm-messaging/spec/#multiple-endpoints
+        for did_service in did_doc.didcomm_services:
+            if "didcomm/v2" in did_service.accept:
+                return did_service
+        return None
 
 
 async def resolve_did_services_chain(
