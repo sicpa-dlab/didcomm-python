@@ -9,6 +9,10 @@ on:
         required: false
         default: '0'
 
+env:
+  PKG_NAME: didcomm
+
+
 jobs:
 
   checks:
