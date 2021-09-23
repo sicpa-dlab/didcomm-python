@@ -50,6 +50,9 @@ ROUTING_PROTOCOL_VER_CURRENT = "2.0"
 ROUTING_PROTOCOL_VER_COMPATIBILITY = SpecifierSet("~=2.0")
 
 
+PROFILE_DIDCOMM_V2 = "didcomm/v2"
+
+
 class ROUTING_PROTOCOL_MSG_TYPES(Enum):
     FORWARD = "forward"
 
@@ -134,10 +137,9 @@ async def find_did_service(
         if did_service is None:
             # TODO define exc attrs instead of explicit message
             raise InvalidDIDDocError(
-                f"service with service id '{service_id}' not found"
-                f" for DID '{to}'"
+                f"service with service id '{service_id}' not found" f" for DID '{to}'"
             )
-        if "didcomm/v2" not in did_service.accept:
+        if PROFILE_DIDCOMM_V2 not in did_service.accept:
             raise InvalidDIDDocError(
                 f"service with service id '{service_id}'"
                 f" for DID '{to}' does not accept didcomm/v2 profile"
@@ -150,7 +152,7 @@ async def find_did_service(
         # > by protocol availability or preference.
         # https://identity.foundation/didcomm-messaging/spec/#multiple-endpoints
         for did_service in did_doc.didcomm_services:
-            if "didcomm/v2" in did_service.accept:
+            if PROFILE_DIDCOMM_V2 in did_service.accept:
                 return did_service
         return None
 
@@ -262,7 +264,9 @@ async def wrap_in_forward(
 
 
 async def unpack_forward(
-    resolvers_config: ResolversConfig, packed_msg: Union[JSON, JSON_OBJ], decrypt_by_all_keys: bool
+    resolvers_config: ResolversConfig,
+    packed_msg: Union[JSON, JSON_OBJ],
+    decrypt_by_all_keys: bool,
 ) -> ForwardResult:
     """
     Can be called by a Mediator who expects a Forward message to be unpacked

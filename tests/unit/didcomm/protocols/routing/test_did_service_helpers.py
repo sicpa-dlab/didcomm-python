@@ -33,7 +33,9 @@ async def test_find_did_service__no_diddoc(resolvers_config_mock, did_doc):
 
 
 @pytest.mark.asyncio
-async def test_find_did_service__no_service_with_v2_profile(resolvers_config_mock, did_doc):
+async def test_find_did_service__no_service_with_v2_profile(
+    resolvers_config_mock, did_doc
+):
     resolve_mock = resolvers_config_mock.did_resolver.resolve
     resolve_mock.return_value = did_doc
 
@@ -41,7 +43,8 @@ async def test_find_did_service__no_service_with_v2_profile(resolvers_config_moc
         id="",
         service_endpoint="",
         routing_keys=[""],
-        accept=["didcomm/aip2;env=rfc587", "didcomm/aip2;env=rfc19"])
+        accept=["didcomm/aip2;env=rfc587", "didcomm/aip2;env=rfc19"],
+    )
 
     did_doc.didcomm_services = [service1]
     resolve_mock.return_value = did_doc
@@ -51,26 +54,31 @@ async def test_find_did_service__no_service_with_v2_profile(resolvers_config_moc
 
 
 @pytest.mark.asyncio
-async def test_find_did_service__first_service_with_v2_profile(resolvers_config_mock, did_doc):
+async def test_find_did_service__first_service_with_v2_profile(
+    resolvers_config_mock, did_doc
+):
     resolve_mock = resolvers_config_mock.did_resolver.resolve
 
     service1 = DIDCommService(
         id="",
         service_endpoint="",
         routing_keys=[""],
-        accept=["didcomm/aip2;env=rfc587", "didcomm/aip2;env=rfc19"])
+        accept=["didcomm/aip2;env=rfc587", "didcomm/aip2;env=rfc19"],
+    )
 
     service2 = DIDCommService(
         id="",
         service_endpoint="",
         routing_keys=[""],
-        accept=["didcomm/aip1", "didcomm/v2"])
+        accept=["didcomm/aip1", "didcomm/v2"],
+    )
 
     service3 = DIDCommService(
         id="",
         service_endpoint="",
         routing_keys=[""],
-        accept=["didcomm/v2", "didcomm/aip2;env=rfc19"])
+        accept=["didcomm/v2", "didcomm/aip2;env=rfc19"],
+    )
 
     did_doc.didcomm_services = [service1, service2, service3]
     resolve_mock.return_value = did_doc
@@ -94,16 +102,12 @@ async def test_find_did_service__by_service_id(resolvers_config_mock, did_doc):
     resolve_mock.return_value = did_doc
 
     service1 = DIDCommService(
-        id="123",
-        service_endpoint="",
-        routing_keys=[""],
-        accept=["didcomm/v2"])
+        id="123", service_endpoint="", routing_keys=[""], accept=["didcomm/v2"]
+    )
 
     service2 = DIDCommService(
-        id="456",
-        service_endpoint="",
-        routing_keys=[""],
-        accept=["didcomm/v2"])
+        id="456", service_endpoint="", routing_keys=[""], accept=["didcomm/v2"]
+    )
 
     did_doc.didcomm_services = [service1, service2]
 
@@ -114,26 +118,26 @@ async def test_find_did_service__by_service_id(resolvers_config_mock, did_doc):
 
 
 @pytest.mark.asyncio
-async def test_find_did_service__by_service_id_no_v2_profile(resolvers_config_mock, did_doc):
+async def test_find_did_service__by_service_id_no_v2_profile(
+    resolvers_config_mock, did_doc
+):
     resolve_mock = resolvers_config_mock.did_resolver.resolve
     resolve_mock.return_value = did_doc
 
     service1 = DIDCommService(
-        id="123",
-        service_endpoint="",
-        routing_keys=[""],
-        accept=["didcomm/v2"])
+        id="123", service_endpoint="", routing_keys=[""], accept=["didcomm/v2"]
+    )
 
     service2 = DIDCommService(
-        id="456",
-        service_endpoint="",
-        routing_keys=[""],
-        accept=["didcomm/aip1"])
+        id="456", service_endpoint="", routing_keys=[""], accept=["didcomm/aip1"]
+    )
 
     did_doc.didcomm_services = [service1, service2]
 
     with pytest.raises(InvalidDIDDocError):
-        await find_did_service(resolvers_config_mock, did_doc.did, service_id=service2.id)
+        await find_did_service(
+            resolvers_config_mock, did_doc.did, service_id=service2.id
+        )
 
 
 # ==========================

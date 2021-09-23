@@ -5,7 +5,12 @@ import attr
 import uuid
 from typing import Union, Optional, Any, List
 
-from authlib.common.encoding import to_unicode, urlsafe_b64decode, to_bytes, urlsafe_b64encode
+from authlib.common.encoding import (
+    to_unicode,
+    urlsafe_b64decode,
+    to_bytes,
+    urlsafe_b64encode,
+)
 from authlib.jose import ECKey, OKPKey
 from authlib.jose.rfc7517 import AsymmetricKey
 

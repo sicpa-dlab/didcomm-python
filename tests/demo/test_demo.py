@@ -106,8 +106,11 @@ async def test_demo_non_repudiable_encryption(
 
 @pytest.mark.asyncio
 async def test_demo_encrypted_to_multiple_recipients(
-    resolvers_config_alice, resolvers_config_bob, resolvers_config_charlie,
-    resolvers_config_mediator1, resolvers_config_mediator2
+    resolvers_config_alice,
+    resolvers_config_bob,
+    resolvers_config_charlie,
+    resolvers_config_mediator1,
+    resolvers_config_mediator2,
 ):
     # ALICE
     message = Message(
@@ -128,8 +131,10 @@ async def test_demo_encrypted_to_multiple_recipients(
         pack_config=pack_config,
     )
     packed_msg_for_bob = pack_result_for_bob.packed_msg
-    print(f"Sending ${packed_msg_for_bob} for Bob to "
-          f"${pack_result_for_bob.service_metadata.service_endpoint}")
+    print(
+        f"Sending ${packed_msg_for_bob} for Bob to "
+        f"${pack_result_for_bob.service_metadata.service_endpoint}"
+    )
 
     pack_result_for_charlie = await pack_encrypted(
         resolvers_config=resolvers_config_alice,
@@ -139,11 +144,15 @@ async def test_demo_encrypted_to_multiple_recipients(
         pack_config=pack_config,
     )
     packed_msg_for_charlie = pack_result_for_charlie.packed_msg
-    print(f"Sending ${packed_msg_for_charlie} for Charlie to "
-          f"${pack_result_for_charlie.service_metadata.service_endpoint}")
+    print(
+        f"Sending ${packed_msg_for_charlie} for Charlie to "
+        f"${pack_result_for_charlie.service_metadata.service_endpoint}"
+    )
 
     # BOB's MEDIATOR
-    forward_bob = await unpack_forward(resolvers_config_mediator1, packed_msg_for_bob, True)
+    forward_bob = await unpack_forward(
+        resolvers_config_mediator1, packed_msg_for_bob, True
+    )
     print(f"Got {forward_bob.forwarded_msg}")
 
     # BOB
@@ -151,15 +160,21 @@ async def test_demo_encrypted_to_multiple_recipients(
     print(f"Bob got ${unpack_result_at_bob.message} message")
 
     # CHARLIE's MEDIATOR
-    forward_forward_charlie = await unpack_forward(resolvers_config_mediator2, packed_msg_for_charlie, True)
+    forward_forward_charlie = await unpack_forward(
+        resolvers_config_mediator2, packed_msg_for_charlie, True
+    )
     print(f"Got {forward_forward_charlie.forwarded_msg}")
 
     # MEDIATOR2's MEDIATOR
-    forward_charlie = await unpack_forward(resolvers_config_mediator2, forward_forward_charlie.forwarded_msg, True)
+    forward_charlie = await unpack_forward(
+        resolvers_config_mediator2, forward_forward_charlie.forwarded_msg, True
+    )
     print(f"Got {forward_charlie.forwarded_msg}")
 
     # CHARLIE
-    unpack_result_at_charlie = await unpack(resolvers_config_charlie, forward_charlie.forwarded_msg)
+    unpack_result_at_charlie = await unpack(
+        resolvers_config_charlie, forward_charlie.forwarded_msg
+    )
     print(f"Charlie got ${unpack_result_at_charlie.message} message")
 
 
