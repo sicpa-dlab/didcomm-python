@@ -34,6 +34,7 @@ def secrets_resolver_bob():
     return MockSecretsResolverBob()
 
 
+@pytest.fixture()
 def secrets_resolver_charlie():
     return MockSecretsResolverCharlie()
 

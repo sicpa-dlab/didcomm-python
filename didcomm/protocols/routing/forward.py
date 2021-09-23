@@ -262,7 +262,7 @@ async def wrap_in_forward(
 
 
 async def unpack_forward(
-    resolvers_config: ResolversConfig, packed_msg: JSON, decrypt_by_all_keys: bool
+    resolvers_config: ResolversConfig, packed_msg: Union[JSON, JSON_OBJ], decrypt_by_all_keys: bool
 ) -> ForwardResult:
     """
     Can be called by a Mediator who expects a Forward message to be unpacked
@@ -277,8 +277,18 @@ async def unpack_forward(
 
     :return: Forward plaintext
     """
+    if isinstance(packed_msg, str):
+        msg_as_dict = json_str_to_dict(packed_msg)
+    elif isinstance(packed_msg, dict):
+        msg_as_dict = packed_msg
+    else:
+        # FIXME in python it should be a kind of TypeError instead
+        raise DIDCommValueError(
+            "unexpected type of packed_message: '{type(packed_msg)}'"
+        )
+
     fwd_unpack_res = await unpack_anoncrypt(
-        json_str_to_dict(packed_msg), resolvers_config, decrypt_by_all_keys
+        msg_as_dict, resolvers_config, decrypt_by_all_keys
     )
 
     if not is_forward(fwd_unpack_res.msg):
