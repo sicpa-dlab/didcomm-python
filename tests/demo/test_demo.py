@@ -105,7 +105,7 @@ async def test_demo_non_repudiable_encryption(
 
 
 @pytest.mark.asyncio
-async def test_demo_encrypted_to_multiple_recipients(
+async def test_demo_message_to_multiple_recipients(
     resolvers_config_alice,
     resolvers_config_bob,
     resolvers_config_charlie,
