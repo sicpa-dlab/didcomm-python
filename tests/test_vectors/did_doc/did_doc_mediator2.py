@@ -9,6 +9,8 @@ from didcomm.did_doc.did_doc import VerificationMethod, DIDDoc, DIDCommService
 
 # FIXME build verification material
 #       (currently it's a copy-paste from Bob's ones)
+from didcomm.protocols.routing.forward import PROFILE_DIDCOMM_V2, PROFILE_DIDCOMM_AIP2_ENV_RFC587
+
 MEDIATOR2_VERIFICATION_METHOD_KEY_AGREEM_X25519_1 = VerificationMethod(
     id="did:example:mediator2#key-x25519-1",
     controller="did:example:mediator2#key-x25519-1",
@@ -104,7 +106,7 @@ DID_DOC_MEDIATOR2 = DIDDoc(
         DIDCommService(
             id="did:example:123456789abcdefghi#didcomm-1",
             service_endpoint="http://example.com/path",
-            accept=["didcomm/v2", "didcomm/aip2;env=rfc587"],
+            accept=[PROFILE_DIDCOMM_V2, PROFILE_DIDCOMM_AIP2_ENV_RFC587],
             routing_keys=["did:example:mediator1#key-x25519-1"],
         )
     ],

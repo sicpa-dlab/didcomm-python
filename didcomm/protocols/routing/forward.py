@@ -50,6 +50,9 @@ ROUTING_PROTOCOL_VER_CURRENT = "2.0"
 ROUTING_PROTOCOL_VER_COMPATIBILITY = SpecifierSet("~=2.0")
 
 
+PROFILE_DIDCOMM_AIP1 = "didcomm/aip1"
+PROFILE_DIDCOMM_AIP2_ENV_RFC19 = "didcomm/aip2;env=rfc19"
+PROFILE_DIDCOMM_AIP2_ENV_RFC587 = "didcomm/aip2;env=rfc587"
 PROFILE_DIDCOMM_V2 = "didcomm/v2"
 
 
@@ -137,7 +140,7 @@ async def find_did_service(
         if did_service is None:
             # TODO define exc attrs instead of explicit message
             raise InvalidDIDDocError(
-                f"service with service id '{service_id}' not found" f" for DID '{to}'"
+                f"service with service id '{service_id}' not found for DID '{to}'"
             )
         if PROFILE_DIDCOMM_V2 not in did_service.accept:
             raise InvalidDIDDocError(

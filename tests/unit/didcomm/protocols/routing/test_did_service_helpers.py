@@ -5,7 +5,8 @@ from didcomm.did_doc.did_doc import DIDDoc, DIDCommService
 from didcomm.protocols.routing import forward  # for patch.object mocks
 from didcomm.protocols.routing.forward import (
     find_did_service,
-    resolve_did_services_chain,
+    resolve_did_services_chain, PROFILE_DIDCOMM_AIP2_ENV_RFC587, PROFILE_DIDCOMM_AIP2_ENV_RFC19, PROFILE_DIDCOMM_AIP1,
+    PROFILE_DIDCOMM_V2,
 )
 
 from tests import mock_module
@@ -43,7 +44,7 @@ async def test_find_did_service__no_service_with_v2_profile(
         id="",
         service_endpoint="",
         routing_keys=[""],
-        accept=["didcomm/aip2;env=rfc587", "didcomm/aip2;env=rfc19"],
+        accept=[PROFILE_DIDCOMM_AIP2_ENV_RFC587, PROFILE_DIDCOMM_AIP2_ENV_RFC19],
     )
 
     did_doc.didcomm_services = [service1]
@@ -63,21 +64,21 @@ async def test_find_did_service__first_service_with_v2_profile(
         id="",
         service_endpoint="",
         routing_keys=[""],
-        accept=["didcomm/aip2;env=rfc587", "didcomm/aip2;env=rfc19"],
+        accept=[PROFILE_DIDCOMM_AIP2_ENV_RFC587, PROFILE_DIDCOMM_AIP2_ENV_RFC19],
     )
 
     service2 = DIDCommService(
         id="",
         service_endpoint="",
         routing_keys=[""],
-        accept=["didcomm/aip1", "didcomm/v2"],
+        accept=[PROFILE_DIDCOMM_AIP1, PROFILE_DIDCOMM_V2],
     )
 
     service3 = DIDCommService(
         id="",
         service_endpoint="",
         routing_keys=[""],
-        accept=["didcomm/v2", "didcomm/aip2;env=rfc19"],
+        accept=[PROFILE_DIDCOMM_V2, PROFILE_DIDCOMM_AIP2_ENV_RFC19],
     )
 
     did_doc.didcomm_services = [service1, service2, service3]
@@ -102,11 +103,11 @@ async def test_find_did_service__by_service_id(resolvers_config_mock, did_doc):
     resolve_mock.return_value = did_doc
 
     service1 = DIDCommService(
-        id="123", service_endpoint="", routing_keys=[""], accept=["didcomm/v2"]
+        id="123", service_endpoint="", routing_keys=[""], accept=[PROFILE_DIDCOMM_V2]
     )
 
     service2 = DIDCommService(
-        id="456", service_endpoint="", routing_keys=[""], accept=["didcomm/v2"]
+        id="456", service_endpoint="", routing_keys=[""], accept=[PROFILE_DIDCOMM_V2]
     )
 
     did_doc.didcomm_services = [service1, service2]
@@ -125,11 +126,11 @@ async def test_find_did_service__by_service_id_no_v2_profile(
     resolve_mock.return_value = did_doc
 
     service1 = DIDCommService(
-        id="123", service_endpoint="", routing_keys=[""], accept=["didcomm/v2"]
+        id="123", service_endpoint="", routing_keys=[""], accept=[PROFILE_DIDCOMM_V2]
     )
 
     service2 = DIDCommService(
-        id="456", service_endpoint="", routing_keys=[""], accept=["didcomm/aip1"]
+        id="456", service_endpoint="", routing_keys=[""], accept=[PROFILE_DIDCOMM_AIP1]
     )
 
     did_doc.didcomm_services = [service1, service2]
