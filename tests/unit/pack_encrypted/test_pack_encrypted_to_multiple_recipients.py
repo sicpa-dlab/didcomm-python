@@ -89,5 +89,6 @@ async def test_message_to_multiple_recipients(
     assert unpack_result_at_charlie.metadata.enc_alg_anon is None
 
     assert unpack_result_at_bob.message == unpack_result_at_charlie.message
-    assert replace(unpack_result_at_bob.metadata, encrypted_to=None) == \
-           replace(unpack_result_at_charlie.metadata, encrypted_to=None)
+    assert replace(unpack_result_at_bob.metadata, encrypted_to=None) == replace(
+        unpack_result_at_charlie.metadata, encrypted_to=None
+    )

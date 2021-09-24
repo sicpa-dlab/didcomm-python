@@ -6,7 +6,10 @@ from didcomm.common.types import (
     VerificationMaterialFormat,
 )
 from didcomm.did_doc.did_doc import DIDDoc, VerificationMethod, DIDCommService
-from didcomm.protocols.routing.forward import PROFILE_DIDCOMM_V2, PROFILE_DIDCOMM_AIP2_ENV_RFC587
+from didcomm.protocols.routing.forward import (
+    PROFILE_DIDCOMM_V2,
+    PROFILE_DIDCOMM_AIP2_ENV_RFC587,
+)
 
 CHARLIE_VERIFICATION_METHOD_KEY_AGREEM_X25519 = VerificationMethod(
     id="did:example:charlie#key-x25519-1",

@@ -5,7 +5,10 @@ from didcomm.did_doc.did_doc import DIDDoc, DIDCommService
 from didcomm.protocols.routing import forward  # for patch.object mocks
 from didcomm.protocols.routing.forward import (
     find_did_service,
-    resolve_did_services_chain, PROFILE_DIDCOMM_AIP2_ENV_RFC587, PROFILE_DIDCOMM_AIP2_ENV_RFC19, PROFILE_DIDCOMM_AIP1,
+    resolve_did_services_chain,
+    PROFILE_DIDCOMM_AIP2_ENV_RFC587,
+    PROFILE_DIDCOMM_AIP2_ENV_RFC19,
+    PROFILE_DIDCOMM_AIP1,
     PROFILE_DIDCOMM_V2,
 )
 
