@@ -50,6 +50,12 @@ ROUTING_PROTOCOL_VER_CURRENT = "2.0"
 ROUTING_PROTOCOL_VER_COMPATIBILITY = SpecifierSet("~=2.0")
 
 
+PROFILE_DIDCOMM_AIP1 = "didcomm/aip1"
+PROFILE_DIDCOMM_AIP2_ENV_RFC19 = "didcomm/aip2;env=rfc19"
+PROFILE_DIDCOMM_AIP2_ENV_RFC587 = "didcomm/aip2;env=rfc587"
+PROFILE_DIDCOMM_V2 = "didcomm/v2"
+
+
 class ROUTING_PROTOCOL_MSG_TYPES(Enum):
     FORWARD = "forward"
 
@@ -134,18 +140,24 @@ async def find_did_service(
         if did_service is None:
             # TODO define exc attrs instead of explicit message
             raise InvalidDIDDocError(
-                f"service with service id '{service_id}' not found"
-                f" for for DID '{to}'"
+                f"service with service id '{service_id}' not found for DID '{to}'"
+            )
+        if PROFILE_DIDCOMM_V2 not in did_service.accept:
+            raise InvalidDIDDocError(
+                f"service with service id '{service_id}'"
+                f" for DID '{to}' does not accept didcomm/v2 profile"
             )
         return did_service
     else:
-        try:
-            # using the first as per spec
-            # >Entries are SHOULD be specified in order of receiver preference
-            # https://identity.foundation/didcomm-messaging/spec/#multiple-endpoints
-            return did_doc.didcomm_services[0]
-        except IndexError:
-            return None
+        # Find the first service accepting `didcomm/v2` profile because the spec states:
+        # > Entries SHOULD be specified in order of receiver preference,
+        # > but any endpoint MAY be selected by the sender, typically
+        # > by protocol availability or preference.
+        # https://identity.foundation/didcomm-messaging/spec/#multiple-endpoints
+        for did_service in did_doc.didcomm_services:
+            if PROFILE_DIDCOMM_V2 in did_service.accept:
+                return did_service
+        return None
 
 
 async def resolve_did_services_chain(
@@ -255,7 +267,9 @@ async def wrap_in_forward(
 
 
 async def unpack_forward(
-    resolvers_config: ResolversConfig, packed_msg: JSON, decrypt_by_all_keys: bool
+    resolvers_config: ResolversConfig,
+    packed_msg: Union[JSON, JSON_OBJ],
+    decrypt_by_all_keys: bool,
 ) -> ForwardResult:
     """
     Can be called by a Mediator who expects a Forward message to be unpacked
@@ -270,8 +284,18 @@ async def unpack_forward(
 
     :return: Forward plaintext
     """
+    if isinstance(packed_msg, str):
+        msg_as_dict = json_str_to_dict(packed_msg)
+    elif isinstance(packed_msg, dict):
+        msg_as_dict = packed_msg
+    else:
+        # FIXME in python it should be a kind of TypeError instead
+        raise DIDCommValueError(
+            "unexpected type of packed_message: '{type(packed_msg)}'"
+        )
+
     fwd_unpack_res = await unpack_anoncrypt(
-        json_str_to_dict(packed_msg), resolvers_config, decrypt_by_all_keys
+        msg_as_dict, resolvers_config, decrypt_by_all_keys
     )
 
     if not is_forward(fwd_unpack_res.msg):

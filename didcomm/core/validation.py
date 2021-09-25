@@ -1,6 +1,6 @@
 from authlib.common.encoding import to_bytes, urlsafe_b64decode, to_unicode
 
-from didcomm.core.utils import is_did_url, parse_base64url_encoded_json
+from didcomm.core.utils import is_did_url, parse_base64url_encoded_json, calculate_apv
 from didcomm.errors import MalformedMessageError, MalformedMessageCode
 
 
@@ -26,7 +26,7 @@ def validate_anoncrypt_jwe(msg: dict):
     protected_header = _get_protected_header(msg)
 
     # 3. Check apv
-    _check_apv(protected_header)
+    _check_apv(protected_header, msg["recipients"])
 
     return protected_header
 
@@ -59,7 +59,7 @@ def validate_authcrypt_jwe(msg: dict):
         raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
 
     # 5. Check apv
-    _check_apv(protected_header)
+    _check_apv(protected_header, msg["recipients"])
 
     return protected_header
 
@@ -74,7 +74,10 @@ def _get_protected_header(jwe: dict):
     return protected
 
 
-def _check_apv(protected_header: dict):
-    # apv is a hash, so nothing more to check
+def _check_apv(protected_header: dict, recipients: list):
     if "apv" not in protected_header:
+        raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+    kids = [r["header"]["kid"] for r in recipients]
+    expected_apv = calculate_apv(kids)
+    if protected_header["apv"] != expected_apv:
         raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)

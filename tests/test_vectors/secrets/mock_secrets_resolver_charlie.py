@@ -8,7 +8,7 @@ from didcomm.common.types import (
 from didcomm.secrets.secrets_resolver import Secret
 from tests.test_vectors.secrets.mock_secrets_resolver import MockSecretsResolverInMemory
 
-CHARLIE_SECRET_JEY_AGREEMENT_KEY_X25519 = Secret(
+CHARLIE_SECRET_KEY_AGREEMENT_KEY_X25519 = Secret(
     kid="did:example:charlie#key-x25519-1",
     type=VerificationMethodType.JSON_WEB_KEY_2020,
     verification_material=VerificationMaterial(
@@ -45,7 +45,7 @@ class MockSecretsResolverCharlie(MockSecretsResolverInMemory):
     def __init__(self):
         super().__init__(
             secrets=[
-                CHARLIE_SECRET_JEY_AGREEMENT_KEY_X25519,
+                CHARLIE_SECRET_KEY_AGREEMENT_KEY_X25519,
                 CHARLIE_SECRET_AUTH_KEY_ED25519,
             ]
         )

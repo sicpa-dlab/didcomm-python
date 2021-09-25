@@ -6,6 +6,10 @@ from didcomm.common.types import (
     VerificationMaterialFormat,
 )
 from didcomm.did_doc.did_doc import DIDDoc, VerificationMethod, DIDCommService
+from didcomm.protocols.routing.forward import (
+    PROFILE_DIDCOMM_V2,
+    PROFILE_DIDCOMM_AIP2_ENV_RFC587,
+)
 
 CHARLIE_VERIFICATION_METHOD_KEY_AGREEM_X25519 = VerificationMethod(
     id="did:example:charlie#key-x25519-1",
@@ -47,7 +51,7 @@ DID_DOC_CHARLIE = DIDDoc(
         DIDCommService(
             id="did:example:123456789abcdefghi#didcomm-1",
             service_endpoint="did:example:mediator2",
-            accept=["didcomm/v2", "didcomm/aip2;env=rfc587"],
+            accept=[PROFILE_DIDCOMM_V2, PROFILE_DIDCOMM_AIP2_ENV_RFC587],
             routing_keys=[
                 "did:example:mediator2#key-p521-1",
             ],

@@ -322,7 +322,6 @@ async def __forward_if_needed(
     pack_config: Optional[PackEncryptedConfig] = None,
     pack_params: Optional[PackEncryptedParameters] = None,
 ) -> Optional[ForwardPackResult]:
-    routing_keys = []
 
     if not pack_config.forward:
         logger.debug("forwrad is turned off")
@@ -342,7 +341,9 @@ async def __forward_if_needed(
     #   >1 alternative endpoints
     #   >2 alternative endpoints recursion
     if len(did_services_chain) > 1:
-        routing_keys[:0] = [s.service_endpoint for s in did_services_chain[:-1]]
+        routing_keys = [
+            s.service_endpoint for s in did_services_chain[:-1]
+        ] + routing_keys
 
     return await wrap_in_forward(
         resolvers_config=resolvers_config,

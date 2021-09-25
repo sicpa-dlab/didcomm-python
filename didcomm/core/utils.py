@@ -1,9 +1,16 @@
 import dataclasses
+import hashlib
+
 import attr
 import uuid
-from typing import Union, Optional, Any
+from typing import Union, Optional, Any, List
 
-from authlib.common.encoding import to_unicode, urlsafe_b64decode, to_bytes
+from authlib.common.encoding import (
+    to_unicode,
+    urlsafe_b64decode,
+    to_bytes,
+    urlsafe_b64encode,
+)
 from authlib.jose import ECKey, OKPKey
 from authlib.jose.rfc7517 import AsymmetricKey
 
@@ -176,3 +183,9 @@ def dataclass_to_dict(msg) -> dict:
 
 def attrs_to_dict(attrs_inst: Any) -> dict:
     return dict_cleanup(attr.asdict(attrs_inst))
+
+
+def calculate_apv(kids: List[DID_URL]) -> str:
+    return to_unicode(
+        urlsafe_b64encode(hashlib.sha256(to_bytes(".".join(sorted(kids)))).digest())
+    )
