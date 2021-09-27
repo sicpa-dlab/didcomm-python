@@ -6,11 +6,6 @@ from didcomm.pack_encrypted import PackEncryptedConfig, pack_encrypted
 from didcomm.unpack import unpack, UnpackConfig
 from tests.test_vectors.common import BOB_DID, ALICE_DID
 from tests.test_vectors.didcomm_messages.messages import TEST_MESSAGE
-from tests.unit.spec_test_vectors.conftest import (
-    resolvers_config_alice,
-    resolvers_config_bob,
-    did_resolver,
-)
 
 RECIPIENT_KEYS_COUNT = [1, 2, 3]
 SAMPLES_COUNT = 1000
@@ -23,6 +18,16 @@ async def measure_average(sampler, count):
     end = perf_counter_ns()
     avg_time_per_sample = (end - start) / count
     return avg_time_per_sample
+
+
+@pytest.fixture()
+def resolvers_config_alice(resolvers_config_alice_all_in_secrets):
+    return resolvers_config_alice_all_in_secrets
+
+
+@pytest.fixture()
+def resolvers_config_bob(resolvers_config_bob_all_in_secrets):
+    return resolvers_config_bob_all_in_secrets
 
 
 @pytest.fixture
