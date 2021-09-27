@@ -6,7 +6,11 @@ from didcomm.pack_encrypted import PackEncryptedConfig, pack_encrypted
 from didcomm.unpack import unpack, UnpackConfig
 from tests.test_vectors.common import BOB_DID, ALICE_DID
 from tests.test_vectors.didcomm_messages.messages import TEST_MESSAGE
-from tests.unit.spec_test_vectors.conftest import resolvers_config_alice, resolvers_config_bob, did_resolver
+from tests.unit.spec_test_vectors.conftest import (
+    resolvers_config_alice,
+    resolvers_config_bob,
+    did_resolver,
+)
 
 RECIPIENT_KEYS_COUNT = [1, 2, 3]
 SAMPLES_COUNT = 1000
@@ -35,8 +39,11 @@ async def all_bob_key_agreement_kids(resolvers_config_alice):
 @pytest.mark.parametrize("sign_frm", [None, ALICE_DID])
 @pytest.mark.parametrize("frm", [None, ALICE_DID])
 async def test_pack_encrypted(
-        frm, sign_frm, recipient_keys_count,
-        resolvers_config_alice, all_bob_key_agreement_kids
+    frm,
+    sign_frm,
+    recipient_keys_count,
+    resolvers_config_alice,
+    all_bob_key_agreement_kids,
 ):
     bob_did_doc = await resolvers_config_alice.did_resolver.resolve(BOB_DID)
     bob_did_doc.key_agreement_kids = all_bob_key_agreement_kids[:recipient_keys_count]
@@ -58,8 +65,10 @@ async def test_pack_encrypted(
     print()
     enc_type = "_auth" if frm else "_anon"
     signed_or_not = "_signed" if sign_frm else ""
-    print(f"pack{enc_type}_encrypted{signed_or_not} for {recipient_keys_count} recipient keys "
-          f"takes {avg_time} ns in average")
+    print(
+        f"pack{enc_type}_encrypted{signed_or_not} for {recipient_keys_count} recipient keys "
+        f"takes {avg_time} ns in average"
+    )
 
 
 @pytest.mark.skip(reason="disabled to skip on CI")
@@ -68,8 +77,12 @@ async def test_pack_encrypted(
 @pytest.mark.parametrize("sign_frm", [None, ALICE_DID])
 @pytest.mark.parametrize("frm", [None, ALICE_DID])
 async def test_unpack_encrypted(
-        frm, sign_frm, recipient_keys_count,
-        resolvers_config_alice, resolvers_config_bob, all_bob_key_agreement_kids
+    frm,
+    sign_frm,
+    recipient_keys_count,
+    resolvers_config_alice,
+    resolvers_config_bob,
+    all_bob_key_agreement_kids,
 ):
     bob_did_doc = await resolvers_config_alice.did_resolver.resolve(BOB_DID)
     bob_did_doc.key_agreement_kids = all_bob_key_agreement_kids[:recipient_keys_count]
@@ -89,7 +102,9 @@ async def test_unpack_encrypted(
         unpack_config = UnpackConfig(expect_decrypt_by_all_keys=True)
 
         await unpack(
-            resolvers_config=resolvers_config_bob, packed_msg=pack_result.packed_msg, unpack_config=unpack_config
+            resolvers_config=resolvers_config_bob,
+            packed_msg=pack_result.packed_msg,
+            unpack_config=unpack_config,
         )
 
     avg_time = await measure_average(sample, SAMPLES_COUNT)
@@ -97,5 +112,7 @@ async def test_unpack_encrypted(
     print()
     enc_type = "_auth" if frm else "_anon"
     signed_or_not = "_signed" if sign_frm else ""
-    print(f"unpack{enc_type}_encrypted{signed_or_not} for {recipient_keys_count} recipient keys "
-          f"takes {avg_time} ns in average")
+    print(
+        f"unpack{enc_type}_encrypted{signed_or_not} for {recipient_keys_count} recipient keys "
+        f"takes {avg_time} ns in average"
+    )
