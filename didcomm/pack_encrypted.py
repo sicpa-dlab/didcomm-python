@@ -156,10 +156,8 @@ async def pack_encrypted(
         from_kid=encrypt_res.from_kid,
         sign_from_kid=sign_res.sign_frm_kid if sign_res else None,
         service_metadata=ServiceMetadata(
-            did_services_chain[0].id, did_services_chain[-1].service_endpoint
-        )
-        if did_services_chain
-        else None,
+            did_services_chain[-1].id, did_services_chain[0].service_endpoint
+        ) if did_services_chain else None,
     )
 
 
