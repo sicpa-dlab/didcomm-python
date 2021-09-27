@@ -342,6 +342,9 @@ async def __forward_if_needed(
     #   ==1 usual sender forward process
     #   >1 alternative endpoints
     #   >2 alternative endpoints recursion
+    # TODO
+    #   - case: a mediator's service has non-empty routing keys
+    #     list (not covered by the spec for now)
     if len(did_services_chain) > 1:
         routing_keys = [
             s.service_endpoint for s in did_services_chain[1:]
