@@ -4,10 +4,14 @@ import pytest
 
 from didcomm.core.defaults import DEF_ENC_ALG_AUTH
 from didcomm.message import Message
-from didcomm.pack_encrypted import PackEncryptedConfig, pack_encrypted
+from didcomm.pack_encrypted import PackEncryptedConfig, pack_encrypted, ServiceMetadata
 from didcomm.protocols.routing.forward import unpack_forward
 from didcomm.unpack import unpack
 from tests.test_vectors.common import ALICE_DID, BOB_DID, CHARLIE_DID
+from tests.test_vectors.did_doc import (
+    DID_DOC_CHARLIE,
+    DID_DOC_MEDIATOR2,
+)
 
 
 @pytest.mark.asyncio
@@ -47,6 +51,11 @@ async def test_message_to_multiple_recipients(
     )
     packed_msg_for_charlie = pack_result_for_charlie.packed_msg
 
+    assert pack_result_for_charlie.service_metadata == ServiceMetadata(
+        id=DID_DOC_CHARLIE.didcomm_services[0].id,
+        service_endpoint=DID_DOC_MEDIATOR2.didcomm_services[0].service_endpoint,
+    )
+
     # BOB's MEDIATOR
     forward_bob = await unpack_forward(
         resolvers_config_mediator1, packed_msg_for_bob, True
@@ -62,7 +71,7 @@ async def test_message_to_multiple_recipients(
 
     # MEDIATOR2's MEDIATOR
     forward_charlie = await unpack_forward(
-        resolvers_config_mediator2, forward_forward_charlie.forwarded_msg, True
+        resolvers_config_mediator1, forward_forward_charlie.forwarded_msg, True
     )
 
     # CHARLIE

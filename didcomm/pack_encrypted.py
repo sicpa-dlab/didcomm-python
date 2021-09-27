@@ -157,7 +157,9 @@ async def pack_encrypted(
         sign_from_kid=sign_res.sign_frm_kid if sign_res else None,
         service_metadata=ServiceMetadata(
             did_services_chain[-1].id, did_services_chain[0].service_endpoint
-        ) if did_services_chain else None,
+        )
+        if did_services_chain
+        else None,
     )
 
 
@@ -317,12 +319,12 @@ async def __forward_if_needed(
     packed_msg: JSON_OBJ,
     to: DID_OR_DID_URL,
     did_services_chain: List[DIDCommService],
-    pack_config: Optional[PackEncryptedConfig] = None,
-    pack_params: Optional[PackEncryptedParameters] = None,
+    pack_config: PackEncryptedConfig,
+    pack_params: PackEncryptedParameters,
 ) -> Optional[ForwardPackResult]:
 
     if not pack_config.forward:
-        logger.debug("forwrad is turned off")
+        logger.debug("forward is turned off")
         return None
 
     # build routing keys them using recipient service information
@@ -330,17 +332,19 @@ async def __forward_if_needed(
         logger.debug("No service endpoint found: skipping forward wrapping")
         return None
 
-    # first service is for 'to' DID
-    routing_keys = did_services_chain[0].routing_keys
+    # last service is for 'to' DID
+    routing_keys = did_services_chain[-1].routing_keys
 
     # prepend routing with alternative endpoints
+    # starting from the second mediator if any
+    # (the first one considered to have URI endpoint)
     # cases:
     #   ==1 usual sender forward process
     #   >1 alternative endpoints
     #   >2 alternative endpoints recursion
     if len(did_services_chain) > 1:
         routing_keys = [
-            s.service_endpoint for s in did_services_chain[:-1]
+            s.service_endpoint for s in did_services_chain[1:]
         ] + routing_keys
 
     return await wrap_in_forward(
