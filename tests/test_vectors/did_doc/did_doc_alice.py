@@ -146,7 +146,18 @@ DID_DOC_ALICE_SPEC_TEST_VECTORS = DIDDoc(
         "did:example:alice#key-p256-1",
         "did:example:alice#key-p521-1",
     ],
-    didcomm_services=[],
+    didcomm_services=[
+        """
+        DIDCommService(
+            id="did:example:123456789abcdefghi#didcomm-1",
+            service_endpoint="did:example:mediator1",
+            accept=[PROFILE_DIDCOMM_V2, PROFILE_DIDCOMM_AIP2_ENV_RFC587],
+            routing_keys=[
+                "did:example:mediator2#key-p521-1",
+            ],
+        )
+        """
+    ],
     verification_methods=[
         ALICE_VERIFICATION_METHOD_KEY_AGREEM_X25519,
         ALICE_VERIFICATION_METHOD_KEY_AGREEM_P256,

@@ -167,7 +167,7 @@ async def test_demo_message_to_multiple_recipients(
 
     # MEDIATOR2's MEDIATOR
     forward_charlie = await unpack_forward(
-        resolvers_config_mediator2, forward_forward_charlie.forwarded_msg, True
+        resolvers_config_mediator1, forward_forward_charlie.forwarded_msg, True
     )
     print(f"Got {forward_charlie.forwarded_msg}")
 

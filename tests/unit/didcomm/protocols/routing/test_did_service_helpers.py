@@ -1,7 +1,7 @@
 import pytest
 
 from didcomm.errors import DIDDocNotResolvedError, InvalidDIDDocError
-from didcomm.did_doc.did_doc import DIDDoc, DIDCommService
+from didcomm.did_doc.did_doc import DIDCommService
 from didcomm.protocols.routing import forward  # for patch.object mocks
 from didcomm.protocols.routing.forward import (
     find_did_service,
@@ -13,11 +13,6 @@ from didcomm.protocols.routing.forward import (
 )
 
 from tests import mock_module
-
-
-@pytest.fixture
-def did_doc(did) -> DIDDoc:
-    return DIDDoc(did, [], [], [], [])
 
 
 # ===============
@@ -163,11 +158,6 @@ async def test_resolve_did_services_chain__no_service(
     assert res == []
 
 
-@pytest.fixture
-def didcomm_service():
-    return DIDCommService("", "", [""], [""])
-
-
 @pytest.mark.asyncio
 async def test_resolve_did_services_chain__uri_as_endpoint(
     resolvers_config_mock, did_doc, find_did_service_mock, didcomm_service
@@ -185,14 +175,13 @@ async def test_resolve_did_services_chain__did_as_endpoint(
 ):
     service1 = DIDCommService("", did1, [""], [""])
     service2 = DIDCommService("", "https://some.domain", [""], [""])
-    expected_res = [service1, service2]
+    find_did_service_return = [service1, service2]
+    expected_res = list(reversed(find_did_service_return))
 
-    find_did_service_mock.side_effect = (x for x in expected_res)
+    find_did_service_mock.side_effect = (x for x in find_did_service_return)
 
     res = await resolve_did_services_chain(resolvers_config_mock, did1)
-
-    for i in range(len(expected_res)):
-        assert res[i] is expected_res[i]
+    assert res == expected_res
 
 
 @pytest.mark.asyncio
@@ -200,9 +189,9 @@ async def test_resolve_did_services_chain__no_mediator_did_service(
     resolvers_config_mock, did1, did2, find_did_service_mock
 ):
     service1 = DIDCommService("", did1, [""], [""])
-    expected_res = [service1, None]
+    find_did_service_return = [service1, None]
 
-    find_did_service_mock.side_effect = (x for x in expected_res)
+    find_did_service_mock.side_effect = (x for x in find_did_service_return)
 
     with pytest.raises(InvalidDIDDocError) as excinfo:
         await resolve_did_services_chain(resolvers_config_mock, did1)
@@ -231,9 +220,8 @@ async def test_resolve_did_services_chain__did_endpoint_recursion(
     service1 = DIDCommService("", did1, [""], [""])
     service2 = DIDCommService("", did2, [""], [""])
     service3 = DIDCommService("", "https://some.domain", [""], [""])
-    expected_res = [service1, service2, service3]
 
-    find_did_service_mock.side_effect = (x for x in expected_res)
+    find_did_service_mock.side_effect = (x for x in [service1, service2, service3])
 
     with pytest.raises(exc_t) as excinfo:
         await resolve_did_services_chain(

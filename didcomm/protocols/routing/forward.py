@@ -174,7 +174,7 @@ async def resolve_did_services_chain(
         return res
 
     service_uri = to_did_service.service_endpoint
-    res.append(to_did_service)
+    res.insert(0, to_did_service)
 
     # alternative endpoints
     while is_did_or_did_url(service_uri):
@@ -185,7 +185,7 @@ async def resolve_did_services_chain(
             #      DID Doc services (it SHOULD NOT be as per spec but ...)
             exc_t = NotImplementedError if did_recursion else InvalidDIDDocError
             raise exc_t(
-                f"mediator '{res[-2].service_endpoint}' defines alternative"
+                f"mediator '{res[-1].service_endpoint}' defines alternative"
                 f" endpoint '{service_uri}' recursively"
             )
 
@@ -198,7 +198,7 @@ async def resolve_did_services_chain(
             raise InvalidDIDDocError(f"mediator '{mediator_did}' service doc not found")
 
         service_uri = mediator_did_service.service_endpoint
-        res.append(mediator_did_service)
+        res.insert(0, mediator_did_service)
 
     return res
 
