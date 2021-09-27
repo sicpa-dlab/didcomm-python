@@ -29,6 +29,7 @@ async def all_bob_key_agreement_kids(resolvers_config_alice):
     bob_did_doc.key_agreement_kids = all_key_agreement_kids
 
 
+@pytest.mark.skip(reason="disabled to skip on CI")
 @pytest.mark.asyncio
 @pytest.mark.parametrize("recipient_keys_count", RECIPIENT_KEYS_COUNT)
 @pytest.mark.parametrize("sign_frm", [None, ALICE_DID])
@@ -61,6 +62,7 @@ async def test_pack_encrypted(
           f"takes {avg_time} ns in average")
 
 
+@pytest.mark.skip(reason="disabled to skip on CI")
 @pytest.mark.asyncio
 @pytest.mark.parametrize("recipient_keys_count", RECIPIENT_KEYS_COUNT)
 @pytest.mark.parametrize("sign_frm", [None, ALICE_DID])
