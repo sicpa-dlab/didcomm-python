@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import json
-
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON
+from didcomm.core.serialization import dict_to_json
+from didcomm.helper import pack_from_prior_field
 from didcomm.message import Message
 
 
@@ -32,4 +32,6 @@ async def pack_plaintext(resolvers_config: ResolversConfig, message: Message) ->
 
     :return: A packed message as a JSON string.
     """
-    return json.dumps(message.as_dict())
+    message = message.as_dict()
+    await pack_from_prior_field(message, resolvers_config)
+    return dict_to_json(message)

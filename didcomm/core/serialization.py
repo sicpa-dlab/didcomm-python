@@ -13,14 +13,16 @@ def dict_to_json(msg: dict) -> JSON:
 
 
 def json_bytes_to_dict(json_bytes: bytes) -> dict:
-    try:
-        return json_loads(to_unicode(json_bytes))
-    except Exception as exc:
-        raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE) from exc
+    return json_str_to_dict(to_unicode(json_bytes))
 
 
 def json_str_to_dict(json_str: JSON) -> dict:
     try:
-        return json_loads(json_str)
+        json_dict = json_loads(json_str)
     except Exception as exc:
         raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE) from exc
+
+    if not isinstance(json_dict, dict):  # in case of a primitive value
+        raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
+
+    return json_dict

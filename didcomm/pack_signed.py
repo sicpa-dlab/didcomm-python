@@ -8,6 +8,7 @@ from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
 from didcomm.core.utils import is_did
 from didcomm.errors import DIDCommValueError
+from didcomm.helper import pack_from_prior_field
 from didcomm.message import Message
 
 
@@ -49,7 +50,9 @@ async def pack_signed(
     :return: A packed message as a JSON string.
     """
     __validate(sign_frm)
-    sign_result = await sign(message.as_dict(), sign_frm, resolvers_config)
+    message = message.as_dict()
+    await pack_from_prior_field(message, resolvers_config)
+    sign_result = await sign(message, sign_frm, resolvers_config)
     packed_msg = dict_to_json(sign_result.msg)
     return PackSignedResult(
         packed_msg=packed_msg, sign_from_kid=sign_result.sign_frm_kid

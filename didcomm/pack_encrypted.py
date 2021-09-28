@@ -7,16 +7,17 @@ from typing import Optional, List
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON, JSON_OBJ, DID_OR_DID_URL
-from didcomm.core.defaults import DEF_ENC_ALG_AUTH, DEF_ENC_ALG_ANON
 from didcomm.core.anoncrypt import anoncrypt, find_keys_and_anoncrypt
 from didcomm.core.authcrypt import find_keys_and_authcrypt
+from didcomm.core.defaults import DEF_ENC_ALG_AUTH, DEF_ENC_ALG_ANON
 from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
 from didcomm.core.types import EncryptResult, SignResult, DIDCommGeneratorType
 from didcomm.core.utils import get_did, is_did, didcomm_id_generator_default
-from didcomm.errors import DIDCommValueError
-from didcomm.message import Message, Header
 from didcomm.did_doc.did_doc import DIDCommService
+from didcomm.errors import DIDCommValueError
+from didcomm.helper import pack_from_prior_field
+from didcomm.message import Message, Header
 from didcomm.protocols.routing.forward import (
     wrap_in_forward,
     resolve_did_services_chain,
@@ -113,6 +114,7 @@ async def pack_encrypted(
 
     # 2. message as dict
     msg_as_dict = message.as_dict()
+    await pack_from_prior_field(msg_as_dict, resolvers_config)
 
     # 3. sign if needed
     sign_res = await __sign_if_needed(resolvers_config, msg_as_dict, sign_frm)
