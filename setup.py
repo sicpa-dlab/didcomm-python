@@ -21,7 +21,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
     ],
-    packages=find_packages(exclude=['tests', 'tests.*']),
+    packages=find_packages(exclude=["tests", "tests.*"]),
     install_requires=[
         # TODO switch to pypi once necessary authlib version is released
         "Authlib@git+https://github.com/lepture/authlib.git@7bfd5590cc365803633c56e784b43494589abff2",
