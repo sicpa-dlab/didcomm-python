@@ -1,10 +1,13 @@
 import pytest
 
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.core.serialization import json_str_to_dict
-from didcomm.core.utils import get_did, is_did_url
+from didcomm.core.utils import is_did_url, get_did
 from didcomm.message import Message, FromPrior
-from didcomm.pack_plaintext import pack_plaintext, PackPlaintextParameters
+from didcomm.pack_encrypted import (
+    pack_encrypted,
+    PackEncryptedParameters,
+    PackEncryptedConfig,
+)
 from didcomm.unpack import unpack
 from tests.test_vectors.common import ALICE_DID, BOB_DID, CHARLIE_DID
 from tests.test_vectors.secrets.mock_secrets_resolver import MockSecretsResolverInMemory
@@ -69,14 +72,16 @@ TEST_MESSAGE: Message = Message(
 
 
 @pytest.mark.asyncio
-async def test_pack_plaintext_with_from_prior_and_issuer_kid(
-    resolvers_config_charlie_rotated_to_alice,
-    resolvers_config_bob,
+async def test_pack_encrypted_with_from_prior_and_issuer_kid(
+    resolvers_config_charlie_rotated_to_alice, resolvers_config_bob
 ):
-    pack_result = await pack_plaintext(
+    pack_result = await pack_encrypted(
         resolvers_config=resolvers_config_charlie_rotated_to_alice,
         message=TEST_MESSAGE,
-        pack_params=PackPlaintextParameters(
+        to=BOB_DID,
+        frm=ALICE_DID,
+        pack_config=PackEncryptedConfig(forward=False),
+        pack_params=PackEncryptedParameters(
             from_prior_issuer_kid=CHARLIE_SECRET_AUTH_KEY_ED25519.kid
         ),
     )
@@ -87,27 +92,23 @@ async def test_pack_plaintext_with_from_prior_and_issuer_kid(
         unpack_result.metadata.from_prior_issuer_kid
         == CHARLIE_SECRET_AUTH_KEY_ED25519.kid
     )
-    assert (
-        unpack_result.metadata.signed_from_prior
-        == json_str_to_dict(pack_result.packed_msg)["from_prior"]
-    )
+    assert unpack_result.metadata.signed_from_prior is not None
 
 
 @pytest.mark.asyncio
-async def test_pack_plaintext_with_from_prior_and_no_issuer_kid(
-    resolvers_config_charlie_rotated_to_alice,
-    resolvers_config_bob,
+async def test_pack_encrypted_with_from_prior_and_no_issuer_kid(
+    resolvers_config_charlie_rotated_to_alice, resolvers_config_bob
 ):
-    pack_result = await pack_plaintext(
+    pack_result = await pack_encrypted(
         resolvers_config=resolvers_config_charlie_rotated_to_alice,
         message=TEST_MESSAGE,
+        to=BOB_DID,
+        frm=ALICE_DID,
+        pack_config=PackEncryptedConfig(forward=False),
     )
     unpack_result = await unpack(resolvers_config_bob, pack_result.packed_msg)
 
     assert unpack_result.message == TEST_MESSAGE
     assert is_did_url(unpack_result.metadata.from_prior_issuer_kid)
     assert get_did(unpack_result.metadata.from_prior_issuer_kid) == CHARLIE_DID
-    assert (
-        unpack_result.metadata.signed_from_prior
-        == json_str_to_dict(pack_result.packed_msg)["from_prior"]
-    )
+    assert unpack_result.metadata.signed_from_prior is not None

@@ -25,12 +25,12 @@ from tests.test_vectors.didcomm_messages.tests.test_vectors_plaintext_positive i
 )
 
 
-async def check_pack_plaintext(msg, expected_json, resolvers_config_bob):
-    packed_msg = await pack_plaintext(resolvers_config_bob, msg)
-    assert json_str_to_dict(packed_msg) == json_str_to_dict(expected_json)
+async def check_pack_plaintext(message, expected_json, resolvers_config_bob):
+    pack_result = await pack_plaintext(resolvers_config_bob, message)
+    assert json_str_to_dict(pack_result.packed_msg) == json_str_to_dict(expected_json)
 
-    unpacked_msg = await unpack(resolvers_config_bob, packed_msg)
-    assert unpacked_msg.message == msg
+    unpack_result = await unpack(resolvers_config_bob, pack_result.packed_msg)
+    assert unpack_result.message == message
 
 
 @pytest.mark.asyncio

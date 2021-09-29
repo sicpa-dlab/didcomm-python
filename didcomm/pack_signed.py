@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Optional
 
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON, DID_OR_DID_URL, DID_URL
@@ -8,7 +9,7 @@ from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
 from didcomm.core.utils import is_did
 from didcomm.errors import DIDCommValueError
-from didcomm.helper import pack_from_prior_field
+from didcomm.helper import pack_from_prior_in_place
 from didcomm.message import Message
 
 
@@ -16,6 +17,7 @@ async def pack_signed(
     resolvers_config: ResolversConfig,
     message: Message,
     sign_frm: DID_OR_DID_URL,
+    pack_params: Optional[PackSignedParameters] = None,
 ) -> PackSignedResult:
     """
     Produces `DIDComm Signed Message`
@@ -41,6 +43,7 @@ async def pack_signed(
     :param resolvers_config: secrets and DIDDoc resolvers
     :param message: The message to be packed into a DIDComm message
     :param sign_frm: DID or key ID the sender uses for signing.
+    :param pack_params: Optional parameters for pack
 
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
     :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc
@@ -49,13 +52,24 @@ async def pack_signed(
 
     :return: A packed message as a JSON string.
     """
+    pack_params = pack_params or PackSignedParameters()
+
     __validate(sign_frm)
     message = message.as_dict()
-    await pack_from_prior_field(message, resolvers_config)
+
+    from_prior_issuer_kid = await pack_from_prior_in_place(
+        message,
+        resolvers_config,
+        pack_params.from_prior_issuer_kid,
+    )
+
     sign_result = await sign(message, sign_frm, resolvers_config)
     packed_msg = dict_to_json(sign_result.msg)
+
     return PackSignedResult(
-        packed_msg=packed_msg, sign_from_kid=sign_result.sign_frm_kid
+        packed_msg=packed_msg,
+        sign_from_kid=sign_result.sign_frm_kid,
+        from_prior_issuer_kid=from_prior_issuer_kid,
     )
 
 
@@ -67,10 +81,27 @@ class PackSignedResult:
     Attributes:
         packed_msg (str): A packed message as a JSON string
         sign_from_kid (DID_URL): Identifier (DID URL) of sender key used for message signing
+        from_prior_issuer_kid (DID_URL): Identifier (DID URL) of issuer key used for signing from_prior.
+                                         None if the message does not contain from_prior.
     """
 
     packed_msg: JSON
     sign_from_kid: DID_URL
+    from_prior_issuer_kid: Optional[DID_URL] = None
+
+
+@dataclass
+class PackSignedParameters:
+    """
+    Optional parameters for pack.
+
+    Attributes:
+        from_prior_issuer_kid (DID_URL): If from_prior is specified in the source message,
+            this field can explicitly specify which key to use for signing from_prior
+            in the packed message
+    """
+
+    from_prior_issuer_kid: Optional[DID_URL] = None
 
 
 def __validate(sign_frm: DID_OR_DID_URL):

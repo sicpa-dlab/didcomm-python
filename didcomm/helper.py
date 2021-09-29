@@ -1,74 +1,88 @@
-from copy import copy
+from typing import Optional
 
 from authlib.common.encoding import to_unicode, to_bytes, json_loads, urlsafe_b64decode
 from authlib.jose import JsonWebSignature
+from authlib.jose.errors import BadSignatureError
 
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JWT_TYPE, DID_URL
 from didcomm.core.keys.sign_keys_selector import find_signing_key, find_verification_key
 from didcomm.core.serialization import dict_to_json_bytes, json_bytes_to_dict
-from didcomm.core.utils import extract_key, extract_sign_alg, is_did_url
-from didcomm.errors import MalformedMessageError, MalformedMessageCode
+from didcomm.core.utils import extract_key, extract_sign_alg, is_did_url, get_did
+from didcomm.errors import (
+    MalformedMessageError,
+    MalformedMessageCode,
+    DIDCommValueError,
+)
 
 
-async def pack_from_prior_field(message: dict, resolvers_config: ResolversConfig):
-    if not message.get("from_prior"):
-        return
+async def pack_from_prior_in_place(
+    message: dict, resolvers_config: ResolversConfig, issuer_kid: Optional[DID_URL]
+) -> DID_URL:
+    if message.get("from_prior") is None:
+        return None
 
     from_prior = message["from_prior"]
+
     if not isinstance(from_prior, dict):
         raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-    if message.get("from") and from_prior["sub"] != message["from"]:
-        raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+    if issuer_kid is not None and get_did(issuer_kid) != from_prior["iss"]:
+        raise DIDCommValueError()
+
+    issuer_did_or_kid = issuer_kid or from_prior["iss"]
 
     jws = JsonWebSignature()
-
-    iss_kid = from_prior["iss_kid"]
-    from_prior = copy(from_prior)
-    del from_prior["iss_kid"]
 
     payload = dict_to_json_bytes(from_prior)
 
-    secret = await find_signing_key(iss_kid, resolvers_config)
+    secret = await find_signing_key(issuer_did_or_kid, resolvers_config)
     private_key = extract_key(secret)
     alg = extract_sign_alg(secret)
 
-    protected = {"typ": JWT_TYPE, "alg": alg.value, "kid": iss_kid}
+    protected = {"typ": JWT_TYPE, "alg": alg.value, "kid": secret.kid}
 
-    packed = jws.serialize_compact(protected, payload, private_key)
+    message["from_prior"] = to_unicode(
+        jws.serialize_compact(protected, payload, private_key)
+    )
 
-    message["from_prior"] = to_unicode(packed)
+    return secret.kid
 
 
-async def unpack_from_prior_field(message: dict, resolvers_config: ResolversConfig):
-    if not message.get("from_prior"):
-        return
+async def unpack_from_prior_in_place(
+    message: dict, resolvers_config: ResolversConfig
+) -> DID_URL:
+    if message.get("from_prior") is None:
+        return None
 
     packed_from_prior = message["from_prior"]
+
     if not isinstance(packed_from_prior, str):
-        raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+        raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
 
-    iss_kid = __extract_from_prior_kid(packed_from_prior)
+    issuer_kid = __extract_from_prior_kid(packed_from_prior)
 
-    verification_method = await find_verification_key(iss_kid, resolvers_config)
+    verification_method = await find_verification_key(issuer_kid, resolvers_config)
     public_key = extract_key(verification_method)
 
-    jws = JsonWebSignature()
-
-    jws_object = jws.deserialize_compact(to_bytes(packed_from_prior), public_key)
+    try:
+        jws = JsonWebSignature()
+        jws_object = jws.deserialize_compact(to_bytes(packed_from_prior), public_key)
+    except BadSignatureError as exc:
+        raise MalformedMessageError(MalformedMessageCode.INVALID_SIGNATURE) from exc
+    except Exception as exc:
+        raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE) from exc
 
     if jws_object.type != "compact":
-        raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+        raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
 
     protected = jws_object.header.protected
+    if protected.get("typ") != JWT_TYPE:
+        raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
 
-    from_prior = json_bytes_to_dict(jws_object.payload)
-    from_prior["iss_kid"] = protected["kid"]
+    message["from_prior"] = json_bytes_to_dict(jws_object.payload)
 
-    if message.get("from") and from_prior["sub"] != message["from"]:
-        raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-
-    message["from_prior"] = from_prior
+    return issuer_kid
 
 
 def __extract_from_prior_kid(packed_from_prior: str) -> DID_URL:
@@ -76,5 +90,5 @@ def __extract_from_prior_kid(packed_from_prior: str) -> DID_URL:
     protected_segment = packed_from_prior.split(b".")[0]
     protected = json_loads(urlsafe_b64decode(protected_segment).decode("utf-8"))
     if not is_did_url(protected.get("kid")):
-        raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+        raise DIDCommValueError()
     return protected["kid"]

@@ -21,7 +21,7 @@ async def test_unpack_simple_plaintext(resolvers_config_bob):
 
 @pytest.mark.asyncio
 async def test_pack_simple_plaintext(resolvers_config_bob):
-    packed_msg = await pack_plaintext(resolvers_config_bob, TEST_MESSAGE)
-    assert json_str_to_dict(packed_msg) == json_str_to_dict(
+    pack_result = await pack_plaintext(resolvers_config_bob, TEST_MESSAGE)
+    assert json_str_to_dict(pack_result.packed_msg) == json_str_to_dict(
         TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE
     )

@@ -37,19 +37,18 @@ TEST_ATTACHMENT_MINIMAL = Attachment(
 )
 
 TEST_FROM_PRIOR = FromPrior(
-    iss="did:example1",
-    sub="did:example2",
+    iss="did:example:charlie",
+    sub="did:example:alice",
     aud="123",
     exp=1234,
     nbf=12345,
     iat=123456,
     jti="dfg",
-    iss_kid="did:example1#key1",
 )
 
 TEST_FROM_PRIOR_MINIMAL = FromPrior(
-    iss="did:example1",
-    sub="did:example2",
+    iss="did:example:charlie",
+    sub="did:example:alice",
 )
 
 

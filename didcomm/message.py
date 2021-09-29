@@ -2,20 +2,20 @@ from __future__ import annotations
 
 import dataclasses
 from dataclasses import dataclass
-import attr
 from typing import Optional, List, Union, Dict, TypeVar, Generic, Callable
+
+import attr
 
 from didcomm.common.types import (
     JSON_VALUE,
     DID,
-    DID_URL,
     JSON_OBJ,
     JSON,
     DIDCommMessageTypes,
 )
-from didcomm.core.utils import dataclass_to_dict, attrs_to_dict, is_did, is_did_url
-from didcomm.core.serialization import json_str_to_dict, json_bytes_to_dict
 from didcomm.core.converters import converter__id
+from didcomm.core.serialization import json_str_to_dict, json_bytes_to_dict
+from didcomm.core.utils import dataclass_to_dict, attrs_to_dict, is_did
 from didcomm.core.validators import validator__instance_of
 from didcomm.errors import (
     MalformedMessageError,
@@ -183,6 +183,9 @@ class GenericMessage(Generic[T]):
             for to in self.to:
                 if not isinstance(to, str):
                     raise DIDCommValueError()
+        if self.from_prior is not None and self.frm is not None:
+            if self.from_prior.sub != self.frm:
+                raise DIDCommValueError()
         if self.attachments is not None:
             for attachment in self.attachments:
                 if not isinstance(attachment, Attachment):
@@ -374,7 +377,6 @@ class FromPrior:
     nbf: Optional[int] = None
     iat: Optional[int] = None
     jti: Optional[str] = None
-    iss_kid: Optional[DID_URL] = None
 
     def as_dict(self) -> dict:
         self._validate()
@@ -405,7 +407,5 @@ class FromPrior:
             and not isinstance(self.iat, int)
             or self.jti is not None
             and not isinstance(self.jti, str)
-            or self.iss_kid is not None
-            and not is_did_url(self.iss_kid)
         ):
             raise DIDCommValueError()
