@@ -19,6 +19,18 @@ from didcomm.errors import (
 async def pack_from_prior_in_place(
     message: dict, resolvers_config: ResolversConfig, issuer_kid: Optional[DID_URL]
 ) -> DID_URL:
+    """
+    Packs from_prior field within a given message to JWS (if the message contains from_prior).
+    In result, the message will contain the packed from_prior.
+
+    Args:
+        message: a plaintext message as a dict which optionally contains from_prior not yet packed to JWS
+        resolvers_config: secrets and DIDDoc resolvers
+        issuer_kid: optionally provided issuer key to use for signing from_prior
+
+    Returns:
+        identifier of the issuer key actually used to sign from_prior
+    """
     if message.get("from_prior") is None:
         return None
 
@@ -52,6 +64,17 @@ async def pack_from_prior_in_place(
 async def unpack_from_prior_in_place(
     message: dict, resolvers_config: ResolversConfig
 ) -> DID_URL:
+    """
+    Unpacks from_prior field within a given message from JWS (if the message contains from_prior).
+    In result, the message will contain the unpacked from_prior.
+
+    Args:
+        message: a plaintext message as a dict which optionally contains from_prior packed to JWS
+        resolvers_config: secrets and DIDDoc resolvers
+
+    Returns:
+        identifier of the issuer key which from_prior was signed with
+    """
     if message.get("from_prior") is None:
         return None
 

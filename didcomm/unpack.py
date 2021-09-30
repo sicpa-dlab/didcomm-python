@@ -17,7 +17,7 @@ from didcomm.core.serialization import (
 )
 from didcomm.core.sign import is_signed, unpack_sign
 from didcomm.errors import DIDCommValueError
-from didcomm.helper import unpack_from_prior_in_place
+from didcomm.core.from_prior import unpack_from_prior_in_place
 from didcomm.message import Message
 from didcomm.protocols.routing.forward import unpack_forward, is_forward
 

@@ -16,7 +16,7 @@ from didcomm.core.types import EncryptResult, SignResult, DIDCommGeneratorType
 from didcomm.core.utils import get_did, is_did, didcomm_id_generator_default
 from didcomm.did_doc.did_doc import DIDCommService
 from didcomm.errors import DIDCommValueError
-from didcomm.helper import pack_from_prior_in_place
+from didcomm.core.from_prior import pack_from_prior_in_place
 from didcomm.message import Message, Header
 from didcomm.protocols.routing.forward import (
     wrap_in_forward,

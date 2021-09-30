@@ -9,7 +9,7 @@ from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
 from didcomm.core.utils import is_did
 from didcomm.errors import DIDCommValueError
-from didcomm.helper import pack_from_prior_in_place
+from didcomm.core.from_prior import pack_from_prior_in_place
 from didcomm.message import Message
 
 

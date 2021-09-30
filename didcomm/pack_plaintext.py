@@ -6,7 +6,7 @@ from typing import Optional
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JSON, DID_URL
 from didcomm.core.serialization import dict_to_json
-from didcomm.helper import pack_from_prior_in_place
+from didcomm.core.from_prior import pack_from_prior_in_place
 from didcomm.message import Message
 
 
