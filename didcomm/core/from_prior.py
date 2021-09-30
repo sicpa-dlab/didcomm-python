@@ -39,6 +39,12 @@ async def pack_from_prior_in_place(
     if not isinstance(from_prior, dict):
         raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
 
+    if from_prior["sub"] == from_prior["iss"]:
+        raise DIDCommValueError()
+
+    if message.get("from") is not None and from_prior["sub"] != message["from"]:
+        raise DIDCommValueError()
+
     if issuer_kid is not None and get_did(issuer_kid) != from_prior["iss"]:
         raise DIDCommValueError()
 
@@ -109,9 +115,12 @@ async def unpack_from_prior_in_place(
 
 
 def __extract_from_prior_kid(packed_from_prior: str) -> DID_URL:
-    packed_from_prior = to_bytes(packed_from_prior)
-    protected_segment = packed_from_prior.split(b".")[0]
-    protected = json_loads(urlsafe_b64decode(protected_segment).decode("utf-8"))
-    if not is_did_url(protected.get("kid")):
-        raise DIDCommValueError()
-    return protected["kid"]
+    try:
+        packed_from_prior = to_bytes(packed_from_prior)
+        protected_segment = packed_from_prior.split(b".")[0]
+        protected = json_loads(urlsafe_b64decode(protected_segment).decode("utf-8"))
+        if not is_did_url(protected.get("kid")):
+            raise DIDCommValueError()
+        return protected["kid"]
+    except Exception as exc:
+        raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE) from exc

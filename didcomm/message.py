@@ -183,9 +183,6 @@ class GenericMessage(Generic[T]):
             for to in self.to:
                 if not isinstance(to, str):
                     raise DIDCommValueError()
-        if self.from_prior is not None and self.frm is not None:
-            if self.from_prior.sub != self.frm:
-                raise DIDCommValueError()
         if self.attachments is not None:
             for attachment in self.attachments:
                 if not isinstance(attachment, Attachment):

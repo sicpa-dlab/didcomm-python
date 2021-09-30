@@ -12,6 +12,9 @@ from tests.test_vectors.secrets import (
     MockSecretsResolverMediator1,
     MockSecretsResolverMediator2,
 )
+from tests.test_vectors.secrets.mock_secrets_resolver_charlie_rotated_to_alice import (
+    MockSecretsResolverCharlieRotatedToAlice,
+)
 
 
 @pytest.fixture()
@@ -37,6 +40,11 @@ def secrets_resolver_bob():
 @pytest.fixture()
 def secrets_resolver_charlie():
     return MockSecretsResolverCharlie()
+
+
+@pytest.fixture()
+def secrets_resolver_charlie_rotated_to_alice():
+    return MockSecretsResolverCharlieRotatedToAlice()
 
 
 @pytest.fixture()
@@ -92,6 +100,16 @@ def resolvers_config_bob_with_non_secrets(
 def resolvers_config_charlie(secrets_resolver_charlie, did_resolver):
     return ResolversConfig(
         secrets_resolver=secrets_resolver_charlie, did_resolver=did_resolver
+    )
+
+
+@pytest.fixture()
+def resolvers_config_charlie_rotated_to_alice(
+    secrets_resolver_charlie_rotated_to_alice, did_resolver_with_non_secrets
+):
+    return ResolversConfig(
+        secrets_resolver=secrets_resolver_charlie_rotated_to_alice,
+        did_resolver=did_resolver_with_non_secrets,
     )
 
 
