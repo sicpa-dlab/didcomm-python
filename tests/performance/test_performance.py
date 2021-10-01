@@ -11,13 +11,39 @@ RECIPIENT_KEYS_COUNT = [1, 2, 3]
 SAMPLES_COUNT = 1000
 
 
-async def measure_average(sampler, count):
+async def measure_naive(sampler, count):
     start = perf_counter_ns()
     for i in range(count):
         await sampler()
     end = perf_counter_ns()
-    avg_time_per_sample = (end - start) / count
-    return avg_time_per_sample
+    time_in_ns = end - start
+    time_in_ms = time_in_ns / 1000000
+    return time_in_ms
+
+
+def dump_res(
+    operations,
+    time_in_ms,
+    recipient_keys_count,
+    unpack=False,
+    authcrypt=False,
+    signed=False,
+):
+    avrg = time_in_ms / operations
+    thrpt = 1 / avrg
+
+    op_type = "unpack" if unpack else "pack"
+    enc_type = "_auth" if authcrypt else "_anon"
+    signed_or_not = "_signed" if signed else ""
+
+    op_descr = (
+        f"'{op_type}{enc_type}_encrypted{signed_or_not}' [{recipient_keys_count} kIds]:"
+    )
+
+    print(
+        f"\nbenchmark of {op_descr:40}"
+        f" {time_in_ms:7.3f} ms, {operations:7} ops, {thrpt:10.3f} ops/ms, {avrg:7.3f} mss/op"
+    )
 
 
 @pytest.fixture()
@@ -65,14 +91,14 @@ async def test_pack_encrypted(
             pack_config=pack_config,
         )
 
-    avg_time = await measure_average(sample, SAMPLES_COUNT)
-
-    print()
-    enc_type = "_auth" if frm else "_anon"
-    signed_or_not = "_signed" if sign_frm else ""
-    print(
-        f"pack{enc_type}_encrypted{signed_or_not} for {recipient_keys_count} recipient keys "
-        f"takes {avg_time} ns in average"
+    time_is_ms = await measure_naive(sample, SAMPLES_COUNT)
+    dump_res(
+        SAMPLES_COUNT,
+        time_is_ms,
+        recipient_keys_count,
+        False,
+        bool(frm),
+        bool(sign_frm),
     )
 
 
@@ -112,12 +138,7 @@ async def test_unpack_encrypted(
             unpack_config=unpack_config,
         )
 
-    avg_time = await measure_average(sample, SAMPLES_COUNT)
-
-    print()
-    enc_type = "_auth" if frm else "_anon"
-    signed_or_not = "_signed" if sign_frm else ""
-    print(
-        f"unpack{enc_type}_encrypted{signed_or_not} for {recipient_keys_count} recipient keys "
-        f"takes {avg_time} ns in average"
+    time_is_ms = await measure_naive(sample, SAMPLES_COUNT)
+    dump_res(
+        SAMPLES_COUNT, time_is_ms, recipient_keys_count, True, bool(frm), bool(sign_frm)
     )
