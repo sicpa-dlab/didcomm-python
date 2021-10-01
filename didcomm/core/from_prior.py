@@ -18,7 +18,7 @@ from didcomm.errors import (
 
 async def pack_from_prior_in_place(
     message: dict, resolvers_config: ResolversConfig, issuer_kid: Optional[DID_URL]
-) -> DID_URL:
+) -> Optional[DID_URL]:
     """
     Packs from_prior field within a given message to JWS (if the message contains from_prior).
     In result, the message will contain the packed from_prior.
@@ -29,7 +29,7 @@ async def pack_from_prior_in_place(
         issuer_kid: optionally provided issuer key to use for signing from_prior
 
     Returns:
-        identifier of the issuer key actually used to sign from_prior
+        identifier of the issuer key actually used to sign from_prior if the latter is present
     """
     if message.get("from_prior") is None:
         return None
@@ -69,7 +69,7 @@ async def pack_from_prior_in_place(
 
 async def unpack_from_prior_in_place(
     message: dict, resolvers_config: ResolversConfig
-) -> DID_URL:
+) -> Optional[DID_URL]:
     """
     Unpacks from_prior field within a given message from JWS (if the message contains from_prior).
     In result, the message will contain the unpacked from_prior.
@@ -79,24 +79,24 @@ async def unpack_from_prior_in_place(
         resolvers_config: secrets and DIDDoc resolvers
 
     Returns:
-        identifier of the issuer key which from_prior was signed with
+        identifier of the issuer key which from_prior was signed with if the latter is present
     """
     if message.get("from_prior") is None:
         return None
 
-    packed_from_prior = message["from_prior"]
+    from_prior_jwt = message["from_prior"]
 
-    if not isinstance(packed_from_prior, str):
+    if not isinstance(from_prior_jwt, str):
         raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
 
-    issuer_kid = __extract_from_prior_kid(packed_from_prior)
+    issuer_kid = __extract_from_prior_kid(from_prior_jwt)
 
     verification_method = await find_verification_key(issuer_kid, resolvers_config)
     public_key = extract_key(verification_method)
 
     try:
         jws = JsonWebSignature()
-        jws_object = jws.deserialize_compact(to_bytes(packed_from_prior), public_key)
+        jws_object = jws.deserialize_compact(to_bytes(from_prior_jwt), public_key)
     except BadSignatureError as exc:
         raise MalformedMessageError(MalformedMessageCode.INVALID_SIGNATURE) from exc
     except Exception as exc:
@@ -114,10 +114,10 @@ async def unpack_from_prior_in_place(
     return issuer_kid
 
 
-def __extract_from_prior_kid(packed_from_prior: str) -> DID_URL:
+def __extract_from_prior_kid(from_prior_jwt: str) -> DID_URL:
     try:
-        packed_from_prior = to_bytes(packed_from_prior)
-        protected_segment = packed_from_prior.split(b".")[0]
+        from_prior_jwt = to_bytes(from_prior_jwt)
+        protected_segment = from_prior_jwt.split(b".")[0]
         protected = json_loads(urlsafe_b64decode(protected_segment).decode("utf-8"))
         if not is_did_url(protected.get("kid")):
             raise DIDCommValueError()

@@ -29,6 +29,6 @@ async def test_unpack_plaintext_with_from_prior(
     assert unpack_result.message == TEST_MESSAGE_FROM_PRIOR
     assert unpack_result.metadata.from_prior_issuer_kid == "did:example:charlie#key-1"
     assert (
-        unpack_result.metadata.signed_from_prior
+        unpack_result.metadata.from_prior_jwt
         == json_str_to_dict(PACKED_MESSAGE)["from_prior"]
     )

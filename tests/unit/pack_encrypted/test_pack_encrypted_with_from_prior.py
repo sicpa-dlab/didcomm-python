@@ -43,7 +43,7 @@ async def test_pack_encrypted_with_from_prior_and_issuer_kid(
         unpack_result.metadata.from_prior_issuer_kid
         == CHARLIE_SECRET_AUTH_KEY_ED25519.kid
     )
-    assert unpack_result.metadata.signed_from_prior is not None
+    assert unpack_result.metadata.from_prior_jwt is not None
 
 
 @pytest.mark.parametrize(
@@ -67,4 +67,4 @@ async def test_pack_encrypted_with_from_prior_and_no_issuer_kid(
     assert unpack_result.message == message
     assert is_did_url(unpack_result.metadata.from_prior_issuer_kid)
     assert get_did(unpack_result.metadata.from_prior_issuer_kid) == CHARLIE_DID
-    assert unpack_result.metadata.signed_from_prior is not None
+    assert unpack_result.metadata.from_prior_jwt is not None

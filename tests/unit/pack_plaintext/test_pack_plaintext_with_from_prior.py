@@ -40,7 +40,7 @@ async def test_pack_plaintext_with_from_prior_and_issuer_kid(
         == CHARLIE_SECRET_AUTH_KEY_ED25519.kid
     )
     assert (
-        unpack_result.metadata.signed_from_prior
+        unpack_result.metadata.from_prior_jwt
         == json_str_to_dict(pack_result.packed_msg)["from_prior"]
     )
 
@@ -64,6 +64,6 @@ async def test_pack_plaintext_with_from_prior_and_no_issuer_kid(
     assert is_did_url(unpack_result.metadata.from_prior_issuer_kid)
     assert get_did(unpack_result.metadata.from_prior_issuer_kid) == CHARLIE_DID
     assert (
-        unpack_result.metadata.signed_from_prior
+        unpack_result.metadata.from_prior_jwt
         == json_str_to_dict(pack_result.packed_msg)["from_prior"]
     )

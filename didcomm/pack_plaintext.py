@@ -37,7 +37,7 @@ async def pack_plaintext(
     :raises DIDNotResolvedError: If a DID or DID URL (key ID) can not be resolved or not found
     :raises SecretNotResolvedError: If there is no secret for the given DID or DID URL (key ID)
 
-    :return: A packed message as a JSON string.
+    :return: PackPlaintextResult
     """
     pack_params = pack_params or PackPlaintextParameters()
 

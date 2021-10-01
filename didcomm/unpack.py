@@ -109,7 +109,7 @@ async def unpack(
         metadata.sign_alg = unwrap_sign_result.alg
 
     if msg_as_dict.get("from_prior") is not None:
-        metadata.signed_from_prior = msg_as_dict["from_prior"]
+        metadata.from_prior_jwt = msg_as_dict["from_prior"]
     from_prior_issuer_kid = await unpack_from_prior_in_place(
         msg_as_dict, resolvers_config
     )
@@ -153,7 +153,7 @@ class Metadata:
         enc_alg_anon (AnonCryptAlg): algorithm used for anonymous encryption if the message has been encrypted but not authenticated
         sign_alg (SignAlg): signature algorithm in case of non-repudiation
         signed_message (JWS): if the message has been signed, the JWS is returned for non-repudiation purposes
-        signed_from_prior (str): if the message contains from_prior field, the compactly serialized JWS containing it
+        from_prior_jwt (str): if the message contains from_prior field, the JWT as a compactly serialized JWS containing from_prior
             is returned for non-repudiation purposes
     """
 
@@ -170,7 +170,7 @@ class Metadata:
     enc_alg_anon: Optional[AnonCryptAlg] = None
     sign_alg: Optional[SignAlg] = None
     signed_message: Optional[JWS] = None
-    signed_from_prior: Optional[str] = None
+    from_prior_jwt: Optional[str] = None
 
 
 @dataclass(frozen=True)

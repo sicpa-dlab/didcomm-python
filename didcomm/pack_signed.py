@@ -50,7 +50,7 @@ async def pack_signed(
     :raises SecretNotFoundError: If there is no secret for the given DID or DID URL (key ID)
     :raises DIDCommValueError: If invalid input is provided.
 
-    :return: A packed message as a JSON string.
+    :return: PackSignedResult
     """
     pack_params = pack_params or PackSignedParameters()
 
