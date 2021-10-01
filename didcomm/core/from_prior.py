@@ -1,13 +1,12 @@
 from typing import Optional
 
 from authlib.common.encoding import to_unicode, to_bytes, json_loads, urlsafe_b64decode
-from authlib.jose import JsonWebSignature
+from authlib.jose import JsonWebToken
 from authlib.jose.errors import BadSignatureError
 
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JWT_TYPE, DID_URL
+from didcomm.common.types import DID_URL
 from didcomm.core.keys.sign_keys_selector import find_signing_key, find_verification_key
-from didcomm.core.serialization import dict_to_json_bytes, json_bytes_to_dict
 from didcomm.core.utils import extract_key, extract_sign_alg, is_did_url, get_did
 from didcomm.errors import (
     MalformedMessageError,
@@ -20,7 +19,8 @@ async def pack_from_prior_in_place(
     message: dict, resolvers_config: ResolversConfig, issuer_kid: Optional[DID_URL]
 ) -> Optional[DID_URL]:
     """
-    Packs from_prior field within a given message to JWS (if the message contains from_prior).
+    Packs from_prior field within a given message to JWT (compactly serialized JWS with claim set)
+    if the message contains from_prior.
     In result, the message will contain the packed from_prior.
 
     Args:
@@ -50,19 +50,17 @@ async def pack_from_prior_in_place(
 
     issuer_did_or_kid = issuer_kid or from_prior["iss"]
 
-    jws = JsonWebSignature()
-
-    payload = dict_to_json_bytes(from_prior)
+    jwt = JsonWebToken()
 
     secret = await find_signing_key(issuer_did_or_kid, resolvers_config)
-    private_key = extract_key(secret)
+    private_key = extract_key(
+        secret, align_kid=True
+    )  # kid within key must have proper value because JsonWebToken.encode writes its value to JWT's header kid field
     alg = extract_sign_alg(secret)
 
-    protected = {"typ": JWT_TYPE, "alg": alg.value, "kid": secret.kid}
+    header = {"alg": alg.value}
 
-    message["from_prior"] = to_unicode(
-        jws.serialize_compact(protected, payload, private_key)
-    )
+    message["from_prior"] = to_unicode(jwt.encode(header, from_prior, private_key))
 
     return secret.kid
 
@@ -71,7 +69,8 @@ async def unpack_from_prior_in_place(
     message: dict, resolvers_config: ResolversConfig
 ) -> Optional[DID_URL]:
     """
-    Unpacks from_prior field within a given message from JWS (if the message contains from_prior).
+    Unpacks from_prior field within a given message from JWT (compactly serialized JWS with claim set)
+    if the message contains from_prior.
     In result, the message will contain the unpacked from_prior.
 
     Args:
@@ -95,21 +94,12 @@ async def unpack_from_prior_in_place(
     public_key = extract_key(verification_method)
 
     try:
-        jws = JsonWebSignature()
-        jws_object = jws.deserialize_compact(to_bytes(from_prior_jwt), public_key)
+        jwt = JsonWebToken()
+        message["from_prior"] = jwt.decode(to_bytes(from_prior_jwt), public_key)
     except BadSignatureError as exc:
         raise MalformedMessageError(MalformedMessageCode.INVALID_SIGNATURE) from exc
     except Exception as exc:
         raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE) from exc
-
-    if jws_object.type != "compact":
-        raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
-
-    protected = jws_object.header.protected
-    if protected.get("typ") != JWT_TYPE:
-        raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
-
-    message["from_prior"] = json_bytes_to_dict(jws_object.payload)
 
     return issuer_kid
 

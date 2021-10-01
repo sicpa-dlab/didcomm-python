@@ -153,7 +153,7 @@ class Metadata:
         enc_alg_anon (AnonCryptAlg): algorithm used for anonymous encryption if the message has been encrypted but not authenticated
         sign_alg (SignAlg): signature algorithm in case of non-repudiation
         signed_message (JWS): if the message has been signed, the JWS is returned for non-repudiation purposes
-        from_prior_jwt (str): if the message contains from_prior field, the JWT as a compactly serialized JWS containing from_prior
+        from_prior_jwt (str): if the message contains from_prior field, the JWT (compactly serialized JWS with claim set) containing from_prior
             is returned for non-repudiation purposes
     """
 
