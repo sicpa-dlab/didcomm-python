@@ -54,6 +54,8 @@ DIDCommMessageMediaTypes = DIDCommMessageTypes
 #   - replace DIDCommMessageTypes with DIDCommMessageMediaTypes
 #   - rename DIDCommMessageProtocolTypes to DIDCommMessageTypes
 
+JWT_TYPE = "JWT"
+
 
 class DIDCommMessageProtocolTypes(Enum):
     FORWARD = "https://didcomm.org/routing/2.0/forward"

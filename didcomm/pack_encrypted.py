@@ -6,17 +6,18 @@ from typing import Optional, List
 
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JSON, JSON_OBJ, DID_OR_DID_URL
-from didcomm.core.defaults import DEF_ENC_ALG_AUTH, DEF_ENC_ALG_ANON
+from didcomm.common.types import JSON, JSON_OBJ, DID_OR_DID_URL, DID_URL
 from didcomm.core.anoncrypt import anoncrypt, find_keys_and_anoncrypt
 from didcomm.core.authcrypt import find_keys_and_authcrypt
+from didcomm.core.defaults import DEF_ENC_ALG_AUTH, DEF_ENC_ALG_ANON
 from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
 from didcomm.core.types import EncryptResult, SignResult, DIDCommGeneratorType
 from didcomm.core.utils import get_did, is_did, didcomm_id_generator_default
-from didcomm.errors import DIDCommValueError
-from didcomm.message import Message, Header
 from didcomm.did_doc.did_doc import DIDCommService
+from didcomm.errors import DIDCommValueError
+from didcomm.core.from_prior import pack_from_prior_in_place
+from didcomm.message import Message, Header
 from didcomm.protocols.routing.forward import (
     wrap_in_forward,
     resolve_did_services_chain,
@@ -114,10 +115,17 @@ async def pack_encrypted(
     # 2. message as dict
     msg_as_dict = message.as_dict()
 
-    # 3. sign if needed
+    # 3. Pack from_prior in place
+    from_prior_issuer_kid = await pack_from_prior_in_place(
+        msg_as_dict,
+        resolvers_config,
+        pack_params.from_prior_issuer_kid,
+    )
+
+    # 4. sign if needed
     sign_res = await __sign_if_needed(resolvers_config, msg_as_dict, sign_frm)
 
-    # 4. encrypt
+    # 5. encrypt
     encrypt_res = await __encrypt(
         resolvers_config,
         msg=sign_res.msg if sign_res else msg_as_dict,
@@ -126,19 +134,19 @@ async def pack_encrypted(
         pack_config=pack_config,
     )
 
-    # 5. protected sender ID if needed
+    # 6. protected sender ID if needed
     encrypt_res_protected = __protected_sender_id_if_needed(encrypt_res, pack_config)
 
     packed_msg_dict = (
         encrypt_res_protected.msg if encrypt_res_protected else encrypt_res.msg
     )
 
-    # 6. resolve service information
+    # 7. resolve service information
     did_services_chain = await resolve_did_services_chain(
         resolvers_config, to, pack_params.forward_service_id
     )
 
-    # 7. do forward if needed
+    # 8. do forward if needed
     fwd_res = await __forward_if_needed(
         resolvers_config,
         packed_msg_dict,
@@ -155,6 +163,7 @@ async def pack_encrypted(
         to_kids=encrypt_res.to_kids,
         from_kid=encrypt_res.from_kid,
         sign_from_kid=sign_res.sign_frm_kid if sign_res else None,
+        from_prior_issuer_kid=from_prior_issuer_kid,
         service_metadata=ServiceMetadata(
             did_services_chain[-1].id, did_services_chain[0].service_endpoint
         )
@@ -172,17 +181,20 @@ class PackEncryptedResult:
         packed_msg (str): A packed message as a JSON string ready to be forwarded to the returned 'service_endpoint'
         service_metadata (ServiceMetadata): An optional service metadata which contains a service endpoint
                                             to be used to transport the 'packed_msg'.
-        to_kid (DID_OR_DID_URL): Identifiers (DID URLs) of recipient keys used for message encryption.
-        from_kid (DID_OR_DID_URL): Identifier (DID URL) of sender key used for message encryption.
-                                   None if anonymous (non-authenticated) encryption is used.
-        sign_from_kid (DID_OR_DID_URL): Identifier (DID URL) of sender key used for message signing.
-                                        None if there is no signature.
+        to_kid (DID_URL): Identifiers (DID URLs) of recipient keys used for message encryption.
+        from_kid (DID_URL): Identifier (DID URL) of sender key used for message encryption.
+                            None if anonymous (non-authenticated) encryption is used.
+        sign_from_kid (DID_URL): Identifier (DID URL) of sender key used for message signing.
+                                 None if there is no signature.
+        from_prior_issuer_kid (DID_URL): Identifier (DID URL) of issuer key used for signing from_prior.
+                                         None if the message does not contain from_prior.
     """
 
     packed_msg: JSON
-    to_kids: List[DID_OR_DID_URL]
-    from_kid: Optional[DID_OR_DID_URL]
-    sign_from_kid: Optional[DID_OR_DID_URL]
+    to_kids: List[DID_URL]
+    from_kid: Optional[DID_URL]
+    sign_from_kid: Optional[DID_URL]
+    from_prior_issuer_kid: Optional[DID_URL] = None
     service_metadata: Optional[ServiceMetadata] = None
 
 
@@ -244,6 +256,9 @@ class PackEncryptedParameters:
         forward_didcomm_id_generator (Callable): optional callable to use
             for forward messages ``id`` generation, ``didcomm_id_generator_default``
             is used by default
+        from_prior_issuer_kid (DID_URL): If from_prior is specified in the source message,
+            this field can explicitly specify which key to use for signing from_prior
+            in the packed message
     """
 
     forward_headers: Optional[Header] = None
@@ -251,6 +266,7 @@ class PackEncryptedParameters:
     forward_didcomm_id_generator: Optional[
         DIDCommGeneratorType
     ] = didcomm_id_generator_default
+    from_prior_issuer_kid: Optional[DID_URL] = None
 
 
 def __validate(

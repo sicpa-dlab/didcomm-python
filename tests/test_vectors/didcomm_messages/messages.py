@@ -1,5 +1,6 @@
 import copy
 
+from didcomm.errors import DIDCommValueError
 from didcomm.message import (
     Message,
     Attachment,
@@ -8,9 +9,14 @@ from didcomm.message import (
     AttachmentDataJson,
     FromPrior,
 )
-from tests.test_vectors.common import ALICE_DID, BOB_DID
+from tests.test_vectors.common import (
+    ALICE_DID,
+    BOB_DID,
+    CHARLIE_DID,
+    TTestVectorNegative,
+)
 
-TEST_MESSAGE: Message = Message(
+TEST_MESSAGE = Message(
     id="1234567890",
     type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
     frm=ALICE_DID,
@@ -37,20 +43,140 @@ TEST_ATTACHMENT_MINIMAL = Attachment(
 )
 
 TEST_FROM_PRIOR = FromPrior(
-    iss="did:example1",
-    sub="did:example2",
+    iss="did:example:charlie",
+    sub="did:example:alice",
     aud="123",
     exp=1234,
     nbf=12345,
     iat=123456,
     jti="dfg",
-    iss_kid="did:example1#key1",
 )
 
 TEST_FROM_PRIOR_MINIMAL = FromPrior(
-    iss="did:example1",
-    sub="did:example2",
+    iss="did:example:charlie",
+    sub="did:example:alice",
 )
+
+
+TEST_MESSAGE_FROM_PRIOR_MINIMAL = Message(
+    id="1234567890",
+    type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+    created_time=1516269022,
+    expires_time=1516385931,
+    from_prior=FromPrior(
+        iss=CHARLIE_DID,
+        sub=ALICE_DID,
+    ),
+    body={"messagespecificattribute": "and its value"},
+)
+
+
+TEST_MESSAGE_FROM_PRIOR = Message(
+    id="1234567890",
+    type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+    created_time=1516269022,
+    expires_time=1516385931,
+    from_prior=FromPrior(
+        iss=CHARLIE_DID,
+        sub=ALICE_DID,
+        aud="123",
+        exp=1234,
+        nbf=12345,
+        iat=123456,
+        jti="dfg",
+    ),
+    body={"messagespecificattribute": "and its value"},
+)
+
+
+TEST_MESSAGE_INVALID_FROM_PRIOR = Message(
+    id="1234567890",
+    type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+    created_time=1516269022,
+    expires_time=1516385931,
+    from_prior="invalid",
+    body={"messagespecificattribute": "and its value"},
+)
+
+
+TEST_MESSAGE_INVALID_FROM_PRIOR_ISS = Message(
+    id="1234567890",
+    type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+    created_time=1516269022,
+    expires_time=1516385931,
+    from_prior=FromPrior(
+        iss="invalid",
+        sub=ALICE_DID,
+    ),
+    body={"messagespecificattribute": "and its value"},
+)
+
+
+TEST_MESSAGE_INVALID_FROM_PRIOR_SUB = Message(
+    id="1234567890",
+    type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+    created_time=1516269022,
+    expires_time=1516385931,
+    from_prior=FromPrior(
+        iss=CHARLIE_DID,
+        sub="invalid",
+    ),
+    body={"messagespecificattribute": "and its value"},
+)
+
+
+TEST_MESSAGE_INVALID_FROM_PRIOR_EQUAL_ISS_AND_SUB = Message(
+    id="1234567890",
+    type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+    created_time=1516269022,
+    expires_time=1516385931,
+    from_prior=FromPrior(
+        iss=ALICE_DID,
+        sub=ALICE_DID,
+    ),
+    body={"messagespecificattribute": "and its value"},
+)
+
+
+TEST_MESSAGE_MISMATCHED_FROM_PRIOR_SUB = Message(
+    id="1234567890",
+    type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+    created_time=1516269022,
+    expires_time=1516385931,
+    from_prior=FromPrior(
+        iss=CHARLIE_DID,
+        sub="did:example:dave",
+    ),
+    body={"messagespecificattribute": "and its value"},
+)
+
+
+INVALID_FROM_PRIOR_MESSAGES = [
+    TEST_MESSAGE_INVALID_FROM_PRIOR,
+    TEST_MESSAGE_INVALID_FROM_PRIOR_ISS,
+    TEST_MESSAGE_INVALID_FROM_PRIOR_SUB,
+    TEST_MESSAGE_INVALID_FROM_PRIOR_EQUAL_ISS_AND_SUB,
+    TEST_MESSAGE_MISMATCHED_FROM_PRIOR_SUB,
+]
+
+
+INVALID_FROM_PRIOR_TEST_VECTORS = [
+    TTestVectorNegative(msg, DIDCommValueError) for msg in INVALID_FROM_PRIOR_MESSAGES
+]
 
 
 def minimal_msg():

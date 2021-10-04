@@ -202,8 +202,6 @@ async def test_message_invalid_attachemnt_fields(
         ("nbf", "123"),
         ("iat", "123"),
         ("jti", 123),
-        ("iss_kid", "123"),
-        ("iss_kid", "did:example1"),
     ],
 )
 async def test_message_invalid_from_prior_fields(

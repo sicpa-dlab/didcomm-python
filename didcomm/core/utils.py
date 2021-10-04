@@ -40,7 +40,7 @@ def didcomm_id_generator_default(did: Optional[DID_OR_DID_URL] = None) -> str:
 
 
 def extract_key(
-    verification_method: Union[VerificationMethod, Secret]
+    verification_method: Union[VerificationMethod, Secret], align_kid=False
 ) -> AsymmetricKey:
     if (
         verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020
@@ -48,11 +48,21 @@ def extract_key(
         == VerificationMaterialFormat.JWK
     ):
         jwk = json_str_to_dict(verification_method.verification_material.value)
+
+        if align_kid:
+            if isinstance(verification_method, VerificationMethod):
+                kid = verification_method.id
+            else:
+                kid = verification_method.kid
+            jwk["kid"] = kid
+
         if jwk["kty"] == "EC":
             return ECKey.import_key(jwk)
         elif jwk["kty"] == "OKP":
             return OKPKey.import_key(jwk)
+
         raise DIDCommValueError()
+
     elif verification_method.type == (
         VerificationMethodType.ED25519_VERIFICATION_KEY_2018
     ):

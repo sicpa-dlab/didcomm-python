@@ -25,52 +25,52 @@ from tests.test_vectors.didcomm_messages.tests.test_vectors_plaintext_positive i
 )
 
 
-async def check_pack_simple_plaintext(msg, expected_json, resolvers_config_bob):
-    packed_msg = await pack_plaintext(resolvers_config_bob, msg)
-    assert json_str_to_dict(packed_msg) == json_str_to_dict(expected_json)
+async def check_pack_plaintext(message, expected_json, resolvers_config_bob):
+    pack_result = await pack_plaintext(resolvers_config_bob, message)
+    assert json_str_to_dict(pack_result.packed_msg) == json_str_to_dict(expected_json)
 
-    unpacked_msg = await unpack(resolvers_config_bob, packed_msg)
-    assert unpacked_msg.message == msg
+    unpack_result = await unpack(resolvers_config_bob, pack_result.packed_msg)
+    assert unpack_result.message == message
 
 
 @pytest.mark.asyncio
 async def test_pack_simple_plaintext(resolvers_config_bob):
-    await check_pack_simple_plaintext(
+    await check_pack_plaintext(
         TEST_MESSAGE, TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE, resolvers_config_bob
     )
 
 
 @pytest.mark.asyncio
 async def test_pack_minimal_plaintext(resolvers_config_bob):
-    await check_pack_simple_plaintext(
+    await check_pack_plaintext(
         minimal_msg(), TEST_PLAINTEXT_DIDCOMM_MESSAGE_MINIMAL, resolvers_config_bob
     )
 
 
 @pytest.mark.asyncio
 async def test_pack_attachments_base64(resolvers_config_bob):
-    await check_pack_simple_plaintext(
+    await check_pack_plaintext(
         attachment_base64_msg(), TEST_PLAINTEXT_ATTACHMENT_BASE64, resolvers_config_bob
     )
 
 
 @pytest.mark.asyncio
 async def test_pack_attachments_links(resolvers_config_bob):
-    await check_pack_simple_plaintext(
+    await check_pack_plaintext(
         attachment_links_msg(), TEST_PLAINTEXT_ATTACHMENT_LINKS, resolvers_config_bob
     )
 
 
 @pytest.mark.asyncio
 async def test_pack_attachments_json(resolvers_config_bob):
-    await check_pack_simple_plaintext(
+    await check_pack_plaintext(
         attachment_json_msg(), TEST_PLAINTEXT_ATTACHMENT_JSON, resolvers_config_bob
     )
 
 
 @pytest.mark.asyncio
 async def test_pack_attachments_multi1(resolvers_config_bob):
-    await check_pack_simple_plaintext(
+    await check_pack_plaintext(
         attachment_multi_1_msg(),
         TEST_PLAINTEXT_ATTACHMENT_MULTI_1,
         resolvers_config_bob,
@@ -79,7 +79,7 @@ async def test_pack_attachments_multi1(resolvers_config_bob):
 
 @pytest.mark.asyncio
 async def test_pack_attachments_multi2(resolvers_config_bob):
-    await check_pack_simple_plaintext(
+    await check_pack_plaintext(
         attachment_multi_2_msg(),
         TEST_PLAINTEXT_ATTACHMENT_MULTI_2,
         resolvers_config_bob,

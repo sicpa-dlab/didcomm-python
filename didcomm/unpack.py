@@ -5,7 +5,6 @@ from typing import Optional, List, Union
 
 from authlib.common.encoding import to_unicode, to_bytes
 
-from didcomm.errors import DIDCommValueError
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JWS, JSON, JSON_OBJ, DID_URL
@@ -17,8 +16,10 @@ from didcomm.core.serialization import (
     dict_to_json_bytes,
 )
 from didcomm.core.sign import is_signed, unpack_sign
-from didcomm.protocols.routing.forward import unpack_forward, is_forward
+from didcomm.errors import DIDCommValueError
+from didcomm.core.from_prior import unpack_from_prior_in_place
 from didcomm.message import Message
+from didcomm.protocols.routing.forward import unpack_forward, is_forward
 
 
 async def unpack(
@@ -107,6 +108,13 @@ async def unpack(
         metadata.sign_from = unwrap_sign_result.sign_frm_kid
         metadata.sign_alg = unwrap_sign_result.alg
 
+    if msg_as_dict.get("from_prior") is not None:
+        metadata.from_prior_jwt = msg_as_dict["from_prior"]
+    from_prior_issuer_kid = await unpack_from_prior_in_place(
+        msg_as_dict, resolvers_config
+    )
+    metadata.from_prior_issuer_kid = from_prior_issuer_kid
+
     message = Message.from_dict(msg_as_dict)
 
     return UnpackResult(message=message, metadata=metadata)
@@ -140,10 +148,13 @@ class Metadata:
         encrypted_from (DID_URL): key ID of the sender used for authentication encryption if the message has been authenticated and encrypted
         encrypted_to (List[DID_URL]): target key IDS for encryption if the message has been encrypted
         sign_from (DID_URL): key ID used for signature if the message has been signed
+        from_prior_issuer_kid: (DID_URL): key ID to sign from_prior if the message contains it
         enc_alg_auth (AuthCryptAlg): algorithm used for authentication encryption if the message has been authenticated and encrypted
         enc_alg_anon (AnonCryptAlg): algorithm used for anonymous encryption if the message has been encrypted but not authenticated
         sign_alg (SignAlg): signature algorithm in case of non-repudiation
         signed_message (JWS): if the message has been signed, the JWS is returned for non-repudiation purposes
+        from_prior_jwt (str): if the message contains from_prior field, the JWT (compactly serialized JWS with claim set) containing from_prior
+            is returned for non-repudiation purposes
     """
 
     encrypted: bool
@@ -154,10 +165,12 @@ class Metadata:
     encrypted_from: Optional[DID_URL] = None
     encrypted_to: Optional[List[DID_URL]] = None
     sign_from: Optional[DID_URL] = None
+    from_prior_issuer_kid: Optional[DID_URL] = None
     enc_alg_auth: Optional[AuthCryptAlg] = None
     enc_alg_anon: Optional[AnonCryptAlg] = None
     sign_alg: Optional[SignAlg] = None
     signed_message: Optional[JWS] = None
+    from_prior_jwt: Optional[str] = None
 
 
 @dataclass(frozen=True)

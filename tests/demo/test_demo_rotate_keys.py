@@ -2,13 +2,18 @@ import pytest as pytest
 
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.message import Message, FromPrior
-from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
+from didcomm.pack_encrypted import (
+    pack_encrypted,
+    PackEncryptedConfig,
+    PackEncryptedParameters,
+)
+from didcomm.protocols.routing.forward import unpack_forward
 from didcomm.secrets.secrets_resolver_in_memory import SecretsResolverInMemory
 from didcomm.unpack import unpack
-from didcomm.protocols.routing.forward import unpack_forward
 from tests.test_vectors.common import CHARLIE_DID, BOB_DID, ALICE_DID
 from tests.test_vectors.secrets.mock_secrets_resolver_alice import (
     MockSecretsResolverAlice,
+    ALICE_SECRET_AUTH_KEY_ED25519,
 )
 from tests.test_vectors.secrets.mock_secrets_resolver_charlie import (
     MockSecretsResolverCharlie,
@@ -61,6 +66,9 @@ async def test_demo_attachments(
         frm=CHARLIE_DID,
         to=BOB_DID,
         pack_config=PackEncryptedConfig(),
+        pack_params=PackEncryptedParameters(
+            from_prior_issuer_kid=ALICE_SECRET_AUTH_KEY_ED25519.kid
+        ),
     )
     packed_msg = pack_result.packed_msg
     print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")

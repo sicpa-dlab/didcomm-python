@@ -211,11 +211,11 @@ async def test_demo_plaintext(resolvers_config_alice, resolvers_config_bob):
         frm=ALICE_DID,
         to=[BOB_DID],
     )
-    packed_msg = await pack_plaintext(
+    pack_result = await pack_plaintext(
         resolvers_config=resolvers_config_alice, message=message
     )
-    print(f"Publishing ${packed_msg}")
+    print(f"Publishing ${pack_result.packed_msg}")
 
     # BOB
-    unpack_result = await unpack(resolvers_config_bob, packed_msg)
+    unpack_result = await unpack(resolvers_config_bob, pack_result.packed_msg)
     print(f"Got ${unpack_result.message} message")
