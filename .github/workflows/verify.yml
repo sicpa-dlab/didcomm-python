@@ -1,6 +1,9 @@
-name: tests
+name: verify
 
-on: [ pull_request ]
+on:
+  pull_request:
+  #  paths:
+  #    - '**.py'
 
 
 env:
@@ -9,8 +12,7 @@ env:
 
 jobs:
 
-  check-version-bumped:
-    name: Check version bumped
+  release-version-bumped:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'stable'
     steps:
@@ -45,13 +47,45 @@ jobs:
         if: steps.release_info.outputs.release_info
         run: exit 1
 
-  build:
+  static-black:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Install black
+        run: |
+          pip install black
+
+      - name: Black Format Check
+        run: |
+          black --check .
+
+  static-flake8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 --ignore=E501,F841,E203,W503,W504 .
+
+  unit:
     strategy:
       matrix:
         python-version: [ 3.7, 3.8, 3.9 ]
         os: [ ubuntu-latest, windows-latest, macos-latest ]
     runs-on: ${{ matrix.os }}
-
     steps:
       - uses: actions/checkout@v2
 
