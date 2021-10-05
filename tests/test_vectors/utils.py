@@ -151,8 +151,8 @@ def get_key_agreement_methods(
 
 
 def _map_cure_to_type(vm: Union[Secret, VerificationMethod]) -> KeyAgreementCurveType:
-    if vm.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019:
-        return KeyAgreementCurveType.X25519
+    # if vm.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019:
+    #     return KeyAgreementCurveType.X25519
     if (
         vm.type == VerificationMethodType.JSON_WEB_KEY_2020
         and vm.verification_material.format == VerificationMaterialFormat.JWK

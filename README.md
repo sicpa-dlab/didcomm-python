@@ -2,7 +2,31 @@
 
 Basic [DIDComm v2](https://identity.foundation/didcomm-messaging/spec) support in python.
 
-Requires Python >= 3.7.
+
+## Assumptions and Limitations
+- Python >= 3.7.
+- In order to use the library, `SecretsResolver` and `DIDResolver` interfaces must be implemented on the application level. 
+  Implementation of that interfaces is out of DIDComm library scope.  
+  - Verification materials in DID Docs and secrets are expected in JWK format only.
+  - Key IDs (kids) used in `SecretsResolver` must match the corresponding key IDs from DID Doc verification methods.
+  - Key IDs (kids) in DID Doc verification methods and secrets must be a full [DID Fragment](https://www.w3.org/TR/did-core/#fragment), that is `did#key-id`.
+  - Verification methods referencing another DID Document are not supported (see [Referring to Verification Methods](https://www.w3.org/TR/did-core/#referring-to-verification-methods)).
+- The following curves and algorithms are supported:
+  - Encryption:
+     - Curves: X25519, P-384, P-256, P-521
+     - Content encryption algorithms: 
+       - XC20P (to be used with ECDH-ES only, default for anoncrypt),
+       - A256GCM (to be used with ECDH-ES only),
+       - A256CBC-HS512 (default for authcrypt)
+     - Key wrapping algorithms: ECDH-ES+A256KW, ECDH-1PU+A256KW
+  - Signing:
+    - Curves: Ed25519, Secp256k1, P-256
+    - Algorithms: EdDSA (with crv=Ed25519), ES256, ES256K
+- Forward protocol is implemented and used by default.
+- DID rotation (`fromPrior` field) is supported.
+   
+## DIDComm + peerdid Demo
+See https://github.com/sicpa-dlab/didcomm-demo.
 
 ## Examples
 
