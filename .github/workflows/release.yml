@@ -203,7 +203,7 @@ jobs:
 
       - name: set dev version
         run: |
-          sed -i -r "s~version=\"(.+)\"~version=\"\1.dev${{ github.event.inputs.devN }}\"~" ./setup.py
+          sed -i -r "s~__version__ = \"(.+)\"~__version__ = \"\1.dev${{ github.event.inputs.devN }}\"~" ./didcomm/__init__.py
           grep version ./setup.py
         shell: bash
 
