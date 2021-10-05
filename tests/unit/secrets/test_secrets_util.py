@@ -48,7 +48,7 @@ def test_generate_x25519_keys_as_jwk_dict():
         pytest.param(generate_x25519_keys_as_jwk_dict()[0], id="x25519"),
     ],
 )
-def test_ed25519_jwk_to_secret(private_key):
+def test_jwk_to_secret(private_key):
     secret = jwk_to_secret(private_key)
     assert secret.type == VerificationMethodType.JSON_WEB_KEY_2020
     assert secret.kid == private_key["kid"]
@@ -63,7 +63,7 @@ def test_ed25519_jwk_to_secret(private_key):
         pytest.param(generate_x25519_keys_as_jwk_dict()[0], id="x25519"),
     ],
 )
-def test_ed25519_secret_to_jwk(private_key):
+def test_secret_to_jwk(private_key):
     secret = jwk_to_secret(private_key)
     jwk = secret_to_jwk_dict(secret)
     assert private_key == jwk
@@ -76,7 +76,7 @@ def test_ed25519_secret_to_jwk(private_key):
         pytest.param(generate_x25519_keys_as_jwk_dict()[0], id="x25519"),
     ],
 )
-def test_ed25519_secret_to_jwk_updates_kid(private_key):
+def test_secret_to_jwk_updates_kid(private_key):
     secret = jwk_to_secret(private_key)
     secret.kid = "my-secret"
     jwk = secret_to_jwk_dict(secret)
