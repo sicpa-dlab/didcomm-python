@@ -19,5 +19,5 @@ setup(
             "pytest-mock==3.6.1",  # python 3.6+
             "mock==4.0.3",  # python 3.6+
         ]
-    }
+    },
 )
