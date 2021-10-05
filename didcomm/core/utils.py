@@ -63,11 +63,11 @@ def extract_key(
 
         raise DIDCommValueError()
 
-    elif verification_method.type == (
-        VerificationMethodType.ED25519_VERIFICATION_KEY_2018
-    ):
-        # FIXME
-        raise NotImplementedError()
+    # elif verification_method.type == (
+    #     VerificationMethodType.ED25519_VERIFICATION_KEY_2018
+    # ):
+    #     # FIXME
+    #     raise NotImplementedError()
 
     raise DIDCommValueError()
 
@@ -88,16 +88,16 @@ def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> 
 
         raise DIDCommValueError()
 
-    elif verification_method.type == (
-        VerificationMethodType.ED25519_VERIFICATION_KEY_2018
-    ):
-        return SignAlg.ED25519
-
-    elif (
-        verification_method.type
-        == VerificationMethodType.ECDSA_SECP_256K1_VERIFICATION_KEY_2019
-    ):
-        return SignAlg.ES256K
+    # elif verification_method.type == (
+    #     VerificationMethodType.ED25519_VERIFICATION_KEY_2018
+    # ):
+    #     return SignAlg.ED25519
+    #
+    # elif (
+    #     verification_method.type
+    #     == VerificationMethodType.ECDSA_SECP_256K1_VERIFICATION_KEY_2019
+    # ):
+    #     return SignAlg.ES256K
 
     raise DIDCommValueError()
 

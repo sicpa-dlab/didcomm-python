@@ -17,15 +17,18 @@ DID_OR_DID_URL = Union[DID, DID_URL]
 
 class VerificationMethodType(Enum):
     JSON_WEB_KEY_2020 = 1
-    X25519_KEY_AGREEMENT_KEY_2019 = 2
-    ED25519_VERIFICATION_KEY_2018 = 3
-    ECDSA_SECP_256K1_VERIFICATION_KEY_2019 = 4
+    # X25519_KEY_AGREEMENT_KEY_2019 = 2  - not supported now
+    # ED25519_VERIFICATION_KEY_2018 = 3  - not supported now
+    # X25519_KEY_AGREEMENT_KEY_2020 = 4  - not supported now
+    # ED25519_VERIFICATION_KEY_2020 = 5  - not supported now
+    # ECDSA_SECP_256K1_VERIFICATION_KEY_2019 = 6 - not supported now
     OTHER = 1000
 
 
 class VerificationMaterialFormat(Enum):
     JWK = 1
-    BASE58 = 2
+    # BASE58 = 2 - not supported now
+    # MULTIBASE = 3 - not supported now
     OTHER = 1000
 
 
