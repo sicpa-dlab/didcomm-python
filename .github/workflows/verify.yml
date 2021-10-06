@@ -1,6 +1,9 @@
-name: tests
+name: verify
 
-on: [ pull_request ]
+on:
+  pull_request:
+  #  paths:
+  #    - '**.py'
 
 
 env:
@@ -9,8 +12,7 @@ env:
 
 jobs:
 
-  check-version-bumped:
-    name: Check version bumped
+  release-version-bumped:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'stable'
     steps:
@@ -45,13 +47,49 @@ jobs:
         if: steps.release_info.outputs.release_info
         run: exit 1
 
-  build:
+  static-black:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Install black
+        run: pip install black
+
+      - name: Black Format Check
+        run: black --check .
+
+  static-flake8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Install flake8
+        run: pip install flake8
+
+      - name: Lint with flake8
+        run: flake8 .
+
+  unit:
     strategy:
       matrix:
-        python-version: [ 3.7, 3.8, 3.9 ]
+        python-version: [ '3.7', '3.8', '3.9', '3.10' ]
         os: [ ubuntu-latest, windows-latest, macos-latest ]
+        include:
+          - {python-version: '3.10', toxenv: py310}
+          - {python-version: '3.9', toxenv: py39}
+          - {python-version: '3.8', toxenv: py38}
+          - {python-version: '3.7', toxenv: py37}
     runs-on: ${{ matrix.os }}
-
     steps:
       - uses: actions/checkout@v2
 
@@ -73,10 +111,8 @@ jobs:
           path: ${{ steps.pip_cache_dir.outputs.value }}
           key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}
 
-      - name: Install dependencies
-        run: |
-          pip install -e .[tests]
+      - name: Install tox
+        run: pip install tox
 
       - name: Test with pytest
-        run: |
-          pytest -n auto
+        run: tox -e ${{ matrix.toxenv }}
