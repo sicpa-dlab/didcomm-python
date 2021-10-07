@@ -50,8 +50,8 @@ TEST_SIGNED_DIDCOMM_MESSAGE = [
         TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_1,
         Metadata(
             encrypted=False,
-            authenticated=False,
             non_repudiation=True,
+            authenticated=True,
             anonymous_sender=False,
             sign_from="did:example:alice#key-1",
             sign_alg=SignAlg.ED25519,
@@ -62,8 +62,8 @@ TEST_SIGNED_DIDCOMM_MESSAGE = [
         TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_2,
         Metadata(
             encrypted=False,
-            authenticated=False,
             non_repudiation=True,
+            authenticated=True,
             anonymous_sender=False,
             sign_from="did:example:alice#key-2",
             sign_alg=SignAlg.ES256,
@@ -74,8 +74,8 @@ TEST_SIGNED_DIDCOMM_MESSAGE = [
         TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_3,
         Metadata(
             encrypted=False,
-            authenticated=False,
             non_repudiation=True,
+            authenticated=True,
             anonymous_sender=False,
             sign_from="did:example:alice#key-3",
             sign_alg=SignAlg.ES256K,

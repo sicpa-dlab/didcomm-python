@@ -98,5 +98,5 @@ async def test_anoncrypt(
     assert unpack_res.metadata.anonymous_sender
     assert unpack_res.metadata.encrypted
     assert unpack_res.metadata.non_repudiation == (sign_frm is not None)
+    assert unpack_res.metadata.authenticated == (sign_frm is not None)
     assert not unpack_res.metadata.re_wrapped_in_forward
-    assert not unpack_res.metadata.authenticated
