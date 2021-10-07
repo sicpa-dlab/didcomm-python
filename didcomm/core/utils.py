@@ -5,6 +5,7 @@ import attr
 import uuid
 from typing import Union, Optional, Any, List
 
+import base58
 from authlib.common.encoding import (
     to_unicode,
     urlsafe_b64decode,
@@ -63,11 +64,65 @@ def extract_key(
 
         raise DIDCommValueError()
 
-    # elif verification_method.type == (
-    #     VerificationMethodType.ED25519_VERIFICATION_KEY_2018
-    # ):
-    #     # FIXME
-    #     raise NotImplementedError()
+    elif (
+        verification_method.type
+        in [
+            VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019,
+            VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
+        ]
+        and verification_method.verification_material.format
+        == VerificationMaterialFormat.BASE58
+        and isinstance(verification_method, VerificationMethod)
+    ):
+        raw_value = base58.b58decode(verification_method.verification_material.value)
+        base64url_value = urlsafe_b64encode(raw_value)
+
+        jwk = {
+            "kty": "OKP",
+            "crv": "X25519"
+            if verification_method.type
+            == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019
+            else "Ed25519",
+            "x": to_unicode(base64url_value),
+        }
+
+        if align_kid:
+            jwk["kid"] = verification_method.id
+
+        return OKPKey.import_key(jwk)
+
+    elif (
+        verification_method.type
+        in [
+            VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
+            VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
+        ]
+        and verification_method.verification_material.format
+        == VerificationMaterialFormat.MULTIBASE
+        and isinstance(verification_method, VerificationMethod)
+    ):
+        # Currently only base58btc encoding is supported in scope of multibase support
+        if verification_method.verification_material.value.startswith("z"):
+            raw_value = base58.b58decode(
+                verification_method.verification_material.value[1:]
+            )
+            base64url_value = urlsafe_b64encode(raw_value)
+        else:
+            raise DIDCommValueError()
+
+        jwk = {
+            "kty": "OKP",
+            "crv": "X25519"
+            if verification_method.type
+            == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020
+            else "Ed25519",
+            "x": to_unicode(base64url_value),
+        }
+
+        if align_kid:
+            jwk["kid"] = verification_method.id
+
+        return OKPKey.import_key(jwk)
 
     raise DIDCommValueError()
 
