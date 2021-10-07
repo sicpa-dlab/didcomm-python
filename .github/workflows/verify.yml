@@ -12,7 +12,7 @@ env:
 
 jobs:
 
-  release-version-bumped:
+  release-ready:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'stable'
     steps:
@@ -27,7 +27,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install . --no-deps
-          out="$(pip show ${{ env.PKG_NAME }} | grep Version: | cut -d'' '' -f 2)"
+          out="$(pip show ${{ env.PKG_NAME }} | grep 'Version:' | awk '{print $2}')"
           echo "$out"
           echo "::set-output name=current_version::$out"
         shell: bash
