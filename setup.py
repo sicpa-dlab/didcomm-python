@@ -3,8 +3,8 @@ from setuptools import setup
 # TODO move remaining things
 setup(
     install_requires=[
-        # TODO switch to pypi once necessary authlib version is released
-        "Authlib@git+https://github.com/lepture/authlib.git@7bfd5590cc365803633c56e784b43494589abff2",
+        # TODO switch to authlib stable release version once it appears
+        "Authlib>=1.0.0b1",
         "pycryptodomex~=3.10",
         "attrs~=21.2",  # TODO explore lowest acceptable version
         "packaging~=21.0",  # TODO explore lowest acceptable version
