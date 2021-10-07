@@ -1,4 +1,4 @@
-from authlib.common.encoding import json_dumps
+from didcomm.vendor.authlib.common.encoding import json_dumps
 
 from didcomm.common.algorithms import AuthCryptAlg, SignAlg, AnonCryptAlg
 from didcomm.unpack import Metadata

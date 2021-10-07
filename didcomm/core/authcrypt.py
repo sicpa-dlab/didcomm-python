@@ -1,12 +1,12 @@
 from typing import List
 
-from authlib.common.encoding import (
+from didcomm.vendor.authlib.common.encoding import (
     to_bytes,
     to_unicode,
     urlsafe_b64encode,
     urlsafe_b64decode,
 )
-from authlib.jose import JsonWebEncryption
+from didcomm.vendor.authlib.jose import JsonWebEncryption
 
 from didcomm.common.algorithms import AuthCryptAlg, Algs
 from didcomm.common.resolvers import ResolversConfig

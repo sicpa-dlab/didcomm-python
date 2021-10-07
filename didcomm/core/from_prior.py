@@ -1,8 +1,8 @@
 from typing import Optional
 
-from authlib.common.encoding import to_unicode, to_bytes, json_loads, urlsafe_b64decode
-from authlib.jose import JsonWebToken
-from authlib.jose.errors import BadSignatureError
+from didcomm.vendor.authlib.common.encoding import to_unicode, to_bytes, json_loads, urlsafe_b64decode
+from didcomm.vendor.authlib.jose import JsonWebToken
+from didcomm.vendor.authlib.jose.errors import BadSignatureError
 
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import DID_URL

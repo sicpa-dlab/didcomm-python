@@ -1,6 +1,6 @@
 from typing import List
 
-from authlib.jose import JsonWebEncryption
+from didcomm.vendor.authlib.jose import JsonWebEncryption
 
 from didcomm.common.algorithms import AnonCryptAlg, Algs
 from didcomm.common.resolvers import ResolversConfig

@@ -1,0 +1,1375 @@
+diff --git a/didcomm/vendor/authlib/common/errors.py b/didcomm/vendor/authlib/common/errors.py
+index bc72c07..cee63b5 100644
+--- a/didcomm/vendor/authlib/common/errors.py
++++ b/didcomm/vendor/authlib/common/errors.py
+@@ -1,5 +1,5 @@
+ #: coding: utf-8
+-from authlib.consts import default_json_headers
++from didcomm.vendor.authlib.consts import default_json_headers
+ 
+ 
+ class AuthlibBaseError(Exception):
+diff --git a/didcomm/vendor/authlib/integrations/base_client/async_app.py b/didcomm/vendor/authlib/integrations/base_client/async_app.py
+index 182d16d..cd6963d 100644
+--- a/didcomm/vendor/authlib/integrations/base_client/async_app.py
++++ b/didcomm/vendor/authlib/integrations/base_client/async_app.py
+@@ -1,6 +1,6 @@
+ import time
+ import logging
+-from authlib.common.urls import urlparse
++from didcomm.vendor.authlib.common.urls import urlparse
+ from .errors import (
+     MissingRequestTokenError,
+     MissingTokenError,
+diff --git a/didcomm/vendor/authlib/integrations/base_client/async_openid.py b/didcomm/vendor/authlib/integrations/base_client/async_openid.py
+index a11acc7..b052437 100644
+--- a/didcomm/vendor/authlib/integrations/base_client/async_openid.py
++++ b/didcomm/vendor/authlib/integrations/base_client/async_openid.py
+@@ -1,5 +1,5 @@
+-from authlib.jose import JsonWebToken, JsonWebKey
+-from authlib.oidc.core import UserInfo, CodeIDToken, ImplicitIDToken
++from didcomm.vendor.authlib.jose import JsonWebToken, JsonWebKey
++from didcomm.vendor.authlib.oidc.core import UserInfo, CodeIDToken, ImplicitIDToken
+ 
+ __all__ = ['AsyncOpenIDMixin']
+ 
+diff --git a/didcomm/vendor/authlib/integrations/base_client/errors.py b/didcomm/vendor/authlib/integrations/base_client/errors.py
+index bb4dd2b..2833ff1 100644
+--- a/didcomm/vendor/authlib/integrations/base_client/errors.py
++++ b/didcomm/vendor/authlib/integrations/base_client/errors.py
+@@ -1,4 +1,4 @@
+-from authlib.common.errors import AuthlibBaseError
++from didcomm.vendor.authlib.common.errors import AuthlibBaseError
+ 
+ 
+ class OAuthError(AuthlibBaseError):
+diff --git a/didcomm/vendor/authlib/integrations/base_client/sync_app.py b/didcomm/vendor/authlib/integrations/base_client/sync_app.py
+index 77e005c..188fc76 100644
+--- a/didcomm/vendor/authlib/integrations/base_client/sync_app.py
++++ b/didcomm/vendor/authlib/integrations/base_client/sync_app.py
+@@ -1,8 +1,8 @@
+ import time
+ import logging
+-from authlib.common.urls import urlparse
+-from authlib.consts import default_user_agent
+-from authlib.common.security import generate_token
++from didcomm.vendor.authlib.common.urls import urlparse
++from didcomm.vendor.authlib.consts import default_user_agent
++from didcomm.vendor.authlib.common.security import generate_token
+ from .errors import (
+     MismatchingStateError,
+     MissingRequestTokenError,
+diff --git a/didcomm/vendor/authlib/integrations/base_client/sync_openid.py b/didcomm/vendor/authlib/integrations/base_client/sync_openid.py
+index edaa5d2..d2111f7 100644
+--- a/didcomm/vendor/authlib/integrations/base_client/sync_openid.py
++++ b/didcomm/vendor/authlib/integrations/base_client/sync_openid.py
+@@ -1,5 +1,5 @@
+-from authlib.jose import jwt, JsonWebToken, JsonWebKey
+-from authlib.oidc.core import UserInfo, CodeIDToken, ImplicitIDToken
++from didcomm.vendor.authlib.jose import jwt, JsonWebToken, JsonWebKey
++from didcomm.vendor.authlib.oidc.core import UserInfo, CodeIDToken, ImplicitIDToken
+ 
+ 
+ class OpenIDMixin(object):
+diff --git a/didcomm/vendor/authlib/integrations/django_helpers.py b/didcomm/vendor/authlib/integrations/django_helpers.py
+index 6ecf083..bd99026 100644
+--- a/didcomm/vendor/authlib/integrations/django_helpers.py
++++ b/didcomm/vendor/authlib/integrations/django_helpers.py
+@@ -1,4 +1,4 @@
+-from authlib.common.encoding import json_loads
++from didcomm.vendor.authlib.common.encoding import json_loads
+ 
+ 
+ def create_oauth_request(request, request_cls, use_json=False):
+diff --git a/didcomm/vendor/authlib/integrations/django_oauth1/authorization_server.py b/didcomm/vendor/authlib/integrations/django_oauth1/authorization_server.py
+index 0ac8b5c..fa646b8 100644
+--- a/didcomm/vendor/authlib/integrations/django_oauth1/authorization_server.py
++++ b/didcomm/vendor/authlib/integrations/django_oauth1/authorization_server.py
+@@ -1,11 +1,11 @@
+ import logging
+-from authlib.oauth1 import (
++from didcomm.vendor.authlib.oauth1 import (
+     OAuth1Request,
+     AuthorizationServer as _AuthorizationServer,
+ )
+-from authlib.oauth1 import TemporaryCredential
+-from authlib.common.security import generate_token
+-from authlib.common.urls import url_encode
++from didcomm.vendor.authlib.oauth1 import TemporaryCredential
++from didcomm.vendor.authlib.common.security import generate_token
++from didcomm.vendor.authlib.common.urls import url_encode
+ from django.core.cache import cache
+ from django.conf import settings
+ from django.http import HttpResponse
+diff --git a/didcomm/vendor/authlib/integrations/django_oauth1/resource_protector.py b/didcomm/vendor/authlib/integrations/django_oauth1/resource_protector.py
+index 77f3d81..633fde5 100644
+--- a/didcomm/vendor/authlib/integrations/django_oauth1/resource_protector.py
++++ b/didcomm/vendor/authlib/integrations/django_oauth1/resource_protector.py
+@@ -1,6 +1,6 @@
+ import functools
+-from authlib.oauth1.errors import OAuth1Error
+-from authlib.oauth1 import ResourceProtector as _ResourceProtector
++from didcomm.vendor.authlib.oauth1.errors import OAuth1Error
++from didcomm.vendor.authlib.oauth1 import ResourceProtector as _ResourceProtector
+ from django.http import JsonResponse
+ from django.conf import settings
+ from .nonce import exists_nonce_in_cache
+diff --git a/didcomm/vendor/authlib/integrations/django_oauth2/authorization_server.py b/didcomm/vendor/authlib/integrations/django_oauth2/authorization_server.py
+index 9af7f8d..bc94e15 100644
+--- a/didcomm/vendor/authlib/integrations/django_oauth2/authorization_server.py
++++ b/didcomm/vendor/authlib/integrations/django_oauth2/authorization_server.py
+@@ -1,14 +1,14 @@
+ from django.http import HttpResponse
+ from django.utils.module_loading import import_string
+ from django.conf import settings
+-from authlib.oauth2 import (
++from didcomm.vendor.authlib.oauth2 import (
+     OAuth2Request,
+     HttpRequest,
+     AuthorizationServer as _AuthorizationServer,
+ )
+-from authlib.oauth2.rfc6750 import BearerTokenGenerator
+-from authlib.common.security import generate_token as _generate_token
+-from authlib.common.encoding import json_dumps
++from didcomm.vendor.authlib.oauth2.rfc6750 import BearerTokenGenerator
++from didcomm.vendor.authlib.common.security import generate_token as _generate_token
++from didcomm.vendor.authlib.common.encoding import json_dumps
+ from .signals import client_authenticated, token_revoked
+ from ..django_helpers import create_oauth_request
+ 
+@@ -17,7 +17,7 @@ class AuthorizationServer(_AuthorizationServer):
+     """Django implementation of :class:`authlib.oauth2.rfc6749.AuthorizationServer`.
+     Initialize it with client model and token model::
+ 
+-        from authlib.integrations.django_oauth2 import AuthorizationServer
++        from didcomm.vendor.authlib.integrations.django_oauth2 import AuthorizationServer
+         from your_project.models import OAuth2Client, OAuth2Token
+ 
+         server = AuthorizationServer(OAuth2Client, OAuth2Token)
+diff --git a/didcomm/vendor/authlib/integrations/django_oauth2/endpoints.py b/didcomm/vendor/authlib/integrations/django_oauth2/endpoints.py
+index 686675d..b820988 100644
+--- a/didcomm/vendor/authlib/integrations/django_oauth2/endpoints.py
++++ b/didcomm/vendor/authlib/integrations/django_oauth2/endpoints.py
+@@ -1,4 +1,4 @@
+-from authlib.oauth2.rfc7009 import RevocationEndpoint as _RevocationEndpoint
++from didcomm.vendor.authlib.oauth2.rfc7009 import RevocationEndpoint as _RevocationEndpoint
+ 
+ 
+ class RevocationEndpoint(_RevocationEndpoint):
+diff --git a/didcomm/vendor/authlib/integrations/django_oauth2/resource_protector.py b/didcomm/vendor/authlib/integrations/django_oauth2/resource_protector.py
+index 5b0931a..f3f086d 100644
+--- a/didcomm/vendor/authlib/integrations/django_oauth2/resource_protector.py
++++ b/didcomm/vendor/authlib/integrations/django_oauth2/resource_protector.py
+@@ -1,14 +1,14 @@
+ import functools
+ from django.http import JsonResponse
+-from authlib.oauth2 import (
++from didcomm.vendor.authlib.oauth2 import (
+     OAuth2Error,
+     ResourceProtector as _ResourceProtector,
+ )
+-from authlib.oauth2.rfc6749 import (
++from didcomm.vendor.authlib.oauth2.rfc6749 import (
+     MissingAuthorizationError,
+     HttpRequest,
+ )
+-from authlib.oauth2.rfc6750 import (
++from didcomm.vendor.authlib.oauth2.rfc6750 import (
+     BearerTokenValidator as _BearerTokenValidator
+ )
+ from .signals import token_authenticated
+diff --git a/didcomm/vendor/authlib/integrations/flask_helpers.py b/didcomm/vendor/authlib/integrations/flask_helpers.py
+index 6883e4b..ae5edd1 100644
+--- a/didcomm/vendor/authlib/integrations/flask_helpers.py
++++ b/didcomm/vendor/authlib/integrations/flask_helpers.py
+@@ -1,5 +1,5 @@
+ from flask import request as flask_req
+-from authlib.common.encoding import to_unicode
++from didcomm.vendor.authlib.common.encoding import to_unicode
+ 
+ 
+ def create_oauth_request(request, request_cls, use_json=False):
+diff --git a/didcomm/vendor/authlib/integrations/flask_oauth1/authorization_server.py b/didcomm/vendor/authlib/integrations/flask_oauth1/authorization_server.py
+index 1062a7b..17040b8 100644
+--- a/didcomm/vendor/authlib/integrations/flask_oauth1/authorization_server.py
++++ b/didcomm/vendor/authlib/integrations/flask_oauth1/authorization_server.py
+@@ -1,12 +1,12 @@
+ import logging
+ from werkzeug.utils import import_string
+ from flask import Response
+-from authlib.oauth1 import (
++from didcomm.vendor.authlib.oauth1 import (
+     OAuth1Request,
+     AuthorizationServer as _AuthorizationServer,
+ )
+-from authlib.common.security import generate_token
+-from authlib.common.urls import url_encode
++from didcomm.vendor.authlib.common.security import generate_token
++from didcomm.vendor.authlib.common.urls import url_encode
+ from ..flask_helpers import create_oauth_request
+ 
+ log = logging.getLogger(__name__)
+diff --git a/didcomm/vendor/authlib/integrations/flask_oauth1/cache.py b/didcomm/vendor/authlib/integrations/flask_oauth1/cache.py
+index c22211b..5e81919 100644
+--- a/didcomm/vendor/authlib/integrations/flask_oauth1/cache.py
++++ b/didcomm/vendor/authlib/integrations/flask_oauth1/cache.py
+@@ -1,4 +1,4 @@
+-from authlib.oauth1 import TemporaryCredential
++from didcomm.vendor.authlib.oauth1 import TemporaryCredential
+ 
+ 
+ def register_temporary_credential_hooks(
+diff --git a/didcomm/vendor/authlib/integrations/flask_oauth1/resource_protector.py b/didcomm/vendor/authlib/integrations/flask_oauth1/resource_protector.py
+index 9424f32..14e7e50 100644
+--- a/didcomm/vendor/authlib/integrations/flask_oauth1/resource_protector.py
++++ b/didcomm/vendor/authlib/integrations/flask_oauth1/resource_protector.py
+@@ -3,9 +3,9 @@ from flask import json, Response
+ from flask import request as _req
+ from flask import _app_ctx_stack
+ from werkzeug.local import LocalProxy
+-from authlib.consts import default_json_headers
+-from authlib.oauth1 import ResourceProtector as _ResourceProtector
+-from authlib.oauth1.errors import OAuth1Error
++from didcomm.vendor.authlib.consts import default_json_headers
++from didcomm.vendor.authlib.oauth1 import ResourceProtector as _ResourceProtector
++from didcomm.vendor.authlib.oauth1.errors import OAuth1Error
+ 
+ 
+ class ResourceProtector(_ResourceProtector):
+@@ -28,7 +28,7 @@ class ResourceProtector(_ResourceProtector):
+ 
+     And for ``exists_nonce``, if using cache, we have a built-in hook to create this method::
+ 
+-        from authlib.integrations.flask_oauth1 import create_exists_nonce_func
++        from didcomm.vendor.authlib.integrations.flask_oauth1 import create_exists_nonce_func
+ 
+         exists_nonce = create_exists_nonce_func(cache)
+ 
+diff --git a/didcomm/vendor/authlib/integrations/flask_oauth2/authorization_server.py b/didcomm/vendor/authlib/integrations/flask_oauth2/authorization_server.py
+index 34fdef3..7403f22 100644
+--- a/didcomm/vendor/authlib/integrations/flask_oauth2/authorization_server.py
++++ b/didcomm/vendor/authlib/integrations/flask_oauth2/authorization_server.py
+@@ -1,12 +1,12 @@
+ from werkzeug.utils import import_string
+ from flask import Response, json
+-from authlib.oauth2 import (
++from didcomm.vendor.authlib.oauth2 import (
+     OAuth2Request,
+     HttpRequest,
+     AuthorizationServer as _AuthorizationServer,
+ )
+-from authlib.oauth2.rfc6750 import BearerTokenGenerator
+-from authlib.common.security import generate_token
++from didcomm.vendor.authlib.oauth2.rfc6750 import BearerTokenGenerator
++from didcomm.vendor.authlib.common.security import generate_token
+ from .signals import client_authenticated, token_revoked
+ from ..flask_helpers import create_oauth_request
+ 
+diff --git a/didcomm/vendor/authlib/integrations/flask_oauth2/resource_protector.py b/didcomm/vendor/authlib/integrations/flask_oauth2/resource_protector.py
+index 910c0d5..6022569 100644
+--- a/didcomm/vendor/authlib/integrations/flask_oauth2/resource_protector.py
++++ b/didcomm/vendor/authlib/integrations/flask_oauth2/resource_protector.py
+@@ -4,11 +4,11 @@ from flask import json
+ from flask import request as _req
+ from flask import _app_ctx_stack
+ from werkzeug.local import LocalProxy
+-from authlib.oauth2 import (
++from didcomm.vendor.authlib.oauth2 import (
+     OAuth2Error,
+     ResourceProtector as _ResourceProtector
+ )
+-from authlib.oauth2.rfc6749 import (
++from didcomm.vendor.authlib.oauth2.rfc6749 import (
+     MissingAuthorizationError,
+     HttpRequest,
+ )
+@@ -20,12 +20,12 @@ class ResourceProtector(_ResourceProtector):
+     """A protecting method for resource servers. Creating a ``require_oauth``
+     decorator easily with ResourceProtector::
+ 
+-        from authlib.integrations.flask_oauth2 import ResourceProtector
++        from didcomm.vendor.authlib.integrations.flask_oauth2 import ResourceProtector
+ 
+         require_oauth = ResourceProtector()
+ 
+         # add bearer token validator
+-        from authlib.oauth2.rfc6750 import BearerTokenValidator
++        from didcomm.vendor.authlib.oauth2.rfc6750 import BearerTokenValidator
+         from project.models import Token
+ 
+         class MyBearerTokenValidator(BearerTokenValidator):
+diff --git a/didcomm/vendor/authlib/integrations/httpx_client/__init__.py b/didcomm/vendor/authlib/integrations/httpx_client/__init__.py
+index 3b5437c..b6d494a 100644
+--- a/didcomm/vendor/authlib/integrations/httpx_client/__init__.py
++++ b/didcomm/vendor/authlib/integrations/httpx_client/__init__.py
+@@ -1,4 +1,4 @@
+-from authlib.oauth1 import (
++from didcomm.vendor.authlib.oauth1 import (
+     SIGNATURE_HMAC_SHA1,
+     SIGNATURE_RSA_SHA1,
+     SIGNATURE_PLAINTEXT,
+diff --git a/didcomm/vendor/authlib/integrations/httpx_client/assertion_client.py b/didcomm/vendor/authlib/integrations/httpx_client/assertion_client.py
+index dd5baf7..11027e4 100644
+--- a/didcomm/vendor/authlib/integrations/httpx_client/assertion_client.py
++++ b/didcomm/vendor/authlib/integrations/httpx_client/assertion_client.py
+@@ -1,7 +1,7 @@
+ from httpx import AsyncClient, Client, USE_CLIENT_DEFAULT
+-from authlib.oauth2.rfc7521 import AssertionClient as _AssertionClient
+-from authlib.oauth2.rfc7523 import JWTBearerGrant
+-from authlib.oauth2 import OAuth2Error
++from didcomm.vendor.authlib.oauth2.rfc7521 import AssertionClient as _AssertionClient
++from didcomm.vendor.authlib.oauth2.rfc7523 import JWTBearerGrant
++from didcomm.vendor.authlib.oauth2 import OAuth2Error
+ from .utils import extract_client_kwargs
+ from .oauth2_client import OAuth2Auth
+ 
+diff --git a/didcomm/vendor/authlib/integrations/httpx_client/oauth1_client.py b/didcomm/vendor/authlib/integrations/httpx_client/oauth1_client.py
+index 7f248cb..0120e12 100644
+--- a/didcomm/vendor/authlib/integrations/httpx_client/oauth1_client.py
++++ b/didcomm/vendor/authlib/integrations/httpx_client/oauth1_client.py
+@@ -1,12 +1,12 @@
+ import typing
+ from httpx import AsyncClient, Auth, Client, Request, Response
+-from authlib.oauth1 import (
++from didcomm.vendor.authlib.oauth1 import (
+     SIGNATURE_HMAC_SHA1,
+     SIGNATURE_TYPE_HEADER,
+ )
+-from authlib.common.encoding import to_unicode
+-from authlib.oauth1 import ClientAuth
+-from authlib.oauth1.client import OAuth1Client as _OAuth1Client
++from didcomm.vendor.authlib.common.encoding import to_unicode
++from didcomm.vendor.authlib.oauth1 import ClientAuth
++from didcomm.vendor.authlib.oauth1.client import OAuth1Client as _OAuth1Client
+ from .utils import extract_client_kwargs
+ from ..base_client import OAuthError
+ 
+diff --git a/didcomm/vendor/authlib/integrations/httpx_client/oauth2_client.py b/didcomm/vendor/authlib/integrations/httpx_client/oauth2_client.py
+index 8aaf767..d911b78 100644
+--- a/didcomm/vendor/authlib/integrations/httpx_client/oauth2_client.py
++++ b/didcomm/vendor/authlib/integrations/httpx_client/oauth2_client.py
+@@ -1,9 +1,9 @@
+ import asyncio
+ import typing
+ from httpx import AsyncClient, Auth, Client, Request, Response, USE_CLIENT_DEFAULT
+-from authlib.common.urls import url_decode
+-from authlib.oauth2.client import OAuth2Client as _OAuth2Client
+-from authlib.oauth2.auth import ClientAuth, TokenAuth
++from didcomm.vendor.authlib.common.urls import url_decode
++from didcomm.vendor.authlib.oauth2.client import OAuth2Client as _OAuth2Client
++from didcomm.vendor.authlib.oauth2.auth import ClientAuth, TokenAuth
+ from .utils import HTTPX_CLIENT_KWARGS
+ from ..base_client import (
+     OAuthError,
+diff --git a/didcomm/vendor/authlib/integrations/requests_client/__init__.py b/didcomm/vendor/authlib/integrations/requests_client/__init__.py
+index fcbdec3..91a4f49 100644
+--- a/didcomm/vendor/authlib/integrations/requests_client/__init__.py
++++ b/didcomm/vendor/authlib/integrations/requests_client/__init__.py
+@@ -2,7 +2,7 @@ from .oauth1_session import OAuth1Session, OAuth1Auth
+ from .oauth2_session import OAuth2Session, OAuth2Auth
+ from .assertion_session import AssertionSession
+ from ..base_client import OAuthError
+-from authlib.oauth1 import (
++from didcomm.vendor.authlib.oauth1 import (
+     SIGNATURE_HMAC_SHA1,
+     SIGNATURE_RSA_SHA1,
+     SIGNATURE_PLAINTEXT,
+diff --git a/didcomm/vendor/authlib/integrations/requests_client/assertion_session.py b/didcomm/vendor/authlib/integrations/requests_client/assertion_session.py
+index b5eb389..26bf84a 100644
+--- a/didcomm/vendor/authlib/integrations/requests_client/assertion_session.py
++++ b/didcomm/vendor/authlib/integrations/requests_client/assertion_session.py
+@@ -1,6 +1,6 @@
+ from requests import Session
+-from authlib.oauth2.rfc7521 import AssertionClient
+-from authlib.oauth2.rfc7523 import JWTBearerGrant
++from didcomm.vendor.authlib.oauth2.rfc7521 import AssertionClient
++from didcomm.vendor.authlib.oauth2.rfc7523 import JWTBearerGrant
+ from .oauth2_session import OAuth2Auth
+ from .utils import update_session_configure
+ 
+diff --git a/didcomm/vendor/authlib/integrations/requests_client/oauth1_session.py b/didcomm/vendor/authlib/integrations/requests_client/oauth1_session.py
+index ebf3999..960052e 100644
+--- a/didcomm/vendor/authlib/integrations/requests_client/oauth1_session.py
++++ b/didcomm/vendor/authlib/integrations/requests_client/oauth1_session.py
+@@ -1,13 +1,13 @@
+ # -*- coding: utf-8 -*-
+ from requests import Session
+ from requests.auth import AuthBase
+-from authlib.oauth1 import (
++from didcomm.vendor.authlib.oauth1 import (
+     SIGNATURE_HMAC_SHA1,
+     SIGNATURE_TYPE_HEADER,
+ )
+-from authlib.common.encoding import to_native
+-from authlib.oauth1 import ClientAuth
+-from authlib.oauth1.client import OAuth1Client
++from didcomm.vendor.authlib.common.encoding import to_native
++from didcomm.vendor.authlib.oauth1 import ClientAuth
++from didcomm.vendor.authlib.oauth1.client import OAuth1Client
+ from ..base_client import OAuthError
+ from .utils import update_session_configure
+ 
+diff --git a/didcomm/vendor/authlib/integrations/requests_client/oauth2_session.py b/didcomm/vendor/authlib/integrations/requests_client/oauth2_session.py
+index c4b13c0..30122de 100644
+--- a/didcomm/vendor/authlib/integrations/requests_client/oauth2_session.py
++++ b/didcomm/vendor/authlib/integrations/requests_client/oauth2_session.py
+@@ -1,7 +1,7 @@
+ from requests import Session
+ from requests.auth import AuthBase
+-from authlib.oauth2.client import OAuth2Client
+-from authlib.oauth2.auth import ClientAuth, TokenAuth
++from didcomm.vendor.authlib.oauth2.client import OAuth2Client
++from didcomm.vendor.authlib.oauth2.auth import ClientAuth, TokenAuth
+ from ..base_client import (
+     OAuthError,
+     InvalidTokenError,
+diff --git a/didcomm/vendor/authlib/integrations/sqla_oauth2/client_mixin.py b/didcomm/vendor/authlib/integrations/sqla_oauth2/client_mixin.py
+index d8b30af..db9546e 100644
+--- a/didcomm/vendor/authlib/integrations/sqla_oauth2/client_mixin.py
++++ b/didcomm/vendor/authlib/integrations/sqla_oauth2/client_mixin.py
+@@ -1,7 +1,7 @@
+ from sqlalchemy import Column, String, Text, Integer
+-from authlib.common.encoding import json_loads, json_dumps
+-from authlib.oauth2.rfc6749 import ClientMixin
+-from authlib.oauth2.rfc6749 import scope_to_list, list_to_scope
++from didcomm.vendor.authlib.common.encoding import json_loads, json_dumps
++from didcomm.vendor.authlib.oauth2.rfc6749 import ClientMixin
++from didcomm.vendor.authlib.oauth2.rfc6749 import scope_to_list, list_to_scope
+ 
+ 
+ class OAuth2ClientMixin(ClientMixin):
+diff --git a/didcomm/vendor/authlib/integrations/sqla_oauth2/functions.py b/didcomm/vendor/authlib/integrations/sqla_oauth2/functions.py
+index 10fc971..84a7819 100644
+--- a/didcomm/vendor/authlib/integrations/sqla_oauth2/functions.py
++++ b/didcomm/vendor/authlib/integrations/sqla_oauth2/functions.py
+@@ -65,7 +65,7 @@ def create_revocation_endpoint(session, token_model):
+     :param session: SQLAlchemy session
+     :param token_model: Token model class
+     """
+-    from authlib.oauth2.rfc7009 import RevocationEndpoint
++    from didcomm.vendor.authlib.oauth2.rfc7009 import RevocationEndpoint
+     query_token = create_query_token_func(session, token_model)
+ 
+     class _RevocationEndpoint(RevocationEndpoint):
+@@ -91,7 +91,7 @@ def create_bearer_token_validator(session, token_model):
+     :param session: SQLAlchemy session
+     :param token_model: Token model class
+     """
+-    from authlib.oauth2.rfc6750 import BearerTokenValidator
++    from didcomm.vendor.authlib.oauth2.rfc6750 import BearerTokenValidator
+ 
+     class _BearerTokenValidator(BearerTokenValidator):
+         def authenticate_token(self, token_string):
+diff --git a/didcomm/vendor/authlib/integrations/sqla_oauth2/tokens_mixins.py b/didcomm/vendor/authlib/integrations/sqla_oauth2/tokens_mixins.py
+index 28cee89..df094f6 100644
+--- a/didcomm/vendor/authlib/integrations/sqla_oauth2/tokens_mixins.py
++++ b/didcomm/vendor/authlib/integrations/sqla_oauth2/tokens_mixins.py
+@@ -1,6 +1,6 @@
+ import time
+ from sqlalchemy import Column, String, Text, Integer
+-from authlib.oauth2.rfc6749 import (
++from didcomm.vendor.authlib.oauth2.rfc6749 import (
+     TokenMixin,
+     AuthorizationCodeMixin,
+ )
+diff --git a/didcomm/vendor/authlib/jose/drafts/_jwe_algorithms.py b/didcomm/vendor/authlib/jose/drafts/_jwe_algorithms.py
+index 798984e..5cad097 100644
+--- a/didcomm/vendor/authlib/jose/drafts/_jwe_algorithms.py
++++ b/didcomm/vendor/authlib/jose/drafts/_jwe_algorithms.py
+@@ -3,10 +3,10 @@ from cryptography.hazmat.backends import default_backend
+ from cryptography.hazmat.primitives import hashes
+ from cryptography.hazmat.primitives.kdf.concatkdf import ConcatKDFHash
+ 
+-from authlib.jose.errors import InvalidEncryptionAlgorithmForECDH1PUWithKeyWrappingError
+-from authlib.jose.rfc7516 import JWEAlgorithmWithTagAwareKeyAgreement
+-from authlib.jose.rfc7518 import AESAlgorithm, CBCHS2EncAlgorithm, ECKey, u32be_len_input
+-from authlib.jose.rfc8037 import OKPKey
++from didcomm.vendor.authlib.jose.errors import InvalidEncryptionAlgorithmForECDH1PUWithKeyWrappingError
++from didcomm.vendor.authlib.jose.rfc7516 import JWEAlgorithmWithTagAwareKeyAgreement
++from didcomm.vendor.authlib.jose.rfc7518 import AESAlgorithm, CBCHS2EncAlgorithm, ECKey, u32be_len_input
++from didcomm.vendor.authlib.jose.rfc8037 import OKPKey
+ 
+ 
+ class ECDH1PUAlgorithm(JWEAlgorithmWithTagAwareKeyAgreement):
+diff --git a/didcomm/vendor/authlib/jose/drafts/_jwe_enc_cryptodome.py b/didcomm/vendor/authlib/jose/drafts/_jwe_enc_cryptodome.py
+index cb6fcea..cad6f1a 100644
+--- a/didcomm/vendor/authlib/jose/drafts/_jwe_enc_cryptodome.py
++++ b/didcomm/vendor/authlib/jose/drafts/_jwe_enc_cryptodome.py
+@@ -6,7 +6,7 @@
+ 
+     .. _`Section 4`: https://datatracker.ietf.org/doc/html/draft-amringer-jose-chacha-02#section-4
+ """
+-from authlib.jose.rfc7516 import JWEEncAlgorithm
++from didcomm.vendor.authlib.jose.rfc7516 import JWEEncAlgorithm
+ from Cryptodome.Cipher import ChaCha20_Poly1305 as Cryptodome_ChaCha20_Poly1305
+ 
+ 
+diff --git a/didcomm/vendor/authlib/jose/drafts/_jwe_enc_cryptography.py b/didcomm/vendor/authlib/jose/drafts/_jwe_enc_cryptography.py
+index 1b0c852..377ad82 100644
+--- a/didcomm/vendor/authlib/jose/drafts/_jwe_enc_cryptography.py
++++ b/didcomm/vendor/authlib/jose/drafts/_jwe_enc_cryptography.py
+@@ -7,7 +7,7 @@
+     .. _`Section 4`: https://datatracker.ietf.org/doc/html/draft-amringer-jose-chacha-02#section-4
+ """
+ from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
+-from authlib.jose.rfc7516 import JWEEncAlgorithm
++from didcomm.vendor.authlib.jose.rfc7516 import JWEEncAlgorithm
+ 
+ 
+ class C20PEncAlgorithm(JWEEncAlgorithm):
+diff --git a/didcomm/vendor/authlib/jose/errors.py b/didcomm/vendor/authlib/jose/errors.py
+index b93523f..d00eae3 100644
+--- a/didcomm/vendor/authlib/jose/errors.py
++++ b/didcomm/vendor/authlib/jose/errors.py
+@@ -1,4 +1,4 @@
+-from authlib.common.errors import AuthlibBaseError
++from didcomm.vendor.authlib.common.errors import AuthlibBaseError
+ 
+ 
+ class JoseError(AuthlibBaseError):
+diff --git a/didcomm/vendor/authlib/jose/rfc7515/jws.py b/didcomm/vendor/authlib/jose/rfc7515/jws.py
+index 1248c95..9408ecb 100644
+--- a/didcomm/vendor/authlib/jose/rfc7515/jws.py
++++ b/didcomm/vendor/authlib/jose/rfc7515/jws.py
+@@ -1,14 +1,14 @@
+-from authlib.common.encoding import (
++from didcomm.vendor.authlib.common.encoding import (
+     to_bytes,
+     to_unicode,
+     urlsafe_b64encode,
+     json_b64encode,
+ )
+-from authlib.jose.util import (
++from didcomm.vendor.authlib.jose.util import (
+     extract_header,
+     extract_segment, ensure_dict,
+ )
+-from authlib.jose.errors import (
++from didcomm.vendor.authlib.jose.errors import (
+     DecodeError,
+     MissingAlgorithmError,
+     UnsupportedAlgorithmError,
+diff --git a/didcomm/vendor/authlib/jose/rfc7516/jwe.py b/didcomm/vendor/authlib/jose/rfc7516/jwe.py
+index 0255e4d..f41e668 100644
+--- a/didcomm/vendor/authlib/jose/rfc7516/jwe.py
++++ b/didcomm/vendor/authlib/jose/rfc7516/jwe.py
+@@ -1,15 +1,15 @@
+ from collections import OrderedDict
+ from copy import deepcopy
+ 
+-from authlib.common.encoding import (
++from didcomm.vendor.authlib.common.encoding import (
+     to_bytes, urlsafe_b64encode, json_b64encode, to_unicode
+ )
+-from authlib.jose.rfc7516.models import JWEAlgorithmWithTagAwareKeyAgreement, JWESharedHeader, JWEHeader
+-from authlib.jose.util import (
++from didcomm.vendor.authlib.jose.rfc7516.models import JWEAlgorithmWithTagAwareKeyAgreement, JWESharedHeader, JWEHeader
++from didcomm.vendor.authlib.jose.util import (
+     extract_header,
+     extract_segment, ensure_dict,
+ )
+-from authlib.jose.errors import (
++from didcomm.vendor.authlib.jose.errors import (
+     DecodeError,
+     MissingAlgorithmError,
+     UnsupportedAlgorithmError,
+diff --git a/didcomm/vendor/authlib/jose/rfc7517/_cryptography_key.py b/didcomm/vendor/authlib/jose/rfc7517/_cryptography_key.py
+index f7194a3..3157c07 100644
+--- a/didcomm/vendor/authlib/jose/rfc7517/_cryptography_key.py
++++ b/didcomm/vendor/authlib/jose/rfc7517/_cryptography_key.py
+@@ -3,7 +3,7 @@ from cryptography.hazmat.primitives.serialization import (
+     load_pem_private_key, load_pem_public_key, load_ssh_public_key,
+ )
+ from cryptography.hazmat.backends import default_backend
+-from authlib.common.encoding import to_bytes
++from didcomm.vendor.authlib.common.encoding import to_bytes
+ 
+ 
+ def load_pem_key(raw, ssh_type=None, key_type=None, password=None):
+diff --git a/didcomm/vendor/authlib/jose/rfc7517/asymmetric_key.py b/didcomm/vendor/authlib/jose/rfc7517/asymmetric_key.py
+index 2c59aa5..e82ef6d 100644
+--- a/didcomm/vendor/authlib/jose/rfc7517/asymmetric_key.py
++++ b/didcomm/vendor/authlib/jose/rfc7517/asymmetric_key.py
+@@ -1,4 +1,4 @@
+-from authlib.common.encoding import to_bytes
++from didcomm.vendor.authlib.common.encoding import to_bytes
+ from cryptography.hazmat.primitives.serialization import (
+     Encoding, PrivateFormat, PublicFormat,
+     BestAvailableEncryption, NoEncryption,
+diff --git a/didcomm/vendor/authlib/jose/rfc7517/base_key.py b/didcomm/vendor/authlib/jose/rfc7517/base_key.py
+index c8c958c..aaba682 100644
+--- a/didcomm/vendor/authlib/jose/rfc7517/base_key.py
++++ b/didcomm/vendor/authlib/jose/rfc7517/base_key.py
+@@ -1,6 +1,6 @@
+ import hashlib
+ from collections import OrderedDict
+-from authlib.common.encoding import (
++from didcomm.vendor.authlib.common.encoding import (
+     json_dumps,
+     to_bytes,
+     to_unicode,
+diff --git a/didcomm/vendor/authlib/jose/rfc7517/jwk.py b/didcomm/vendor/authlib/jose/rfc7517/jwk.py
+index dcb38b2..d334d88 100644
+--- a/didcomm/vendor/authlib/jose/rfc7517/jwk.py
++++ b/didcomm/vendor/authlib/jose/rfc7517/jwk.py
+@@ -1,4 +1,4 @@
+-from authlib.common.encoding import json_loads
++from didcomm.vendor.authlib.common.encoding import json_loads
+ from .key_set import KeySet
+ from ._cryptography_key import load_pem_key
+ 
+diff --git a/didcomm/vendor/authlib/jose/rfc7517/key_set.py b/didcomm/vendor/authlib/jose/rfc7517/key_set.py
+index c4f7720..1830234 100644
+--- a/didcomm/vendor/authlib/jose/rfc7517/key_set.py
++++ b/didcomm/vendor/authlib/jose/rfc7517/key_set.py
+@@ -1,4 +1,4 @@
+-from authlib.common.encoding import json_dumps
++from didcomm.vendor.authlib.common.encoding import json_dumps
+ 
+ 
+ class KeySet(object):
+diff --git a/didcomm/vendor/authlib/jose/rfc7518/ec_key.py b/didcomm/vendor/authlib/jose/rfc7518/ec_key.py
+index 0457f83..4b3376e 100644
+--- a/didcomm/vendor/authlib/jose/rfc7518/ec_key.py
++++ b/didcomm/vendor/authlib/jose/rfc7518/ec_key.py
+@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives.asymmetric.ec import (
+     SECP256R1, SECP384R1, SECP521R1, SECP256K1,
+ )
+ from cryptography.hazmat.backends import default_backend
+-from authlib.common.encoding import base64_to_int, int_to_base64
++from didcomm.vendor.authlib.common.encoding import base64_to_int, int_to_base64
+ from ..rfc7517 import AsymmetricKey
+ 
+ 
+diff --git a/didcomm/vendor/authlib/jose/rfc7518/jwe_algs.py b/didcomm/vendor/authlib/jose/rfc7518/jwe_algs.py
+index 2ef0b46..8a941a4 100644
+--- a/didcomm/vendor/authlib/jose/rfc7518/jwe_algs.py
++++ b/didcomm/vendor/authlib/jose/rfc7518/jwe_algs.py
+@@ -11,12 +11,12 @@ from cryptography.hazmat.primitives.ciphers import Cipher
+ from cryptography.hazmat.primitives.ciphers.algorithms import AES
+ from cryptography.hazmat.primitives.ciphers.modes import GCM
+ from cryptography.hazmat.primitives.kdf.concatkdf import ConcatKDFHash
+-from authlib.common.encoding import (
++from didcomm.vendor.authlib.common.encoding import (
+     to_bytes, to_native,
+     urlsafe_b64decode,
+     urlsafe_b64encode
+ )
+-from authlib.jose.rfc7516 import JWEAlgorithm
++from didcomm.vendor.authlib.jose.rfc7516 import JWEAlgorithm
+ from .rsa_key import RSAKey
+ from .ec_key import ECKey
+ from .oct_key import OctKey
+diff --git a/didcomm/vendor/authlib/jose/rfc7518/oct_key.py b/didcomm/vendor/authlib/jose/rfc7518/oct_key.py
+index c2e16b1..0a405c6 100644
+--- a/didcomm/vendor/authlib/jose/rfc7518/oct_key.py
++++ b/didcomm/vendor/authlib/jose/rfc7518/oct_key.py
+@@ -1,8 +1,8 @@
+-from authlib.common.encoding import (
++from didcomm.vendor.authlib.common.encoding import (
+     to_bytes, to_unicode,
+     urlsafe_b64encode, urlsafe_b64decode,
+ )
+-from authlib.common.security import generate_token
++from didcomm.vendor.authlib.common.security import generate_token
+ from ..rfc7517 import Key
+ 
+ 
+diff --git a/didcomm/vendor/authlib/jose/rfc7518/rsa_key.py b/didcomm/vendor/authlib/jose/rfc7518/rsa_key.py
+index 53bd995..f314d3a 100644
+--- a/didcomm/vendor/authlib/jose/rfc7518/rsa_key.py
++++ b/didcomm/vendor/authlib/jose/rfc7518/rsa_key.py
+@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives.asymmetric.rsa import (
+     rsa_recover_prime_factors, rsa_crt_dmp1, rsa_crt_dmq1, rsa_crt_iqmp
+ )
+ from cryptography.hazmat.backends import default_backend
+-from authlib.common.encoding import base64_to_int, int_to_base64
++from didcomm.vendor.authlib.common.encoding import base64_to_int, int_to_base64
+ from ..rfc7517 import AsymmetricKey
+ 
+ 
+diff --git a/didcomm/vendor/authlib/jose/rfc7519/claims.py b/didcomm/vendor/authlib/jose/rfc7519/claims.py
+index 0a5b7ec..dbebed6 100644
+--- a/didcomm/vendor/authlib/jose/rfc7519/claims.py
++++ b/didcomm/vendor/authlib/jose/rfc7519/claims.py
+@@ -1,5 +1,5 @@
+ import time
+-from authlib.jose.errors import (
++from didcomm.vendor.authlib.jose.errors import (
+     MissingClaimError,
+     InvalidClaimError,
+     ExpiredTokenError,
+diff --git a/didcomm/vendor/authlib/jose/rfc7519/jwt.py b/didcomm/vendor/authlib/jose/rfc7519/jwt.py
+index 1866c4e..5f92d25 100644
+--- a/didcomm/vendor/authlib/jose/rfc7519/jwt.py
++++ b/didcomm/vendor/authlib/jose/rfc7519/jwt.py
+@@ -2,7 +2,7 @@ import re
+ import random
+ import datetime
+ import calendar
+-from authlib.common.encoding import (
++from didcomm.vendor.authlib.common.encoding import (
+     to_bytes, to_unicode,
+     json_loads, json_dumps,
+ )
+diff --git a/didcomm/vendor/authlib/jose/rfc8037/okp_key.py b/didcomm/vendor/authlib/jose/rfc8037/okp_key.py
+index ea05801..c1e94a7 100644
+--- a/didcomm/vendor/authlib/jose/rfc8037/okp_key.py
++++ b/didcomm/vendor/authlib/jose/rfc8037/okp_key.py
+@@ -13,7 +13,7 @@ from cryptography.hazmat.primitives.asymmetric.x448 import (
+ from cryptography.hazmat.primitives.serialization import (
+     Encoding, PublicFormat, PrivateFormat, NoEncryption
+ )
+-from authlib.common.encoding import (
++from didcomm.vendor.authlib.common.encoding import (
+     to_unicode, to_bytes,
+     urlsafe_b64decode, urlsafe_b64encode,
+ )
+diff --git a/didcomm/vendor/authlib/jose/util.py b/didcomm/vendor/authlib/jose/util.py
+index adc8ad8..6f4d4b1 100644
+--- a/didcomm/vendor/authlib/jose/util.py
++++ b/didcomm/vendor/authlib/jose/util.py
+@@ -1,6 +1,6 @@
+ import binascii
+-from authlib.common.encoding import urlsafe_b64decode, json_loads, to_unicode
+-from authlib.jose.errors import DecodeError
++from didcomm.vendor.authlib.common.encoding import urlsafe_b64decode, json_loads, to_unicode
++from didcomm.vendor.authlib.jose.errors import DecodeError
+ 
+ 
+ def extract_header(header_segment, error_cls):
+diff --git a/didcomm/vendor/authlib/oauth1/client.py b/didcomm/vendor/authlib/oauth1/client.py
+index 7715711..081117c 100644
+--- a/didcomm/vendor/authlib/oauth1/client.py
++++ b/didcomm/vendor/authlib/oauth1/client.py
+@@ -1,10 +1,10 @@
+ # -*- coding: utf-8 -*-
+-from authlib.common.urls import (
++from didcomm.vendor.authlib.common.urls import (
+     url_decode,
+     add_params_to_uri,
+     urlparse,
+ )
+-from authlib.common.encoding import json_loads
++from didcomm.vendor.authlib.common.encoding import json_loads
+ from .rfc5849 import (
+     SIGNATURE_HMAC_SHA1,
+     SIGNATURE_TYPE_HEADER,
+diff --git a/didcomm/vendor/authlib/oauth1/rfc5849/authorization_server.py b/didcomm/vendor/authlib/oauth1/rfc5849/authorization_server.py
+index 54cf7ba..d34f8b9 100644
+--- a/didcomm/vendor/authlib/oauth1/rfc5849/authorization_server.py
++++ b/didcomm/vendor/authlib/oauth1/rfc5849/authorization_server.py
+@@ -1,4 +1,4 @@
+-from authlib.common.urls import is_valid_url, add_params_to_uri
++from didcomm.vendor.authlib.common.urls import is_valid_url, add_params_to_uri
+ from .base_server import BaseServer
+ from .errors import (
+     OAuth1Error,
+diff --git a/didcomm/vendor/authlib/oauth1/rfc5849/client_auth.py b/didcomm/vendor/authlib/oauth1/rfc5849/client_auth.py
+index e8ddd28..cb2173a 100644
+--- a/didcomm/vendor/authlib/oauth1/rfc5849/client_auth.py
++++ b/didcomm/vendor/authlib/oauth1/rfc5849/client_auth.py
+@@ -1,9 +1,9 @@
+ import time
+ import base64
+ import hashlib
+-from authlib.common.security import generate_token
+-from authlib.common.urls import extract_params
+-from authlib.common.encoding import to_native, to_bytes, to_unicode
++from didcomm.vendor.authlib.common.security import generate_token
++from didcomm.vendor.authlib.common.urls import extract_params
++from didcomm.vendor.authlib.common.encoding import to_native, to_bytes, to_unicode
+ from .wrapper import OAuth1Request
+ from .signature import (
+     SIGNATURE_HMAC_SHA1,
+diff --git a/didcomm/vendor/authlib/oauth1/rfc5849/errors.py b/didcomm/vendor/authlib/oauth1/rfc5849/errors.py
+index 0eea07b..5e9a1c1 100644
+--- a/didcomm/vendor/authlib/oauth1/rfc5849/errors.py
++++ b/didcomm/vendor/authlib/oauth1/rfc5849/errors.py
+@@ -7,8 +7,8 @@
+ 
+     .. _`Section 10`: https://oauth.net/core/1.0a/#rfc.section.10
+ """
+-from authlib.common.errors import AuthlibHTTPError
+-from authlib.common.security import is_secure_transport
++from didcomm.vendor.authlib.common.errors import AuthlibHTTPError
++from didcomm.vendor.authlib.common.security import is_secure_transport
+ 
+ 
+ class OAuth1Error(AuthlibHTTPError):
+diff --git a/didcomm/vendor/authlib/oauth1/rfc5849/parameters.py b/didcomm/vendor/authlib/oauth1/rfc5849/parameters.py
+index 4746aea..984eef5 100644
+--- a/didcomm/vendor/authlib/oauth1/rfc5849/parameters.py
++++ b/didcomm/vendor/authlib/oauth1/rfc5849/parameters.py
+@@ -8,7 +8,7 @@
+ 
+     .. _`section 3.5`: https://tools.ietf.org/html/rfc5849#section-3.5
+ """
+-from authlib.common.urls import urlparse, url_encode, extract_params
++from didcomm.vendor.authlib.common.urls import urlparse, url_encode, extract_params
+ from .util import escape
+ 
+ 
+diff --git a/didcomm/vendor/authlib/oauth1/rfc5849/rsa.py b/didcomm/vendor/authlib/oauth1/rfc5849/rsa.py
+index 3785b0f..2113a98 100644
+--- a/didcomm/vendor/authlib/oauth1/rfc5849/rsa.py
++++ b/didcomm/vendor/authlib/oauth1/rfc5849/rsa.py
+@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives.serialization import (
+ )
+ from cryptography.hazmat.primitives.asymmetric import padding
+ from cryptography.exceptions import InvalidSignature
+-from authlib.common.encoding import to_bytes
++from didcomm.vendor.authlib.common.encoding import to_bytes
+ 
+ 
+ def sign_sha1(msg, rsa_private_key):
+diff --git a/didcomm/vendor/authlib/oauth1/rfc5849/signature.py b/didcomm/vendor/authlib/oauth1/rfc5849/signature.py
+index 6ba67e2..07099fe 100644
+--- a/didcomm/vendor/authlib/oauth1/rfc5849/signature.py
++++ b/didcomm/vendor/authlib/oauth1/rfc5849/signature.py
+@@ -10,8 +10,8 @@
+ import binascii
+ import hashlib
+ import hmac
+-from authlib.common.urls import urlparse
+-from authlib.common.encoding import to_unicode, to_bytes
++from didcomm.vendor.authlib.common.urls import urlparse
++from didcomm.vendor.authlib.common.encoding import to_unicode, to_bytes
+ from .util import escape, unescape
+ 
+ SIGNATURE_HMAC_SHA1 = "HMAC-SHA1"
+diff --git a/didcomm/vendor/authlib/oauth1/rfc5849/util.py b/didcomm/vendor/authlib/oauth1/rfc5849/util.py
+index 9383e22..bd43b21 100644
+--- a/didcomm/vendor/authlib/oauth1/rfc5849/util.py
++++ b/didcomm/vendor/authlib/oauth1/rfc5849/util.py
+@@ -1,4 +1,4 @@
+-from authlib.common.urls import quote, unquote
++from didcomm.vendor.authlib.common.urls import quote, unquote
+ 
+ 
+ def escape(s):
+diff --git a/didcomm/vendor/authlib/oauth1/rfc5849/wrapper.py b/didcomm/vendor/authlib/oauth1/rfc5849/wrapper.py
+index 25b3fc9..2277b0c 100644
+--- a/didcomm/vendor/authlib/oauth1/rfc5849/wrapper.py
++++ b/didcomm/vendor/authlib/oauth1/rfc5849/wrapper.py
+@@ -1,5 +1,5 @@
+ from urllib.request import parse_keqv_list, parse_http_list
+-from authlib.common.urls import (
++from didcomm.vendor.authlib.common.urls import (
+     urlparse, extract_params, url_decode,
+ )
+ from .signature import (
+diff --git a/didcomm/vendor/authlib/oauth2/auth.py b/didcomm/vendor/authlib/oauth2/auth.py
+index c7bf5a3..db918d6 100644
+--- a/didcomm/vendor/authlib/oauth2/auth.py
++++ b/didcomm/vendor/authlib/oauth2/auth.py
+@@ -1,6 +1,6 @@
+ import base64
+-from authlib.common.urls import add_params_to_qs, add_params_to_uri
+-from authlib.common.encoding import to_bytes, to_native
++from didcomm.vendor.authlib.common.urls import add_params_to_qs, add_params_to_uri
++from didcomm.vendor.authlib.common.encoding import to_bytes, to_native
+ from .rfc6749 import OAuth2Token
+ from .rfc6750 import add_bearer_token
+ 
+diff --git a/didcomm/vendor/authlib/oauth2/base.py b/didcomm/vendor/authlib/oauth2/base.py
+index 97300c2..d00c578 100644
+--- a/didcomm/vendor/authlib/oauth2/base.py
++++ b/didcomm/vendor/authlib/oauth2/base.py
+@@ -1,5 +1,5 @@
+-from authlib.common.errors import AuthlibHTTPError
+-from authlib.common.urls import add_params_to_uri
++from didcomm.vendor.authlib.common.errors import AuthlibHTTPError
++from didcomm.vendor.authlib.common.urls import add_params_to_uri
+ 
+ 
+ class OAuth2Error(AuthlibHTTPError):
+diff --git a/didcomm/vendor/authlib/oauth2/client.py b/didcomm/vendor/authlib/oauth2/client.py
+index ddccb95..4617f79 100644
+--- a/didcomm/vendor/authlib/oauth2/client.py
++++ b/didcomm/vendor/authlib/oauth2/client.py
+@@ -1,5 +1,5 @@
+-from authlib.common.security import generate_token
+-from authlib.common.urls import url_decode
++from didcomm.vendor.authlib.common.security import generate_token
++from didcomm.vendor.authlib.common.urls import url_decode
+ from .rfc6749.parameters import (
+     prepare_grant_uri,
+     prepare_token_request,
+diff --git a/didcomm/vendor/authlib/oauth2/rfc6749/errors.py b/didcomm/vendor/authlib/oauth2/rfc6749/errors.py
+index 53c2dff..e499794 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc6749/errors.py
++++ b/didcomm/vendor/authlib/oauth2/rfc6749/errors.py
+@@ -30,8 +30,8 @@
+ 
+     :copyright: (c) 2017 by Hsiaoming Yang.
+ """
+-from authlib.oauth2.base import OAuth2Error
+-from authlib.common.security import is_secure_transport
++from didcomm.vendor.authlib.oauth2.base import OAuth2Error
++from didcomm.vendor.authlib.common.security import is_secure_transport
+ 
+ __all__ = [
+     'OAuth2Error',
+diff --git a/didcomm/vendor/authlib/oauth2/rfc6749/grants/authorization_code.py b/didcomm/vendor/authlib/oauth2/rfc6749/grants/authorization_code.py
+index 570ebf2..d5cfe73 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc6749/grants/authorization_code.py
++++ b/didcomm/vendor/authlib/oauth2/rfc6749/grants/authorization_code.py
+@@ -1,6 +1,6 @@
+ import logging
+-from authlib.common.urls import add_params_to_uri
+-from authlib.common.security import generate_token
++from didcomm.vendor.authlib.common.urls import add_params_to_uri
++from didcomm.vendor.authlib.common.security import generate_token
+ from .base import BaseGrant, AuthorizationEndpointMixin, TokenEndpointMixin
+ from ..errors import (
+     OAuth2Error,
+diff --git a/didcomm/vendor/authlib/oauth2/rfc6749/grants/base.py b/didcomm/vendor/authlib/oauth2/rfc6749/grants/base.py
+index 5401d8d..c452904 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc6749/grants/base.py
++++ b/didcomm/vendor/authlib/oauth2/rfc6749/grants/base.py
+@@ -1,4 +1,4 @@
+-from authlib.consts import default_json_headers
++from didcomm.vendor.authlib.consts import default_json_headers
+ from ..errors import InvalidRequestError
+ 
+ 
+diff --git a/didcomm/vendor/authlib/oauth2/rfc6749/grants/implicit.py b/didcomm/vendor/authlib/oauth2/rfc6749/grants/implicit.py
+index 75b12be..4836a05 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc6749/grants/implicit.py
++++ b/didcomm/vendor/authlib/oauth2/rfc6749/grants/implicit.py
+@@ -1,5 +1,5 @@
+ import logging
+-from authlib.common.urls import add_params_to_uri
++from didcomm.vendor.authlib.common.urls import add_params_to_uri
+ from .base import BaseGrant, AuthorizationEndpointMixin
+ from ..errors import (
+     OAuth2Error,
+diff --git a/didcomm/vendor/authlib/oauth2/rfc6749/models.py b/didcomm/vendor/authlib/oauth2/rfc6749/models.py
+index 04f623b..9e0b325 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc6749/models.py
++++ b/didcomm/vendor/authlib/oauth2/rfc6749/models.py
+@@ -4,7 +4,7 @@
+ 
+     This module defines how to construct Client, AuthorizationCode and Token.
+ """
+-from authlib.deprecate import deprecate
++from didcomm.vendor.authlib.deprecate import deprecate
+ 
+ 
+ class ClientMixin(object):
+diff --git a/didcomm/vendor/authlib/oauth2/rfc6749/parameters.py b/didcomm/vendor/authlib/oauth2/rfc6749/parameters.py
+index 20461fd..3a59ea6 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc6749/parameters.py
++++ b/didcomm/vendor/authlib/oauth2/rfc6749/parameters.py
+@@ -1,9 +1,9 @@
+-from authlib.common.urls import (
++from didcomm.vendor.authlib.common.urls import (
+     urlparse,
+     add_params_to_uri,
+     add_params_to_qs,
+ )
+-from authlib.common.encoding import to_unicode
++from didcomm.vendor.authlib.common.encoding import to_unicode
+ from .errors import (
+     MissingCodeException,
+     MissingTokenException,
+diff --git a/didcomm/vendor/authlib/oauth2/rfc6749/util.py b/didcomm/vendor/authlib/oauth2/rfc6749/util.py
+index a216fbf..7b45842 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc6749/util.py
++++ b/didcomm/vendor/authlib/oauth2/rfc6749/util.py
+@@ -1,6 +1,6 @@
+ import base64
+ import binascii
+-from authlib.common.encoding import to_unicode
++from didcomm.vendor.authlib.common.encoding import to_unicode
+ 
+ 
+ def list_to_scope(scope):
+diff --git a/didcomm/vendor/authlib/oauth2/rfc6749/wrappers.py b/didcomm/vendor/authlib/oauth2/rfc6749/wrappers.py
+index f6cf192..d805be9 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc6749/wrappers.py
++++ b/didcomm/vendor/authlib/oauth2/rfc6749/wrappers.py
+@@ -1,5 +1,5 @@
+ import time
+-from authlib.common.urls import urlparse, url_decode
++from didcomm.vendor.authlib.common.urls import urlparse, url_decode
+ from .errors import InsecureTransportError
+ 
+ 
+diff --git a/didcomm/vendor/authlib/oauth2/rfc6750/parameters.py b/didcomm/vendor/authlib/oauth2/rfc6750/parameters.py
+index 5f4e100..070739c 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc6750/parameters.py
++++ b/didcomm/vendor/authlib/oauth2/rfc6750/parameters.py
+@@ -1,4 +1,4 @@
+-from authlib.common.urls import add_params_to_qs, add_params_to_uri
++from didcomm.vendor.authlib.common.urls import add_params_to_qs, add_params_to_uri
+ 
+ 
+ def add_to_uri(token, uri):
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7009/parameters.py b/didcomm/vendor/authlib/oauth2/rfc7009/parameters.py
+index 2a829a7..908262a 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7009/parameters.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7009/parameters.py
+@@ -1,4 +1,4 @@
+-from authlib.common.urls import add_params_to_qs
++from didcomm.vendor.authlib.common.urls import add_params_to_qs
+ 
+ 
+ def prepare_revoke_token_request(token, token_type_hint=None,
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7009/revocation.py b/didcomm/vendor/authlib/oauth2/rfc7009/revocation.py
+index b130827..8016ff3 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7009/revocation.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7009/revocation.py
+@@ -1,4 +1,4 @@
+-from authlib.consts import default_json_headers
++from didcomm.vendor.authlib.consts import default_json_headers
+ from ..rfc6749 import TokenEndpoint
+ from ..rfc6749 import (
+     InvalidRequestError,
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7521/client.py b/didcomm/vendor/authlib/oauth2/rfc7521/client.py
+index 4c5e5d6..87a8ad8 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7521/client.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7521/client.py
+@@ -1,5 +1,5 @@
+-from authlib.common.encoding import to_native
+-from authlib.oauth2.base import OAuth2Error
++from didcomm.vendor.authlib.common.encoding import to_native
++from didcomm.vendor.authlib.oauth2.base import OAuth2Error
+ 
+ 
+ class AssertionClient(object):
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7523/assertion.py b/didcomm/vendor/authlib/oauth2/rfc7523/assertion.py
+index 0bb9fe7..938daeb 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7523/assertion.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7523/assertion.py
+@@ -1,6 +1,6 @@
+ import time
+-from authlib.jose import jwt
+-from authlib.common.security import generate_token
++from didcomm.vendor.authlib.jose import jwt
++from didcomm.vendor.authlib.common.security import generate_token
+ 
+ 
+ def sign_jwt_bearer_assertion(
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7523/auth.py b/didcomm/vendor/authlib/oauth2/rfc7523/auth.py
+index 01e7edf..8e5acaa 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7523/auth.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7523/auth.py
+@@ -1,4 +1,4 @@
+-from authlib.common.urls import add_params_to_qs
++from didcomm.vendor.authlib.common.urls import add_params_to_qs
+ from .assertion import client_secret_jwt_sign, private_key_jwt_sign
+ from .client import ASSERTION_TYPE
+ 
+@@ -10,7 +10,7 @@ class ClientSecretJWT(object):
+ 
+     Here is an example of use ``client_secret_jwt`` with Requests Session::
+ 
+-        from authlib.integrations.requests_client import OAuth2Session
++        from didcomm.vendor.authlib.integrations.requests_client import OAuth2Session
+ 
+         token_endpoint = 'https://example.com/oauth/token'
+         session = OAuth2Session(
+@@ -57,7 +57,7 @@ class PrivateKeyJWT(ClientSecretJWT):
+ 
+     Here is an example of use ``private_key_jwt`` with Requests Session::
+ 
+-        from authlib.integrations.requests_client import OAuth2Session
++        from didcomm.vendor.authlib.integrations.requests_client import OAuth2Session
+ 
+         token_endpoint = 'https://example.com/oauth/token'
+         session = OAuth2Session(
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7523/client.py b/didcomm/vendor/authlib/oauth2/rfc7523/client.py
+index 8127c7b..d357e73 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7523/client.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7523/client.py
+@@ -1,6 +1,6 @@
+ import logging
+-from authlib.jose import jwt
+-from authlib.jose.errors import JoseError
++from didcomm.vendor.authlib.jose import jwt
++from didcomm.vendor.authlib.jose.errors import JoseError
+ from ..rfc6749 import InvalidClientError
+ 
+ ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7523/jwt_bearer.py b/didcomm/vendor/authlib/oauth2/rfc7523/jwt_bearer.py
+index fb672a9..10bcdcb 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7523/jwt_bearer.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7523/jwt_bearer.py
+@@ -1,5 +1,5 @@
+ import logging
+-from authlib.jose import jwt, JoseError
++from didcomm.vendor.authlib.jose import jwt, JoseError
+ from ..rfc6749 import BaseGrant, TokenEndpointMixin
+ from ..rfc6749 import (
+     UnauthorizedClientError,
+@@ -143,7 +143,7 @@ class JWTBearerGrant(BaseGrant, TokenEndpointMixin):
+         "jwks" column on client table, e.g.::
+ 
+             def resolve_client_key(self, client, headers, payload):
+-                # from authlib.jose import JsonWebKey
++                # from didcomm.vendor.authlib.jose import JsonWebKey
+ 
+                 key_set = JsonWebKey.import_key_set(client.jwks)
+                 return key_set.find_by_kid(headers['kid'])
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7523/token.py b/didcomm/vendor/authlib/oauth2/rfc7523/token.py
+index 6f82660..f8d2d4a 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7523/token.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7523/token.py
+@@ -1,6 +1,6 @@
+ import time
+-from authlib.common.encoding import to_native
+-from authlib.jose import jwt
++from didcomm.vendor.authlib.common.encoding import to_native
++from didcomm.vendor.authlib.jose import jwt
+ 
+ 
+ class JWTBearerTokenGenerator(object):
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7523/validator.py b/didcomm/vendor/authlib/oauth2/rfc7523/validator.py
+index bbbff41..f2b27f6 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7523/validator.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7523/validator.py
+@@ -1,6 +1,6 @@
+ import time
+ import logging
+-from authlib.jose import jwt, JoseError, JWTClaims
++from didcomm.vendor.authlib.jose import jwt, JoseError, JWTClaims
+ from ..rfc6749 import TokenMixin
+ from ..rfc6750 import BearerTokenValidator
+ 
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7591/claims.py b/didcomm/vendor/authlib/oauth2/rfc7591/claims.py
+index b6157b5..2fb7013 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7591/claims.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7591/claims.py
+@@ -1,6 +1,6 @@
+-from authlib.jose import BaseClaims, JsonWebKey
+-from authlib.jose.errors import InvalidClaimError
+-from authlib.common.urls import is_valid_url
++from didcomm.vendor.authlib.jose import BaseClaims, JsonWebKey
++from didcomm.vendor.authlib.jose.errors import InvalidClaimError
++from didcomm.vendor.authlib.common.urls import is_valid_url
+ 
+ 
+ class ClientMetadataClaims(BaseClaims):
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7591/endpoint.py b/didcomm/vendor/authlib/oauth2/rfc7591/endpoint.py
+index 4926ce3..200b223 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7591/endpoint.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7591/endpoint.py
+@@ -1,9 +1,9 @@
+ import os
+ import time
+ import binascii
+-from authlib.consts import default_json_headers
+-from authlib.common.security import generate_token
+-from authlib.jose import JsonWebToken, JoseError
++from didcomm.vendor.authlib.consts import default_json_headers
++from didcomm.vendor.authlib.common.security import generate_token
++from didcomm.vendor.authlib.jose import JsonWebToken, JoseError
+ from ..rfc6749 import AccessDeniedError, InvalidRequestError
+ from ..rfc6749 import scope_to_list
+ from .claims import ClientMetadataClaims
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7592/endpoint.py b/didcomm/vendor/authlib/oauth2/rfc7592/endpoint.py
+index 5a036d7..353b92a 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7592/endpoint.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7592/endpoint.py
+@@ -1,4 +1,4 @@
+-from authlib.consts import default_json_headers
++from didcomm.vendor.authlib.consts import default_json_headers
+ from ..rfc6749 import AccessDeniedError
+ from ..rfc6750 import InvalidTokenError
+ 
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7636/challenge.py b/didcomm/vendor/authlib/oauth2/rfc7636/challenge.py
+index 885436f..f157d35 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7636/challenge.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7636/challenge.py
+@@ -1,6 +1,6 @@
+ import re
+ import hashlib
+-from authlib.common.encoding import to_bytes, to_unicode, urlsafe_b64encode
++from didcomm.vendor.authlib.common.encoding import to_bytes, to_unicode, urlsafe_b64encode
+ from ..rfc6749.errors import InvalidRequestError, InvalidGrantError
+ 
+ 
+diff --git a/didcomm/vendor/authlib/oauth2/rfc7662/introspection.py b/didcomm/vendor/authlib/oauth2/rfc7662/introspection.py
+index cca15b8..885dfdd 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc7662/introspection.py
++++ b/didcomm/vendor/authlib/oauth2/rfc7662/introspection.py
+@@ -1,4 +1,4 @@
+-from authlib.consts import default_json_headers
++from didcomm.vendor.authlib.consts import default_json_headers
+ from ..rfc6749 import (
+     TokenEndpoint,
+     InvalidRequestError,
+diff --git a/didcomm/vendor/authlib/oauth2/rfc8414/models.py b/didcomm/vendor/authlib/oauth2/rfc8414/models.py
+index 3e89a5c..0ad8b6b 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc8414/models.py
++++ b/didcomm/vendor/authlib/oauth2/rfc8414/models.py
+@@ -1,5 +1,5 @@
+-from authlib.common.urls import urlparse, is_valid_url
+-from authlib.common.security import is_secure_transport
++from didcomm.vendor.authlib.common.urls import urlparse, is_valid_url
++from didcomm.vendor.authlib.common.security import is_secure_transport
+ 
+ 
+ class AuthorizationServerMetadata(dict):
+diff --git a/didcomm/vendor/authlib/oauth2/rfc8414/well_known.py b/didcomm/vendor/authlib/oauth2/rfc8414/well_known.py
+index dc948d8..c215d21 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc8414/well_known.py
++++ b/didcomm/vendor/authlib/oauth2/rfc8414/well_known.py
+@@ -1,4 +1,4 @@
+-from authlib.common.urls import urlparse
++from didcomm.vendor.authlib.common.urls import urlparse
+ 
+ 
+ def get_well_known_url(issuer, external=False, suffix='oauth-authorization-server'):
+diff --git a/didcomm/vendor/authlib/oauth2/rfc8628/endpoint.py b/didcomm/vendor/authlib/oauth2/rfc8628/endpoint.py
+index 5bcdb9f..1a5eb80 100644
+--- a/didcomm/vendor/authlib/oauth2/rfc8628/endpoint.py
++++ b/didcomm/vendor/authlib/oauth2/rfc8628/endpoint.py
+@@ -1,6 +1,6 @@
+-from authlib.consts import default_json_headers
+-from authlib.common.security import generate_token
+-from authlib.common.urls import add_params_to_uri
++from didcomm.vendor.authlib.consts import default_json_headers
++from didcomm.vendor.authlib.common.security import generate_token
++from didcomm.vendor.authlib.common.urls import add_params_to_uri
+ 
+ 
+ class DeviceAuthorizationEndpoint(object):
+diff --git a/didcomm/vendor/authlib/oidc/core/claims.py b/didcomm/vendor/authlib/oidc/core/claims.py
+index ca6958f..1da17cc 100644
+--- a/didcomm/vendor/authlib/oidc/core/claims.py
++++ b/didcomm/vendor/authlib/oidc/core/claims.py
+@@ -1,8 +1,8 @@
+ import time
+ import hmac
+-from authlib.common.encoding import to_bytes
+-from authlib.jose import JWTClaims
+-from authlib.jose.errors import (
++from didcomm.vendor.authlib.common.encoding import to_bytes
++from didcomm.vendor.authlib.jose import JWTClaims
++from didcomm.vendor.authlib.jose.errors import (
+     MissingClaimError,
+     InvalidClaimError,
+ )
+diff --git a/didcomm/vendor/authlib/oidc/core/errors.py b/didcomm/vendor/authlib/oidc/core/errors.py
+index e5fb630..489a874 100644
+--- a/didcomm/vendor/authlib/oidc/core/errors.py
++++ b/didcomm/vendor/authlib/oidc/core/errors.py
+@@ -1,4 +1,4 @@
+-from authlib.oauth2 import OAuth2Error
++from didcomm.vendor.authlib.oauth2 import OAuth2Error
+ 
+ 
+ class InteractionRequiredError(OAuth2Error):
+diff --git a/didcomm/vendor/authlib/oidc/core/grants/code.py b/didcomm/vendor/authlib/oidc/core/grants/code.py
+index 040a360..58d416d 100644
+--- a/didcomm/vendor/authlib/oidc/core/grants/code.py
++++ b/didcomm/vendor/authlib/oidc/core/grants/code.py
+@@ -42,7 +42,7 @@ class OpenIDToken(object):
+         """Provide user information for the given scope. Developers
+         MUST implement this method in subclass, e.g.::
+ 
+-            from authlib.oidc.core import UserInfo
++            from didcomm.vendor.authlib.oidc.core import UserInfo
+ 
+             def generate_user_info(self, user, scope):
+                 user_info = UserInfo(sub=user.id, name=user.name)
+diff --git a/didcomm/vendor/authlib/oidc/core/grants/hybrid.py b/didcomm/vendor/authlib/oidc/core/grants/hybrid.py
+index 384c867..779b5d9 100644
+--- a/didcomm/vendor/authlib/oidc/core/grants/hybrid.py
++++ b/didcomm/vendor/authlib/oidc/core/grants/hybrid.py
+@@ -1,7 +1,7 @@
+ import logging
+-from authlib.common.security import generate_token
+-from authlib.oauth2.rfc6749 import InvalidScopeError
+-from authlib.oauth2.rfc6749.grants.authorization_code import (
++from didcomm.vendor.authlib.common.security import generate_token
++from didcomm.vendor.authlib.oauth2.rfc6749 import InvalidScopeError
++from didcomm.vendor.authlib.oauth2.rfc6749.grants.authorization_code import (
+     validate_code_authorization_request
+ )
+ from .implicit import OpenIDImplicitGrant
+diff --git a/didcomm/vendor/authlib/oidc/core/grants/implicit.py b/didcomm/vendor/authlib/oidc/core/grants/implicit.py
+index a498f45..66667fa 100644
+--- a/didcomm/vendor/authlib/oidc/core/grants/implicit.py
++++ b/didcomm/vendor/authlib/oidc/core/grants/implicit.py
+@@ -1,5 +1,5 @@
+ import logging
+-from authlib.oauth2.rfc6749 import (
++from didcomm.vendor.authlib.oauth2.rfc6749 import (
+     OAuth2Error,
+     InvalidScopeError,
+     AccessDeniedError,
+@@ -57,7 +57,7 @@ class OpenIDImplicitGrant(ImplicitGrant):
+         """Provide user information for the given scope. Developers
+         MUST implement this method in subclass, e.g.::
+ 
+-            from authlib.oidc.core import UserInfo
++            from didcomm.vendor.authlib.oidc.core import UserInfo
+ 
+             def generate_user_info(self, user, scope):
+                 user_info = UserInfo(sub=user.id, name=user.name)
+diff --git a/didcomm/vendor/authlib/oidc/core/grants/util.py b/didcomm/vendor/authlib/oidc/core/grants/util.py
+index 3b57dbe..1bcc68c 100644
+--- a/didcomm/vendor/authlib/oidc/core/grants/util.py
++++ b/didcomm/vendor/authlib/oidc/core/grants/util.py
+@@ -1,9 +1,9 @@
+ import time
+-from authlib.oauth2.rfc6749 import InvalidRequestError
+-from authlib.oauth2.rfc6749 import scope_to_list
+-from authlib.jose import jwt
+-from authlib.common.encoding import to_native
+-from authlib.common.urls import add_params_to_uri, quote_url
++from didcomm.vendor.authlib.oauth2.rfc6749 import InvalidRequestError
++from didcomm.vendor.authlib.oauth2.rfc6749 import scope_to_list
++from didcomm.vendor.authlib.jose import jwt
++from didcomm.vendor.authlib.common.encoding import to_native
++from didcomm.vendor.authlib.common.urls import add_params_to_uri, quote_url
+ from ..util import create_half_hash
+ from ..errors import (
+     LoginRequiredError,
+diff --git a/didcomm/vendor/authlib/oidc/core/models.py b/didcomm/vendor/authlib/oidc/core/models.py
+index 5f41405..07be863 100644
+--- a/didcomm/vendor/authlib/oidc/core/models.py
++++ b/didcomm/vendor/authlib/oidc/core/models.py
+@@ -1,4 +1,4 @@
+-from authlib.oauth2.rfc6749 import (
++from didcomm.vendor.authlib.oauth2.rfc6749 import (
+     AuthorizationCodeMixin as _AuthorizationCodeMixin
+ )
+ 
+diff --git a/didcomm/vendor/authlib/oidc/core/util.py b/didcomm/vendor/authlib/oidc/core/util.py
+index 37d23de..ea4b778 100644
+--- a/didcomm/vendor/authlib/oidc/core/util.py
++++ b/didcomm/vendor/authlib/oidc/core/util.py
+@@ -1,5 +1,5 @@
+ import hashlib
+-from authlib.common.encoding import to_bytes, urlsafe_b64encode
++from didcomm.vendor.authlib.common.encoding import to_bytes, urlsafe_b64encode
+ 
+ 
+ def create_half_hash(s, alg):
+diff --git a/didcomm/vendor/authlib/oidc/discovery/models.py b/didcomm/vendor/authlib/oidc/discovery/models.py
+index db1a804..6f8ffdb 100644
+--- a/didcomm/vendor/authlib/oidc/discovery/models.py
++++ b/didcomm/vendor/authlib/oidc/discovery/models.py
+@@ -1,5 +1,5 @@
+-from authlib.oauth2.rfc8414 import AuthorizationServerMetadata
+-from authlib.oauth2.rfc8414.models import validate_array_value
++from didcomm.vendor.authlib.oauth2.rfc8414 import AuthorizationServerMetadata
++from didcomm.vendor.authlib.oauth2.rfc8414.models import validate_array_value
+ 
+ 
+ class OpenIDProviderMetadata(AuthorizationServerMetadata):
+diff --git a/didcomm/vendor/authlib/oidc/discovery/well_known.py b/didcomm/vendor/authlib/oidc/discovery/well_known.py
+index e3087a1..74f99dd 100644
+--- a/didcomm/vendor/authlib/oidc/discovery/well_known.py
++++ b/didcomm/vendor/authlib/oidc/discovery/well_known.py
+@@ -1,4 +1,4 @@
+-from authlib.common.urls import urlparse
++from didcomm.vendor.authlib.common.urls import urlparse
+ 
+ 
+ def get_well_known_url(issuer, external=False):

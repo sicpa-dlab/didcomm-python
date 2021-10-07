@@ -1,5 +1,5 @@
-from authlib.jose import JsonWebSignature
-from authlib.jose.errors import BadSignatureError
+from didcomm.vendor.authlib.jose import JsonWebSignature
+from didcomm.vendor.authlib.jose.errors import BadSignatureError
 
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import DID_OR_DID_URL, DIDCommMessageTypes

@@ -1,5 +1,5 @@
 import pytest
-from authlib.common.encoding import json_dumps
+from didcomm.vendor.authlib.common.encoding import json_dumps
 
 from didcomm.errors import MalformedMessageError
 from didcomm.unpack import unpack

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional, Callable
 
-from authlib.jose.rfc7517 import AsymmetricKey
+from didcomm.vendor.authlib.jose.rfc7517 import AsymmetricKey
 
 from didcomm.common.algorithms import SignAlg, AnonCryptAlg, AuthCryptAlg
 from didcomm.common.types import DID_URL, DID_OR_DID_URL

@@ -1,4 +1,4 @@
-from authlib.common.encoding import (
+from didcomm.vendor.authlib.common.encoding import (
     json_loads,
     json_dumps,
     to_unicode,

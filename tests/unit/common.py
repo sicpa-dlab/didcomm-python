@@ -1,6 +1,6 @@
 import copy
 
-from authlib.common.encoding import json_loads
+from didcomm.vendor.authlib.common.encoding import json_loads
 
 from didcomm.core.utils import parse_base64url_encoded_json
 from didcomm.unpack import unpack, Metadata

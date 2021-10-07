@@ -1,4 +1,4 @@
-from authlib.common.encoding import json_dumps
+from didcomm.vendor.authlib.common.encoding import json_dumps
 
 from didcomm.errors import MalformedMessageError
 from tests.test_vectors.common import TTestVectorNegative

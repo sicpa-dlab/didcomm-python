@@ -1,8 +1,8 @@
 import json
 from typing import Dict, Tuple
 
-from authlib.common.encoding import json_dumps
-from authlib.jose import OKPKey
+from didcomm.vendor.authlib.common.encoding import json_dumps
+from didcomm.vendor.authlib.jose import OKPKey
 
 from didcomm.common.types import (
     VerificationMethodType,

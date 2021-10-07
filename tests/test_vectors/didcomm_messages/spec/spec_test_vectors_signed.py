@@ -1,6 +1,6 @@
 import copy
 
-from authlib.common.encoding import json_dumps
+from didcomm.vendor.authlib.common.encoding import json_dumps
 
 from didcomm.common.algorithms import SignAlg
 from didcomm.unpack import Metadata

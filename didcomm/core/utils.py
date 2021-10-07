@@ -5,14 +5,14 @@ import attr
 import uuid
 from typing import Union, Optional, Any, List
 
-from authlib.common.encoding import (
+from didcomm.vendor.authlib.common.encoding import (
     to_unicode,
     urlsafe_b64decode,
     to_bytes,
     urlsafe_b64encode,
 )
-from authlib.jose import ECKey, OKPKey
-from authlib.jose.rfc7517 import AsymmetricKey
+from didcomm.vendor.authlib.jose import ECKey, OKPKey
+from didcomm.vendor.authlib.jose.rfc7517 import AsymmetricKey
 
 from didcomm.common.algorithms import SignAlg
 from didcomm.common.types import (

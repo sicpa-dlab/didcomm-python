@@ -1,5 +1,6 @@
 include LICENSE README.md
 
-recursive-include provisioner LICENSE LICENSE* *LICENSE*
+recursive-include didcomm LICENSE LICENSE* *LICENSE*
+include didcomm/vendor/vendors.txt
 
 global-exclude *.py[cod] __pycache__ *.so

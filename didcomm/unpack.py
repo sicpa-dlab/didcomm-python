@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List, Union
 
-from authlib.common.encoding import to_unicode, to_bytes
+from didcomm.vendor.authlib.common.encoding import to_unicode, to_bytes
 
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig
