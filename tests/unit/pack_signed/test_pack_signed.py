@@ -38,9 +38,9 @@ async def test_anoncrypt(msg, sign_frm, resolvers_config_alice, resolvers_config
     )
     assert unpack_res.message == msg
     assert unpack_res.metadata.non_repudiation
+    assert unpack_res.metadata.authenticated
     assert unpack_res.metadata.enc_alg_anon is None
     assert unpack_res.metadata.enc_alg_auth is None
     assert not unpack_res.metadata.anonymous_sender
     assert not unpack_res.metadata.encrypted
     assert not unpack_res.metadata.re_wrapped_in_forward
-    assert not unpack_res.metadata.authenticated

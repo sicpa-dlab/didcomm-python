@@ -105,6 +105,7 @@ async def unpack(
         msg_as_dict = json_bytes_to_dict(msg)
 
         metadata.non_repudiation = True
+        metadata.authenticated = True
         metadata.sign_from = unwrap_sign_result.sign_frm_kid
         metadata.sign_alg = unwrap_sign_result.alg
 
