@@ -61,7 +61,7 @@ jobs:
         run: pip install black
 
       - name: Black Format Check
-        run: black --check .
+        run: black --check --exclude didcomm/vendor .
 
   static-flake8:
     runs-on: ubuntu-latest

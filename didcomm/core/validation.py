@@ -1,4 +1,8 @@
-from didcomm.vendor.authlib.common.encoding import to_bytes, urlsafe_b64decode, to_unicode
+from didcomm.vendor.authlib.common.encoding import (
+    to_bytes,
+    urlsafe_b64decode,
+    to_unicode,
+)
 
 from didcomm.core.utils import is_did_url, parse_base64url_encoded_json, calculate_apv
 from didcomm.errors import MalformedMessageError, MalformedMessageCode

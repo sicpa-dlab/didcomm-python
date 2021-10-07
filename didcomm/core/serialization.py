@@ -1,4 +1,9 @@
-from didcomm.vendor.authlib.common.encoding import to_bytes, json_dumps, json_loads, to_unicode
+from didcomm.vendor.authlib.common.encoding import (
+    to_bytes,
+    json_dumps,
+    json_loads,
+    to_unicode,
+)
 
 from didcomm.common.types import JSON
 from didcomm.errors import MalformedMessageError, MalformedMessageCode

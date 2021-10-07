@@ -32,13 +32,13 @@ $ flake8 .
 Run [black](https://black.readthedocs.io/en/stable/usage_and_configuration/index.html) for a dry check as follows:
 
 ```bash
-$ black --check .
+$ black --check --exclude didcomm/vendor .
 ```
 
 or to auto-format:
 
 ```bash
-$ black .
+$ black --exclude didcomm/vendor .
 ```
 
 ## Unit Testing

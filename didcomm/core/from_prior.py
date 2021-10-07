@@ -1,6 +1,11 @@
 from typing import Optional
 
-from didcomm.vendor.authlib.common.encoding import to_unicode, to_bytes, json_loads, urlsafe_b64decode
+from didcomm.vendor.authlib.common.encoding import (
+    to_unicode,
+    to_bytes,
+    json_loads,
+    urlsafe_b64decode,
+)
 from didcomm.vendor.authlib.jose import JsonWebToken
 from didcomm.vendor.authlib.jose.errors import BadSignatureError
 
