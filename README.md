@@ -2,6 +2,10 @@
 
 Basic [DIDComm v2](https://identity.foundation/didcomm-messaging/spec) support in python.
 
+## Installation
+```
+pip install didcomm
+```
 
 ## Assumptions and Limitations
 - Python >= 3.7.
