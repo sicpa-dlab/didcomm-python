@@ -1,7 +1,18 @@
-# didcomm-python
+# DIDComm Python
 
-Basic [DIDComm v2](https://identity.foundation/didcomm-messaging/spec) support in python.
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Unit Tests](https://github.com/sicpa-dlab/didcomm-python/workflows/verify/badge.svg)](https://github.com/sicpa-dlab/didcomm-python/actions/workflows/verify.yml)
+[![Python Package](https://img.shields.io/pypi/v/didcomm)](https://pypi.org/project/didcomm/)
 
+Basic [DIDComm v2](https://identity.foundation/didcomm-messaging/spec) support in Python.
+
+## Installation
+```
+pip install didcomm
+```
+
+## DIDComm + peerdid Demo
+See https://github.com/sicpa-dlab/didcomm-demo.
 
 ## Assumptions and Limitations
 - Python >= 3.7.
@@ -26,8 +37,7 @@ Basic [DIDComm v2](https://identity.foundation/didcomm-messaging/spec) support i
 - Forward protocol is implemented and used by default.
 - DID rotation (`fromPrior` field) is supported.
    
-## DIDComm + peerdid Demo
-See https://github.com/sicpa-dlab/didcomm-demo.
+
 
 ## Examples
 
