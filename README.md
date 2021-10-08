@@ -7,7 +7,8 @@ Basic [DIDComm v2](https://identity.foundation/didcomm-messaging/spec) support i
 - Python >= 3.7.
 - In order to use the library, `SecretsResolver` and `DIDResolver` interfaces must be implemented on the application level. 
   Implementation of that interfaces is out of DIDComm library scope.  
-  - Verification materials in DID Docs and secrets are expected in JWK format only.
+  - Verification materials in DID Docs are expected in JWK, Base58 and Multibase (internally Base58 only) formats.
+  - Verification materials in secrets are expected in JWK format only.
   - Key IDs (kids) used in `SecretsResolver` must match the corresponding key IDs from DID Doc verification methods.
   - Key IDs (kids) in DID Doc verification methods and secrets must be a full [DID Fragment](https://www.w3.org/TR/did-core/#fragment), that is `did#key-id`.
   - Verification methods referencing another DID Document are not supported (see [Referring to Verification Methods](https://www.w3.org/TR/did-core/#referring-to-verification-methods)).
