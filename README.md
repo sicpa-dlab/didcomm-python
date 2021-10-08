@@ -7,6 +7,9 @@ Basic [DIDComm v2](https://identity.foundation/didcomm-messaging/spec) support i
 pip install didcomm
 ```
 
+## DIDComm + peerdid Demo
+See https://github.com/sicpa-dlab/didcomm-demo.
+
 ## Assumptions and Limitations
 - Python >= 3.7.
 - In order to use the library, `SecretsResolver` and `DIDResolver` interfaces must be implemented on the application level. 
@@ -30,8 +33,7 @@ pip install didcomm
 - Forward protocol is implemented and used by default.
 - DID rotation (`fromPrior` field) is supported.
    
-## DIDComm + peerdid Demo
-See https://github.com/sicpa-dlab/didcomm-demo.
+
 
 ## Examples
 
