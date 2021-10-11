@@ -12,7 +12,7 @@ diff_type_objects = ["1", 2, [3], (4,), {5: 6}, lambda: "7", (8 == 9), {10}]
 def gen_fwd_msg():
     return ForwardMessage(
         body=ForwardBody(next="did:example:123"),
-        attachments=[Attachment(data=AttachmentDataJson("somemsg"))],
+        attachments=[Attachment(data=AttachmentDataJson({"some": "msg"}))],
     )
 
 

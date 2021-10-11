@@ -5,6 +5,7 @@ from typing import Callable
 from didcomm.errors import DIDCommValueError, MalformedMessageError
 from didcomm.core import converters
 from didcomm.core.types import DIDCOMM_ORG_DOMAIN, DIDCommFields
+from didcomm.message import Attachment, AttachmentDataJson, AttachmentDataLinks
 from didcomm.protocols.routing.forward import (
     ForwardBody,
     ForwardMessage,
@@ -103,11 +104,40 @@ def test_forward_message__type_good(msg_ver, fwd_msg):
         pytest.param(gen_fwd_msg_dict(remove=[DIDCommFields.BODY]), id="no_body"),
         # TODO the cases above better to test in scope of GenericMessage
         pytest.param(gen_fwd_msg_dict(update={DIDCommFields.BODY: {}}), id="no_next"),
+        pytest.param(gen_fwd_msg_dict(remove=[DIDCommFields.ATTACHMENTS]), id="no_att"),
         pytest.param(
-            gen_fwd_msg_dict(remove=[DIDCommFields.ATTACHMENTS]), id="no_attach"
+            gen_fwd_msg_dict(update={DIDCommFields.ATTACHMENTS: []}), id="empty_att"
         ),
         pytest.param(
-            gen_fwd_msg_dict(update={DIDCommFields.ATTACHMENTS: []}), id="empty_attach"
+            gen_fwd_msg_dict(
+                update={
+                    DIDCommFields.ATTACHMENTS: [
+                        Attachment(data=AttachmentDataJson({"some": "msg1"})),
+                        Attachment(data=AttachmentDataJson({"some": "msg2"})),
+                    ]
+                }
+            ),
+            id="bad_att_len",
+        ),
+        pytest.param(
+            gen_fwd_msg_dict(
+                update={
+                    DIDCommFields.ATTACHMENTS: [
+                        Attachment(data=AttachmentDataLinks(["link"], "hash"))
+                    ]
+                }
+            ),
+            id="bad_att_type",
+        ),
+        pytest.param(
+            gen_fwd_msg_dict(
+                update={
+                    DIDCommFields.ATTACHMENTS: [
+                        Attachment(data=AttachmentDataJson({"somemsg"}))
+                    ]
+                }
+            ),
+            id="bad_att_value_type",
         ),
     ],
 )
@@ -121,3 +151,8 @@ def test_forward_message__body_from_dict(did):
     fwd_body = ForwardMessage._body_from_dict(body)
     assert isinstance(fwd_body, ForwardBody)
     assert fwd_body.next == body["next"]
+
+
+def test_forward_message__forwarded_msg(did):
+    msg = gen_fwd_msg()
+    assert msg.forwarded_msg == msg.attachments[0].data.json
