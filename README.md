@@ -36,7 +36,7 @@ See https://github.com/sicpa-dlab/didcomm-demo.
     - Algorithms: EdDSA (with crv=Ed25519), ES256, ES256K
 - Forward protocol is implemented and used by default.
 - DID rotation (`fromPrior` field) is supported.
-   
+- DIDComm has been implemented under the following [Assumptions](https://hackmd.io/i3gLqgHQR2ihVFV5euyhqg)   
 
 
 ## Examples
