@@ -199,7 +199,7 @@ def test_extract_key_from_x25519_key_agreement_key_2020_method_verification_meth
             type=VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
             verification_material=VerificationMaterial(
                 format=VerificationMaterialFormat.MULTIBASE,
-                value="zJhNWeSVLMYccCk7iopQW4guaSJTojqpMEELgSLhKwRr",
+                value="z6LSbysY2xFMRpGMhb7tFTLMpeuPRaqaWM1yECx2AtzE3KCc",
             ),
         ),
         align_kid=True,
@@ -224,7 +224,7 @@ def test_extract_key_from_ed25519_verification_key_2020_verification_method():
             type=VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
             verification_material=VerificationMaterial(
                 format=VerificationMaterialFormat.MULTIBASE,
-                value="zByHnpUCFb1vAfh9CFZ8ZkmUZguURW8nSw889hy6rD8L7",
+                value="z6MkqRYqQiSgvZQdnBytw86Qbs2ZWUkGv22od935YF4s8M7V",
             ),
         ),
         align_kid=True,

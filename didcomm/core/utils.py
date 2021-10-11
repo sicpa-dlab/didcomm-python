@@ -1,11 +1,12 @@
 import dataclasses
 import hashlib
-
-import attr
 import uuid
+from enum import Enum
 from typing import Union, Optional, Any, List
 
+import attr
 import base58
+import varint
 from authlib.common.encoding import (
     to_unicode,
     urlsafe_b64decode,
@@ -41,21 +42,28 @@ def didcomm_id_generator_default(did: Optional[DID_OR_DID_URL] = None) -> str:
 
 
 def extract_key(
-    verification_method: Union[VerificationMethod, Secret], align_kid=False
+    method: Union[VerificationMethod, Secret], align_kid=False
 ) -> AsymmetricKey:
-    if (
-        verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020
-        and verification_method.verification_material.format
-        == VerificationMaterialFormat.JWK
-    ):
+    if isinstance(method, VerificationMethod):
+        return _extract_key_from_verifciation_method(method, align_kid)
+    else:
+        return _extract_key_from_secret(method, align_kid)
+
+
+def _extract_key_from_verifciation_method(
+    verification_method: VerificationMethod, align_kid
+) -> AsymmetricKey:
+    if verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020:
+        if (
+            verification_method.verification_material.format
+            != VerificationMaterialFormat.JWK
+        ):
+            raise DIDCommValueError()
+
         jwk = json_str_to_dict(verification_method.verification_material.value)
 
         if align_kid:
-            if isinstance(verification_method, VerificationMethod):
-                kid = verification_method.id
-            else:
-                kid = verification_method.kid
-            jwk["kid"] = kid
+            jwk["kid"] = verification_method.id
 
         if jwk["kty"] == "EC":
             return ECKey.import_key(jwk)
@@ -64,16 +72,16 @@ def extract_key(
 
         raise DIDCommValueError()
 
-    elif (
-        verification_method.type
-        in [
-            VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019,
-            VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
-        ]
-        and verification_method.verification_material.format
-        == VerificationMaterialFormat.BASE58
-        and isinstance(verification_method, VerificationMethod)
-    ):
+    elif verification_method.type in [
+        VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019,
+        VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
+    ]:
+        if (
+            verification_method.verification_material.format
+            != VerificationMaterialFormat.BASE58
+        ):
+            raise DIDCommValueError()
+
         raw_value = base58.b58decode(verification_method.verification_material.value)
         base64url_value = urlsafe_b64encode(raw_value)
 
@@ -91,24 +99,37 @@ def extract_key(
 
         return OKPKey.import_key(jwk)
 
-    elif (
-        verification_method.type
-        in [
-            VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
-            VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
-        ]
-        and verification_method.verification_material.format
-        == VerificationMaterialFormat.MULTIBASE
-        and isinstance(verification_method, VerificationMethod)
-    ):
+    elif verification_method.type in [
+        VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
+        VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
+    ]:
+        if (
+            verification_method.verification_material.format
+            != VerificationMaterialFormat.MULTIBASE
+        ):
+            raise DIDCommValueError()
+
         # Currently only base58btc encoding is supported in scope of multibase support
         if verification_method.verification_material.value.startswith("z"):
-            raw_value = base58.b58decode(
+            prefixed_raw_value = base58.b58decode(
                 verification_method.verification_material.value[1:]
             )
-            base64url_value = urlsafe_b64encode(raw_value)
         else:
             raise DIDCommValueError()
+
+        codec, raw_value = from_multicodec(prefixed_raw_value)
+
+        expected_codec = (
+            Codec.X25519
+            if verification_method.type
+            == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020
+            else Codec.ED25519
+        )
+
+        if codec != expected_codec:
+            raise DIDCommValueError()
+
+        base64url_value = urlsafe_b64encode(raw_value)
 
         jwk = {
             "kty": "OKP",
@@ -124,7 +145,29 @@ def extract_key(
 
         return OKPKey.import_key(jwk)
 
-    raise DIDCommValueError()
+    else:
+        raise DIDCommValueError()
+
+
+def _extract_key_from_secret(secret: Secret, align_kid) -> AsymmetricKey:
+    if secret.type == VerificationMethodType.JSON_WEB_KEY_2020:
+        if secret.verification_material.format != VerificationMaterialFormat.JWK:
+            raise DIDCommValueError()
+
+        jwk = json_str_to_dict(secret.verification_material.value)
+
+        if align_kid:
+            jwk["kid"] = secret.kid
+
+        if jwk["kty"] == "EC":
+            return ECKey.import_key(jwk)
+        elif jwk["kty"] == "OKP":
+            return OKPKey.import_key(jwk)
+        else:
+            raise DIDCommValueError()
+
+    else:
+        raise DIDCommValueError()
 
 
 def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> SignAlg:
@@ -254,3 +297,25 @@ def calculate_apv(kids: List[DID_URL]) -> str:
     return to_unicode(
         urlsafe_b64encode(hashlib.sha256(to_bytes(".".join(sorted(kids)))).digest())
     )
+
+
+class Codec(Enum):
+    X25519 = 0xEC
+    ED25519 = 0xED
+
+
+def from_multicodec(value: bytes) -> (Codec, bytes):
+    try:
+        prefix_int = varint.decode_bytes(value)
+    except TypeError:
+        raise ValueError("Invalid multicodec prefix in {}".format(str(value)))
+
+    try:
+        codec = Codec(prefix_int)
+    except ValueError:
+        raise ValueError(
+            "Unknown multicodec prefix {} in {}".format(str(prefix_int), str(value))
+        )
+
+    prefix = varint.encode(prefix_int)
+    return codec, value[len(prefix) :]
