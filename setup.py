@@ -7,6 +7,7 @@ setup(
         "Authlib>=1.0.0b1",
         "pycryptodomex~=3.10",
         "base58~=2.1",
+        "varint~=1.0.2",
         "attrs~=21.2",  # TODO explore lowest acceptable version
         "packaging~=21.0",  # TODO explore lowest acceptable version
     ],
