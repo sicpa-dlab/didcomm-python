@@ -165,7 +165,7 @@ def is_did(v: Any) -> bool:
     #     (https://www.w3.org/TR/did-core/#did-syntax)
     if isinstance(v, (str, DID)):
         parts = str(v).split(":")
-        return len(parts) == 3 and parts[0] == "did" and all(parts)
+        return len(parts) >= 3 and parts[0] == "did" and all(parts)
     return False
 
 
