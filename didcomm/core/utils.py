@@ -259,12 +259,12 @@ def _from_multicodec(value: bytes) -> (_Codec, bytes):
     try:
         prefix_int = varint.decode_bytes(value)
     except Exception:
-        raise ValueError("Invalid multicodec prefix in {}".format(str(value)))
+        raise DIDCommValueError("Invalid multicodec prefix in {}".format(str(value)))
 
     try:
         codec = _Codec(prefix_int)
-    except ValueError:
-        raise ValueError(
+    except DIDCommValueError:
+        raise DIDCommValueError(
             "Unknown multicodec prefix {} in {}".format(str(prefix_int), str(value))
         )
 

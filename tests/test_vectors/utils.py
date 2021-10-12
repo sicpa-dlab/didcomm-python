@@ -4,6 +4,7 @@ from typing import List, Union
 from didcomm.common.types import VerificationMethodType, VerificationMaterialFormat
 from didcomm.core.serialization import json_str_to_dict
 from didcomm.did_doc.did_doc import VerificationMethod
+from didcomm.errors import DIDCommValueError
 from didcomm.secrets.secrets_resolver import Secret
 from tests.test_vectors.did_doc import (
     DID_DOC_ALICE_WITH_NO_SECRETS,
@@ -88,7 +89,7 @@ def get_key_agreement_methods_in_secrets(
         for vm in did_doc.verification_methods
         if vm.id in secrets_resolver.get_secret_kids()
         and vm.id in did_doc.key_agreement_kids
-        and (type == KeyAgreementCurveType.ALL or type == _map_cure_to_type(vm))
+        and (type == KeyAgreementCurveType.ALL or type == _map_curve_to_type(vm))
     ]
 
 
@@ -102,7 +103,7 @@ def get_key_agreement_methods_not_in_secrets(
         for vm in did_doc.verification_methods
         if vm.id not in secrets_resolver.get_secret_kids()
         and vm.id in did_doc.key_agreement_kids
-        and (type == KeyAgreementCurveType.ALL or type == _map_cure_to_type(vm))
+        and (type == KeyAgreementCurveType.ALL or type == _map_curve_to_type(vm))
     ]
 
 
@@ -125,7 +126,7 @@ def get_key_agreement_secrets(
         s
         for s in secrets_resolver.get_secrets()
         if s.kid in did_doc.key_agreement_kids
-        and (type == KeyAgreementCurveType.ALL or type == _map_cure_to_type(s))
+        and (type == KeyAgreementCurveType.ALL or type == _map_curve_to_type(s))
     ]
 
 
@@ -146,11 +147,11 @@ def get_key_agreement_methods(
         vm
         for vm in did_doc.verification_methods
         if vm.id in did_doc.key_agreement_kids
-        and (type == KeyAgreementCurveType.ALL or type == _map_cure_to_type(vm))
+        and (type == KeyAgreementCurveType.ALL or type == _map_curve_to_type(vm))
     ]
 
 
-def _map_cure_to_type(vm: Union[Secret, VerificationMethod]) -> KeyAgreementCurveType:
+def _map_curve_to_type(vm: Union[Secret, VerificationMethod]) -> KeyAgreementCurveType:
     # if vm.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019:
     #     return KeyAgreementCurveType.X25519
     if (
@@ -166,4 +167,4 @@ def _map_cure_to_type(vm: Union[Secret, VerificationMethod]) -> KeyAgreementCurv
             return KeyAgreementCurveType.P384
         if jwk["crv"] == "P-521":
             return KeyAgreementCurveType.P521
-    raise ValueError("Unknown verification methods curve type: " + str(vm))
+    raise DIDCommValueError("Unknown verification methods curve type: " + str(vm))
