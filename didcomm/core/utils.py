@@ -117,13 +117,13 @@ def _extract_key_from_verifciation_method(
         else:
             raise DIDCommValueError()
 
-        codec, raw_value = from_multicodec(prefixed_raw_value)
+        codec, raw_value = _from_multicodec(prefixed_raw_value)
 
         expected_codec = (
-            Codec.X25519
+            _Codec.X25519_PUB
             if verification_method.type
             == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020
-            else Codec.ED25519
+            else _Codec.ED25519_PUB
         )
 
         if codec != expected_codec:
@@ -149,6 +149,9 @@ def _extract_key_from_verifciation_method(
         raise DIDCommValueError()
 
 
+_CURVE25519_POINT_SIZE = 32
+
+
 def _extract_key_from_secret(secret: Secret, align_kid) -> AsymmetricKey:
     if secret.type == VerificationMethodType.JSON_WEB_KEY_2020:
         if secret.verification_material.format != VerificationMaterialFormat.JWK:
@@ -166,38 +169,136 @@ def _extract_key_from_secret(secret: Secret, align_kid) -> AsymmetricKey:
         else:
             raise DIDCommValueError()
 
+    elif secret.type in [
+        VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019,
+        VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
+    ]:
+        if secret.verification_material.format != VerificationMaterialFormat.BASE58:
+            raise DIDCommValueError()
+
+        raw_value = base58.b58decode(secret.verification_material.value)
+
+        raw_d_value = raw_value[:_CURVE25519_POINT_SIZE]
+        raw_x_value = raw_value[_CURVE25519_POINT_SIZE:]
+
+        base64url_d_value = urlsafe_b64encode(raw_d_value)
+        base64url_x_value = urlsafe_b64encode(raw_x_value)
+
+        jwk = {
+            "kty": "OKP",
+            "crv": "X25519"
+            if secret.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019
+            else "Ed25519",
+            "x": to_unicode(base64url_x_value),
+            "d": to_unicode(base64url_d_value),
+        }
+
+        if align_kid:
+            jwk["kid"] = secret.kid
+
+        return OKPKey.import_key(jwk)
+
+    elif secret.type in [
+        VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
+        VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
+    ]:
+        if secret.verification_material.format != VerificationMaterialFormat.MULTIBASE:
+            raise DIDCommValueError()
+
+        # Currently only base58btc encoding is supported in scope of multibase support
+        if secret.verification_material.value.startswith("z"):
+            prefixed_raw_value = base58.b58decode(
+                secret.verification_material.value[1:]
+            )
+        else:
+            raise DIDCommValueError()
+
+        codec, raw_value = _from_multicodec(prefixed_raw_value)
+
+        expected_codec = (
+            _Codec.X25519_PRIV
+            if secret.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020
+            else _Codec.ED25519_PRIV
+        )
+
+        if codec != expected_codec:
+            raise DIDCommValueError()
+
+        raw_d_value = raw_value[:_CURVE25519_POINT_SIZE]
+        raw_x_value = raw_value[_CURVE25519_POINT_SIZE:]
+
+        base64url_d_value = urlsafe_b64encode(raw_d_value)
+        base64url_x_value = urlsafe_b64encode(raw_x_value)
+
+        jwk = {
+            "kty": "OKP",
+            "crv": "X25519"
+            if secret.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020
+            else "Ed25519",
+            "x": to_unicode(base64url_x_value),
+            "d": to_unicode(base64url_d_value),
+        }
+
+        if align_kid:
+            jwk["kid"] = secret.kid
+
+        return OKPKey.import_key(jwk)
+
     else:
         raise DIDCommValueError()
 
 
-def extract_sign_alg(verification_method: Union[VerificationMethod, Secret]) -> SignAlg:
-    if (
-        verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020
-        and verification_method.verification_material.format
-        == VerificationMaterialFormat.JWK
-    ):
-        jwk = json_str_to_dict(verification_method.verification_material.value)
+class _Codec(Enum):
+    X25519_PUB = 0xEC
+    ED25519_PUB = 0xED
+    ED25519_PRIV = 0x1300
+    X25519_PRIV = 0x1302
+
+
+def _from_multicodec(value: bytes) -> (_Codec, bytes):
+    try:
+        prefix_int = varint.decode_bytes(value)
+    except Exception:
+        raise DIDCommValueError("Invalid multicodec prefix in {}".format(str(value)))
+
+    try:
+        codec = _Codec(prefix_int)
+    except DIDCommValueError:
+        raise DIDCommValueError(
+            "Unknown multicodec prefix {} in {}".format(str(prefix_int), str(value))
+        )
+
+    prefix = varint.encode(prefix_int)
+    return codec, value[len(prefix) :]
+
+
+def extract_sign_alg(method: Union[VerificationMethod, Secret]) -> SignAlg:
+    if method.type == VerificationMethodType.JSON_WEB_KEY_2020:
+        if method.verification_material.format != VerificationMaterialFormat.JWK:
+            raise DIDCommValueError()
+
+        jwk = json_str_to_dict(method.verification_material.value)
+
         if jwk["kty"] == "EC" and jwk["crv"] == "P-256":
             return SignAlg.ES256
         elif jwk["kty"] == "EC" and jwk["crv"] == "secp256k1":
             return SignAlg.ES256K
         elif jwk["kty"] == "OKP" and jwk["crv"] == "Ed25519":
             return SignAlg.ED25519
+        else:
+            raise DIDCommValueError()
 
-        raise DIDCommValueError()
+    elif method.type in [
+        VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
+        VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
+    ]:
+        return SignAlg.ED25519
 
-    # elif verification_method.type == (
-    #     VerificationMethodType.ED25519_VERIFICATION_KEY_2018
-    # ):
-    #     return SignAlg.ED25519
-    #
-    # elif (
-    #     verification_method.type
-    #     == VerificationMethodType.ECDSA_SECP_256K1_VERIFICATION_KEY_2019
-    # ):
+    # elif method.type == VerificationMethodType.ECDSA_SECP_256K1_VERIFICATION_KEY_2019:
     #     return SignAlg.ES256K
 
-    raise DIDCommValueError()
+    else:
+        raise DIDCommValueError()
 
 
 # TODO TEST
@@ -297,25 +398,3 @@ def calculate_apv(kids: List[DID_URL]) -> str:
     return to_unicode(
         urlsafe_b64encode(hashlib.sha256(to_bytes(".".join(sorted(kids)))).digest())
     )
-
-
-class Codec(Enum):
-    X25519 = 0xEC
-    ED25519 = 0xED
-
-
-def from_multicodec(value: bytes) -> (Codec, bytes):
-    try:
-        prefix_int = varint.decode_bytes(value)
-    except TypeError:
-        raise ValueError("Invalid multicodec prefix in {}".format(str(value)))
-
-    try:
-        codec = Codec(prefix_int)
-    except ValueError:
-        raise ValueError(
-            "Unknown multicodec prefix {} in {}".format(str(prefix_int), str(value))
-        )
-
-    prefix = varint.encode(prefix_int)
-    return codec, value[len(prefix) :]
