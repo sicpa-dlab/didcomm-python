@@ -269,7 +269,7 @@ def _from_multicodec(value: bytes) -> (_Codec, bytes):
         )
 
     prefix = varint.encode(prefix_int)
-    return codec, value[len(prefix):]
+    return codec, value[len(prefix) :]
 
 
 def extract_sign_alg(method: Union[VerificationMethod, Secret]) -> SignAlg:
