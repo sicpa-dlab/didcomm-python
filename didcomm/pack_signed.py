@@ -106,4 +106,6 @@ class PackSignedParameters:
 
 def __validate(sign_frm: DID_OR_DID_URL):
     if not is_did(sign_frm):
-        raise DIDCommValueError()
+        raise DIDCommValueError(
+            f"`sign_from` value is not a valid DID of DID URL: {sign_frm}"
+        )
