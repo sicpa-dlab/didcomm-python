@@ -1,5 +1,7 @@
 from enum import Enum
 
+from didcomm.common.types import DID
+
 
 class DIDCommError(Exception):
     pass
@@ -10,7 +12,8 @@ class DIDCommValueError(DIDCommError, ValueError):
 
 
 class DIDDocNotResolvedError(DIDCommError):
-    pass
+    def __init__(self, did: DID):
+        self.message = f"DID `{did}` is not found in DID resolver"
 
 
 class DIDUrlNotFoundError(DIDCommError):
@@ -22,7 +25,8 @@ class SecretNotFoundError(DIDCommError):
 
 
 class IncompatibleCryptoError(DIDCommError):
-    pass
+    def __init__(self):
+        self.message = "Sender and recipient keys corresponding to provided parameters are incompatible to each other"
 
 
 class InvalidDIDDocError(DIDCommValueError):

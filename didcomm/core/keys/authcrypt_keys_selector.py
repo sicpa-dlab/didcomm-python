@@ -37,24 +37,30 @@ async def find_authcrypt_pack_sender_and_recipient_keys(
     if frm_kid is None:
         sender_did_doc = await resolvers_config.did_resolver.resolve(frm_did)
         if sender_did_doc is None:
-            raise DIDDocNotResolvedError()
+            raise DIDDocNotResolvedError(frm_did)
         if not sender_did_doc.key_agreement_kids:
-            raise DIDUrlNotFoundError()
+            raise DIDUrlNotFoundError(
+                f"No keyAgreement verification relationships are found for DID `{frm_did}`"
+            )
         sender_kids = sender_did_doc.key_agreement_kids
     else:
         sender_kids = [frm_kid]
 
     recipient_did_doc = await resolvers_config.did_resolver.resolve(to_did)
     if recipient_did_doc is None:
-        raise DIDDocNotResolvedError()
+        raise DIDDocNotResolvedError(to_did)
 
     if to_kid is None:
         if not recipient_did_doc.key_agreement_kids:
-            raise DIDUrlNotFoundError()
+            raise DIDUrlNotFoundError(
+                f"No keyAgreement verification relationships are found for DID `{to_did}`"
+            )
         recipient_kids = recipient_did_doc.key_agreement_kids
     else:
         if to_kid not in recipient_did_doc.key_agreement_kids:
-            raise DIDUrlNotFoundError()
+            raise DIDUrlNotFoundError(
+                f"DID URL `{to_kid}` is not found in keyAgreement verification relationships of DID `{to_did}`"
+            )
         recipient_kids = [to_kid]
 
     secret_found = False
@@ -68,7 +74,7 @@ async def find_authcrypt_pack_sender_and_recipient_keys(
         for kid in recipient_kids:
             verification_method = recipient_did_doc.get_verification_method(kid)
             if verification_method is None:
-                raise DIDUrlNotFoundError()
+                raise DIDUrlNotFoundError(f"Verification method `{kid}` is not found")
             if are_keys_compatible(secret, verification_method):
                 verification_methods.append(verification_method)
 
@@ -76,7 +82,9 @@ async def find_authcrypt_pack_sender_and_recipient_keys(
             return AuthcryptPackKeys(secret, verification_methods)
 
     if not secret_found:
-        raise SecretNotFoundError()
+        raise SecretNotFoundError(
+            f"No secrets are found in secrets resolver for DID URLs: {sender_kids}"
+        )
     else:
         raise IncompatibleCryptoError()
 
@@ -88,23 +96,29 @@ async def find_authcrypt_unpack_sender_and_recipient_keys(
 ) -> AsyncGenerator[AuthcryptUnpackKeys, Any]:
     secret_ids = await resolvers_config.secrets_resolver.get_keys(to_kids)
     if not secret_ids:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(
+            f"No secrets are found in secrets resolver for DID URLs: {to_kids}"
+        )
 
     frm_did = get_did(frm_kid)
     sender_did_doc = await resolvers_config.did_resolver.resolve(frm_did)
     if sender_did_doc is None:
-        raise DIDDocNotResolvedError()
+        raise DIDDocNotResolvedError(frm_did)
     if not sender_did_doc.key_agreement_kids:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(
+            f"No keyAgreement verification relationships are found for DID `{frm_did}`"
+        )
     sender_verification_method = sender_did_doc.get_verification_method(frm_kid)
     if sender_verification_method is None:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(f"Verification method `{frm_kid}` is not found")
 
     found = False
     for secret_id in secret_ids:
         secret = await resolvers_config.secrets_resolver.get_key(secret_id)
         if secret is None:
-            raise SecretNotFoundError()
+            raise SecretNotFoundError(
+                f"Secret `{secret_id}` is not found in secrets resolver"
+            )
         if not are_keys_compatible(secret, sender_verification_method):
             continue
         found = True
