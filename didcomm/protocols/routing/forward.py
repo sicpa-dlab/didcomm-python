@@ -142,7 +142,7 @@ async def find_did_service(
     did_doc = await resolvers_config.did_resolver.resolve(to_did)
 
     if did_doc is None:
-        raise DIDDocNotResolvedError()
+        raise DIDDocNotResolvedError(to_did)
 
     if service_id:
         did_service = did_doc.get_didcomm_service(service_id)

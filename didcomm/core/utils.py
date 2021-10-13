@@ -58,7 +58,10 @@ def _extract_key_from_verifciation_method(
             verification_method.verification_material.format
             != VerificationMaterialFormat.JWK
         ):
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Verification material format {verification_method.verification_material.format} "
+                f"is not supported for verification method type {verification_method.type}"
+            )
 
         jwk = json_str_to_dict(verification_method.verification_material.value)
 
@@ -69,8 +72,8 @@ def _extract_key_from_verifciation_method(
             return ECKey.import_key(jwk)
         elif jwk["kty"] == "OKP":
             return OKPKey.import_key(jwk)
-
-        raise DIDCommValueError()
+        else:
+            raise DIDCommValueError(f"JWK key type {jwk['kty']} is not supported")
 
     elif verification_method.type in [
         VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019,
@@ -80,7 +83,10 @@ def _extract_key_from_verifciation_method(
             verification_method.verification_material.format
             != VerificationMaterialFormat.BASE58
         ):
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Verification material format {verification_method.verification_material.format} "
+                f"is not supported for verification method type {verification_method.type}"
+            )
 
         raw_value = base58.b58decode(verification_method.verification_material.value)
         base64url_value = urlsafe_b64encode(raw_value)
@@ -107,7 +113,10 @@ def _extract_key_from_verifciation_method(
             verification_method.verification_material.format
             != VerificationMaterialFormat.MULTIBASE
         ):
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Verification material format {verification_method.verification_material.format} "
+                f"is not supported for verification method type {verification_method.type}"
+            )
 
         # Currently only base58btc encoding is supported in scope of multibase support
         if verification_method.verification_material.value.startswith("z"):
@@ -115,7 +124,10 @@ def _extract_key_from_verifciation_method(
                 verification_method.verification_material.value[1:]
             )
         else:
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Multibase keys containing internally Base58 values only are currently supported "
+                f"but got the value: {verification_method.verification_material.value}"
+            )
 
         codec, raw_value = _from_multicodec(prefixed_raw_value)
 
@@ -127,7 +139,10 @@ def _extract_key_from_verifciation_method(
         )
 
         if codec != expected_codec:
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Multibase public key value contains multicodec prefix "
+                f"which is inappropriate for verification method type {verification_method.type}"
+            )
 
         base64url_value = urlsafe_b64encode(raw_value)
 
@@ -146,7 +161,9 @@ def _extract_key_from_verifciation_method(
         return OKPKey.import_key(jwk)
 
     else:
-        raise DIDCommValueError()
+        raise DIDCommValueError(
+            f"Verification method type {verification_method.type} is not supported"
+        )
 
 
 _CURVE25519_POINT_SIZE = 32
@@ -155,7 +172,10 @@ _CURVE25519_POINT_SIZE = 32
 def _extract_key_from_secret(secret: Secret, align_kid) -> AsymmetricKey:
     if secret.type == VerificationMethodType.JSON_WEB_KEY_2020:
         if secret.verification_material.format != VerificationMaterialFormat.JWK:
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Verification material format {secret.verification_material.format} "
+                f"is not supported for secret type {secret.type}"
+            )
 
         jwk = json_str_to_dict(secret.verification_material.value)
 
@@ -167,14 +187,17 @@ def _extract_key_from_secret(secret: Secret, align_kid) -> AsymmetricKey:
         elif jwk["kty"] == "OKP":
             return OKPKey.import_key(jwk)
         else:
-            raise DIDCommValueError()
+            raise DIDCommValueError(f"JWK key type {jwk['kty']} is not supported")
 
     elif secret.type in [
         VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019,
         VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
     ]:
         if secret.verification_material.format != VerificationMaterialFormat.BASE58:
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Verification material format {secret.verification_material.format} "
+                f"is not supported for secret type {secret.type}"
+            )
 
         raw_value = base58.b58decode(secret.verification_material.value)
 
@@ -203,7 +226,10 @@ def _extract_key_from_secret(secret: Secret, align_kid) -> AsymmetricKey:
         VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
     ]:
         if secret.verification_material.format != VerificationMaterialFormat.MULTIBASE:
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Verification material format {secret.verification_material.format} "
+                f"is not supported for secret type {secret.type}"
+            )
 
         # Currently only base58btc encoding is supported in scope of multibase support
         if secret.verification_material.value.startswith("z"):
@@ -211,7 +237,10 @@ def _extract_key_from_secret(secret: Secret, align_kid) -> AsymmetricKey:
                 secret.verification_material.value[1:]
             )
         else:
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Multibase keys containing internally Base58 values only are currently supported "
+                f"but got the value: {secret.verification_material.value}"
+            )
 
         codec, raw_value = _from_multicodec(prefixed_raw_value)
 
@@ -222,7 +251,10 @@ def _extract_key_from_secret(secret: Secret, align_kid) -> AsymmetricKey:
         )
 
         if codec != expected_codec:
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Multibase private key value contains multicodec prefix "
+                f"which is inappropriate for secret type {secret.type}"
+            )
 
         raw_d_value = raw_value[:_CURVE25519_POINT_SIZE]
         raw_x_value = raw_value[_CURVE25519_POINT_SIZE:]
@@ -245,7 +277,7 @@ def _extract_key_from_secret(secret: Secret, align_kid) -> AsymmetricKey:
         return OKPKey.import_key(jwk)
 
     else:
-        raise DIDCommValueError()
+        raise DIDCommValueError(f"Secret type {secret.type} is not supported")
 
 
 class _Codec(Enum):
@@ -275,7 +307,10 @@ def _from_multicodec(value: bytes) -> (_Codec, bytes):
 def extract_sign_alg(method: Union[VerificationMethod, Secret]) -> SignAlg:
     if method.type == VerificationMethodType.JSON_WEB_KEY_2020:
         if method.verification_material.format != VerificationMaterialFormat.JWK:
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Verification material format {method.verification_material.format} "
+                f"is not supported for verification method type {method.type}"
+            )
 
         jwk = json_str_to_dict(method.verification_material.value)
 
@@ -286,7 +321,9 @@ def extract_sign_alg(method: Union[VerificationMethod, Secret]) -> SignAlg:
         elif jwk["kty"] == "OKP" and jwk["crv"] == "Ed25519":
             return SignAlg.ED25519
         else:
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"Keys of {jwk['kty']} type with {jwk['crv']} curve are not supported for signing/verification"
+            )
 
     elif method.type in [
         VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
@@ -298,7 +335,9 @@ def extract_sign_alg(method: Union[VerificationMethod, Secret]) -> SignAlg:
     #     return SignAlg.ES256K
 
     else:
-        raise DIDCommValueError()
+        raise DIDCommValueError(
+            f"Verification method type {method.type} is not supported for signing/verification"
+        )
 
 
 # TODO TEST

@@ -42,7 +42,9 @@ async def pack_from_prior_in_place(
         )
 
     if from_prior["sub"] == from_prior["iss"]:
-        raise DIDCommValueError("from_prior `iss` and `sub` values must not be equal")
+        raise DIDCommValueError(
+            f"from_prior `iss` and `sub` values must not be equal but got from_prior value: {from_prior}"
+        )
 
     if message.get("from") is not None and from_prior["sub"] != message["from"]:
         raise DIDCommValueError(
