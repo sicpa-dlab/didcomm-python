@@ -276,22 +276,28 @@ def __validate(
     sign_frm: Optional[DID_OR_DID_URL] = None,
 ):
     if not is_did(to):
-        raise DIDCommValueError()
+        raise DIDCommValueError(f"`to` value is not a valid DID of DID URL: {to}")
 
     if frm is not None and not is_did(frm):
-        raise DIDCommValueError()
+        raise DIDCommValueError(f"`from` value is not a valid DID of DID URL: {frm}")
 
     if sign_frm is not None and not is_did(sign_frm):
-        raise DIDCommValueError()
+        raise DIDCommValueError(
+            f"`sign_from` value is not a valid DID of DID URL: {sign_frm}"
+        )
 
     if message.to is not None and not isinstance(message.to, List):
-        raise DIDCommValueError()
+        raise DIDCommValueError(f"`message.to` value is not a list: {message.to}")
 
     if message.to is not None and get_did(to) not in message.to:
-        raise DIDCommValueError()
+        raise DIDCommValueError(
+            f"`message.to` value {message.to} does not contain `to` value's DID {get_did(to)}"
+        )
 
     if frm is not None and message.frm is not None and get_did(frm) != message.frm:
-        raise DIDCommValueError()
+        raise DIDCommValueError(
+            f"`message.from` value {message.frm} is not equal to `from` value's DID {get_did(frm)}"
+        )
 
 
 async def __sign_if_needed(

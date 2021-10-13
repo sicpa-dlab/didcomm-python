@@ -177,29 +177,35 @@ class GenericMessage(Generic[T]):
             or self.custom_headers is not None
             and not isinstance(self.custom_headers, List)
         ):
-            raise DIDCommValueError()
+            raise DIDCommValueError(f"Plaintext message structure is invalid: {self}")
 
         if self.to is not None:
             for to in self.to:
                 if not isinstance(to, str):
-                    raise DIDCommValueError()
+                    raise DIDCommValueError(f"`to` field element is invalid: {to}")
         if self.attachments is not None:
             for attachment in self.attachments:
                 if not isinstance(attachment, Attachment):
-                    raise DIDCommValueError()
+                    raise DIDCommValueError(
+                        f"`attachments` field element is invalid: {attachment}"
+                    )
         if self.custom_headers is not None:
             for custom_header in self.custom_headers:
                 if not isinstance(custom_header, Dict):
-                    raise DIDCommValueError()
+                    raise DIDCommValueError(
+                        f"`custom_headers` field element is invalid: {custom_header}"
+                    )
                 for k in custom_header.keys():
                     if k in self.__DEFAULT_FIELDS:
-                        raise DIDCommValueError()
+                        raise DIDCommValueError(
+                            f"`custom_headers` field element contains a default field {k}"
+                        )
 
 
 class Message(GenericMessage[JSON_OBJ]):
     def as_dict(self) -> dict:
         if not isinstance(self.body, Dict):
-            raise DIDCommValueError()
+            raise DIDCommValueError(f"Body structure is invalid: {self.body}")
         return super().as_dict()
 
 
@@ -267,7 +273,7 @@ class Attachment:
             or self.byte_count is not None
             and not isinstance(self.byte_count, int)
         ):
-            raise DIDCommValueError()
+            raise DIDCommValueError(f"Attachment structure is invalid: {self}")
 
 
 @dataclass
@@ -297,10 +303,10 @@ class AttachmentDataLinks:
             or self.jws is not None
             and not isinstance(self.jws, Dict)
         ):
-            raise DIDCommValueError()
+            raise DIDCommValueError(f"AttachmentDataLinks structure is invalid: {self}")
         for link in self.links:
             if not isinstance(link, str):
-                raise DIDCommValueError()
+                raise DIDCommValueError(f"Attachment data link is invalid: {link}")
 
 
 @dataclass
@@ -331,7 +337,9 @@ class AttachmentDataBase64:
             or self.jws is not None
             and not isinstance(self.jws, Dict)
         ):
-            raise DIDCommValueError()
+            raise DIDCommValueError(
+                f"AttachmentDataBase64 structure is invalid: {self}"
+            )
 
 
 @dataclass
@@ -362,7 +370,7 @@ class AttachmentDataJson:
             or self.jws is not None
             and not isinstance(self.jws, Dict)
         ):
-            raise DIDCommValueError()
+            raise DIDCommValueError(f"AttachmentDataJson structure is invalid: {self}")
 
 
 @dataclass(frozen=True)
@@ -385,7 +393,10 @@ class FromPrior:
             msg = FromPrior(**d)
             msg._validate()
         except Exception:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+            raise MalformedMessageError(
+                MalformedMessageCode.INVALID_PLAINTEXT,
+                "from_prior plaintext is invalid",
+            )
 
         return msg
 
@@ -405,4 +416,4 @@ class FromPrior:
             or self.jti is not None
             and not isinstance(self.jti, str)
         ):
-            raise DIDCommValueError()
+            raise DIDCommValueError(f"FromPrior structure is invalid: {self}")
