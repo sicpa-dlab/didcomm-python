@@ -74,6 +74,13 @@ async def test_forward_if_needed__no_did_services(wrap_in_forward_mock, test_dat
 
 
 @pytest.mark.asyncio
+async def test_forward_if_needed__no_routing_keys(wrap_in_forward_mock, test_data):
+    test_data.did_services_chain[-1].routing_keys = []
+    res = await __forward_if_needed(**attr.asdict(test_data, recurse=False))
+    assert res is None
+
+
+@pytest.mark.asyncio
 async def test_forward_if_needed__single_service(wrap_in_forward_mock, test_data):
     await __forward_if_needed(**attr.asdict(test_data, recurse=False))
 
