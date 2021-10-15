@@ -27,14 +27,16 @@ async def find_verification_key(
 
     did_doc = await resolvers_config.did_resolver.resolve(did)
     if did_doc is None:
-        raise DIDDocNotResolvedError()
+        raise DIDDocNotResolvedError(did)
 
     if frm_kid not in did_doc.authentication_kids:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(
+            f"DID URL `{frm_kid}` is not found in authentication verification relationships of DID `{did}`"
+        )
 
     verification_method = did_doc.get_verification_method(frm_kid)
     if verification_method is None:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(f"Verification method `{frm_kid}` is not found")
 
     return verification_method
 
@@ -44,7 +46,9 @@ async def _find_signing_key_by_kid(
 ) -> Secret:
     secret = await resolvers_config.secrets_resolver.get_key(frm_kid)
     if secret is None:
-        raise SecretNotFoundError()
+        raise SecretNotFoundError(
+            f"Secret `{frm_kid}` is not found in secrets resolver"
+        )
 
     return secret
 
@@ -54,20 +58,24 @@ async def _find_signing_key_by_did(
 ) -> Secret:
     did_doc = await resolvers_config.did_resolver.resolve(frm_did)
     if did_doc is None:
-        raise DIDDocNotResolvedError()
+        raise DIDDocNotResolvedError(frm_did)
 
     if not did_doc.authentication_kids:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(
+            f"No authentication verification relationships are found for DID `{frm_did}`"
+        )
 
     secret_ids = await resolvers_config.secrets_resolver.get_keys(
         did_doc.authentication_kids
     )
     if not secret_ids:
-        raise SecretNotFoundError()
+        raise SecretNotFoundError(
+            f"No secrets are found in secrets resolver for DID URLs: {did_doc.authentication_kids}"
+        )
 
     kid = secret_ids[0]
     secret = await resolvers_config.secrets_resolver.get_key(kid)
     if secret is None:
-        raise SecretNotFoundError()
+        raise SecretNotFoundError(f"Secret `{kid}` is not found in secrets resolver")
 
     return secret

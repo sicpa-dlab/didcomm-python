@@ -32,18 +32,24 @@ async def find_anoncrypt_unpack_recipient_private_keys(
 ) -> AsyncGenerator[Secret, Any]:
     secret_ids = await resolvers_config.secrets_resolver.get_keys(to_kids)
     if not secret_ids:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(
+            f"No secrets are found in secrets resolver for DID URLs: {to_kids}"
+        )
 
     found = False
     for secret_id in secret_ids:
         secret = await resolvers_config.secrets_resolver.get_key(secret_id)
         if secret is None:
-            raise SecretNotFoundError()
+            raise SecretNotFoundError(
+                f"Secret `{secret_id}` is not found in secrets resolver"
+            )
         found = True
         yield secret
 
     if not found:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(
+            f"No secrets are found in secrets resolver for DID URLs: {secret_ids}"
+        )
 
 
 async def _find_anoncrypt_pack_recipient_public_keys_by_kid(
@@ -51,14 +57,16 @@ async def _find_anoncrypt_pack_recipient_public_keys_by_kid(
 ) -> List[VerificationMethod]:
     did_doc = await resolvers_config.did_resolver.resolve(to_did)
     if did_doc is None:
-        raise DIDDocNotResolvedError()
+        raise DIDDocNotResolvedError(to_did)
 
     if to_kid not in did_doc.key_agreement_kids:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(
+            f"DID URL `{to_kid}` is not found in keyAgreement verification relationships of DID `{to_did}`"
+        )
 
     verification_method = did_doc.get_verification_method(to_kid)
     if verification_method is None:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(f"Verification method `{to_kid}` is not found")
 
     return [verification_method]
 
@@ -68,22 +76,24 @@ async def _find_anoncrypt_pack_recipient_public_keys_by_did(
 ) -> List[VerificationMethod]:
     did_doc = await resolvers_config.did_resolver.resolve(to_did)
     if did_doc is None:
-        raise DIDDocNotResolvedError()
+        raise DIDDocNotResolvedError(to_did)
 
     kids = did_doc.key_agreement_kids
     if not kids:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(
+            f"No keyAgreement verification relationships are found for DID `{to_did}`"
+        )
 
     # return only verification methods having the same type as the first one
     first_verification_method = did_doc.get_verification_method(kids[0])
     if first_verification_method is None:
-        raise DIDUrlNotFoundError()
+        raise DIDUrlNotFoundError(f"Verification method `{kids[0]}` is not found")
 
     verification_methods = []
     for kid in kids:
         verification_method = did_doc.get_verification_method(kid)
         if verification_method is None:
-            raise DIDUrlNotFoundError()
+            raise DIDUrlNotFoundError(f"Verification method `{kid}` is not found")
         if are_keys_compatible(first_verification_method, verification_method):
             verification_methods.append(verification_method)
 

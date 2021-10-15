@@ -19,7 +19,7 @@ from didcomm.core.sign import is_signed, unpack_sign
 from didcomm.errors import DIDCommValueError
 from didcomm.core.from_prior import unpack_from_prior_in_place
 from didcomm.message import Message
-from didcomm.protocols.routing.forward import unpack_forward, is_forward
+from didcomm.protocols.routing.forward import is_forward, ForwardMessage
 
 
 async def unpack(
@@ -52,7 +52,7 @@ async def unpack(
     else:
         # FIXME in python it should be a kind of TypeError instead
         raise DIDCommValueError(
-            "unexpected type of packed_message: '{type(packed_msg)}'"
+            f"unexpected type of packed_message: '{type(packed_msg)}'"
         )
 
     metadata = Metadata(
@@ -61,13 +61,6 @@ async def unpack(
         non_repudiation=False,
         anonymous_sender=False,
     )
-
-    if is_forward(msg_as_dict) and unpack_config.unwrap_re_wrapping_forward:
-        forward_res = await unpack_forward(
-            resolvers_config, packed_msg, unpack_config.expect_decrypt_by_all_keys
-        )
-        msg = to_bytes(forward_res.forwarded_msg)
-        msg_as_dict = json_str_to_dict(forward_res.forwarded_msg)
 
     if is_anoncrypted(msg_as_dict):
         unwrap_anoncrypt_result = await unpack_anoncrypt(
@@ -82,6 +75,12 @@ async def unpack(
         metadata.anonymous_sender = True
         metadata.encrypted_to = unwrap_anoncrypt_result.to_kids
         metadata.enc_alg_anon = unwrap_anoncrypt_result.alg
+
+        if is_forward(msg_as_dict) and unpack_config.unwrap_re_wrapping_forward:
+            fwd_msg = ForwardMessage.from_json(msg)
+            msg_as_dict = fwd_msg.forwarded_msg
+            msg = dict_to_json_bytes(msg_as_dict)
+            metadata.re_wrapped_in_forward = True
 
     if is_authcrypted(msg_as_dict):
         unwrap_authcrypt_result = await unpack_authcrypt(

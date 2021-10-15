@@ -9,6 +9,7 @@ from didcomm.common.types import (
     VerificationMaterial,
     VerificationMaterialFormat,
 )
+from didcomm.errors import DIDCommValueError
 from didcomm.secrets.secrets_resolver import Secret
 
 
@@ -37,7 +38,9 @@ def secret_to_jwk_dict(secret: Secret) -> Dict:
     """
     # assume JWK secrets only
     if secret.verification_material.format != VerificationMaterialFormat.JWK:
-        raise ValueError(f"Unsupported format {secret.verification_material.format}")
+        raise DIDCommValueError(
+            f"Unsupported format {secret.verification_material.format}"
+        )
     res = json.loads(secret.verification_material.value)
     res["kid"] = secret.kid
     return res

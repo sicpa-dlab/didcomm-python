@@ -4,7 +4,7 @@ from copy import deepcopy
 import logging
 import attr
 from dataclasses import dataclass
-from typing import List, Union, Optional, Callable
+from typing import List, Union, Optional, Callable, Dict
 from packaging.specifiers import SpecifierSet
 from enum import Enum
 
@@ -93,7 +93,6 @@ class ForwardMessage(GenericMessage[ForwardBody]):
     )
     attachments: List[Attachment] = attr.ib(kw_only=True)
 
-    # TODO TEST
     @attachments.validator
     def _check_attachments(self, attribute, value):
         if not (
@@ -101,8 +100,9 @@ class ForwardMessage(GenericMessage[ForwardBody]):
             and len(value) == 1
             and isinstance(value[0], Attachment)
             and isinstance(value[0].data, AttachmentDataJson)
+            and isinstance(value[0].data.json, Dict)
         ):
-            raise DIDCommValueError("'{attribute.name}': bad value '{value}'")
+            raise DIDCommValueError(f"'{attribute.name}': bad value '{value}'")
 
     @staticmethod
     def _body_from_dict(body: dict) -> ForwardBody:
@@ -110,6 +110,15 @@ class ForwardMessage(GenericMessage[ForwardBody]):
             return ForwardBody(**body)
         except Exception as exc:
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT) from exc
+
+    @property
+    def forwarded_msg(self) -> JSON_OBJ:
+        """
+        Unwrap (extract) forwarded message.
+
+        :return: unwrapped message as JSON_OBJ
+        """
+        return self.attachments[0].data.json  # JSON_OBJ
 
 
 @attr.s(auto_attribs=True)
@@ -133,7 +142,7 @@ async def find_did_service(
     did_doc = await resolvers_config.did_resolver.resolve(to_did)
 
     if did_doc is None:
-        raise DIDDocNotResolvedError()
+        raise DIDDocNotResolvedError(to_did)
 
     if service_id:
         did_service = did_doc.get_didcomm_service(service_id)
@@ -279,6 +288,7 @@ async def unpack_forward(
 
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
     :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc
+    :raises DIDCommValueError: invalid type of packed message
     :raises SecretNotFoundError: If there is no secret for the given DID or DID URL (key ID)
     :raises MalformedMessageError: if the message is invalid (can not be decrypted, signature is invalid, the plaintext is invalid, etc.)
 
@@ -291,18 +301,19 @@ async def unpack_forward(
     else:
         # FIXME in python it should be a kind of TypeError instead
         raise DIDCommValueError(
-            "unexpected type of packed_message: '{type(packed_msg)}'"
+            f"unexpected type of packed_message: '{type(packed_msg)}'"
         )
 
     fwd_unpack_res = await unpack_anoncrypt(
         msg_as_dict, resolvers_config, decrypt_by_all_keys
     )
 
-    if not is_forward(fwd_unpack_res.msg):
-        raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+    try:
+        fwd_msg = ForwardMessage.from_json(fwd_unpack_res.msg)
+    except DIDCommValueError as exc:
+        raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT) from exc
 
-    fwd_msg = ForwardMessage.from_json(fwd_unpack_res.msg)
-    forwarded_msg_dict = fwd_msg.attachments[0].data.json  # JSON_VALUE
+    forwarded_msg_dict = fwd_msg.forwarded_msg
 
     logger.debug(
         f"unpacked Forward: forwarded msg {forwarded_msg_dict}, to_kids"

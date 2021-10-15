@@ -1,5 +1,7 @@
 from enum import Enum
 
+from didcomm.common.types import DID
+
 
 class DIDCommError(Exception):
     pass
@@ -10,7 +12,8 @@ class DIDCommValueError(DIDCommError, ValueError):
 
 
 class DIDDocNotResolvedError(DIDCommError):
-    pass
+    def __init__(self, did: DID):
+        self.message = f"DID `{did}` is not found in DID resolver"
 
 
 class DIDUrlNotFoundError(DIDCommError):
@@ -22,7 +25,8 @@ class SecretNotFoundError(DIDCommError):
 
 
 class IncompatibleCryptoError(DIDCommError):
-    pass
+    def __init__(self):
+        self.message = "Sender and recipient keys corresponding to provided parameters are incompatible to each other"
 
 
 class InvalidDIDDocError(DIDCommValueError):
@@ -38,19 +42,19 @@ class MalformedMessageCode(Enum):
 
 
 class MalformedMessageError(DIDCommError):
-    def __init__(self, code: MalformedMessageCode):
+    def __init__(self, code: MalformedMessageCode, message: str = None):
         self.code = code
 
-
-class UnsatisfiedConstraintCode(Enum):
-    NOT_ENCRYPTED = 1
-    NOT_AUTHENTICATED = 2
-    NOT_SIGNED = 3
-    SENDER_NOT_PROTECTED = 4
-    NOT_SIGNED_BY_ENCRYPTER = 5
-    NOT_DECRYPTED_BY_ALL_KEYS = 6
-
-
-class UnsatisfiedConstraintError(DIDCommError):
-    def __init__(self, code: UnsatisfiedConstraintCode):
-        self.code = code
+        if message is not None:
+            self.message = message
+        else:
+            if self.code == MalformedMessageCode.CAN_NOT_DECRYPT:
+                self.message = "DIDComm message cannot be decrypted"
+            elif self.code == MalformedMessageCode.INVALID_SIGNATURE:
+                self.message = "Signature is invalid"
+            elif self.code == MalformedMessageCode.INVALID_PLAINTEXT:
+                self.message = "Plaintext is invalid"
+            elif self.code == MalformedMessageCode.INVALID_MESSAGE:
+                self.message = "DIDComm message is invalid"
+            elif self.code == MalformedMessageCode.NOT_SUPPORTED_FWD_PROTOCOL:
+                self.message = "Not supported Forward protocol"

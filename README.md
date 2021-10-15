@@ -1,13 +1,27 @@
-# didcomm-python
+# DIDComm Python
 
-Basic [DIDComm v2](https://identity.foundation/didcomm-messaging/spec) support in python.
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Unit Tests](https://github.com/sicpa-dlab/didcomm-python/workflows/verify/badge.svg)](https://github.com/sicpa-dlab/didcomm-python/actions/workflows/verify.yml)
+[![Python Package](https://img.shields.io/pypi/v/didcomm)](https://pypi.org/project/didcomm/)
 
+Basic [DIDComm v2](https://identity.foundation/didcomm-messaging/spec) support in Python.
+
+## Installation
+```
+pip install didcomm
+```
+
+## DIDComm + peerdid Demo
+See https://github.com/sicpa-dlab/didcomm-demo.
 
 ## Assumptions and Limitations
 - Python >= 3.7.
 - In order to use the library, `SecretsResolver` and `DIDResolver` interfaces must be implemented on the application level. 
   Implementation of that interfaces is out of DIDComm library scope.  
-  - Verification materials in DID Docs and secrets are expected in JWK format only.
+  - Verification materials are expected in JWK, Base58 and Multibase (internally Base58 only) formats.
+    - In Base58 and Multibase formats, keys using only X25519 and Ed25519 curves are supported.
+    - For private keys in Base58 and Multibase formats, the verification material value contains both private and public parts (concatenated bytes).
+    - In Multibase format, bytes of the verification material value is prefixed with the corresponding Multicodec code.
   - Key IDs (kids) used in `SecretsResolver` must match the corresponding key IDs from DID Doc verification methods.
   - Key IDs (kids) in DID Doc verification methods and secrets must be a full [DID Fragment](https://www.w3.org/TR/did-core/#fragment), that is `did#key-id`.
   - Verification methods referencing another DID Document are not supported (see [Referring to Verification Methods](https://www.w3.org/TR/did-core/#referring-to-verification-methods)).
@@ -24,9 +38,8 @@ Basic [DIDComm v2](https://identity.foundation/didcomm-messaging/spec) support i
     - Algorithms: EdDSA (with crv=Ed25519), ES256, ES256K
 - Forward protocol is implemented and used by default.
 - DID rotation (`fromPrior` field) is supported.
-   
-## DIDComm + peerdid Demo
-See https://github.com/sicpa-dlab/didcomm-demo.
+- DIDComm has been implemented under the following [Assumptions](https://hackmd.io/i3gLqgHQR2ihVFV5euyhqg)   
+
 
 ## Examples
 
