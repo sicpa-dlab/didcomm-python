@@ -3,13 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, List, Union
 
-from authlib.common.encoding import to_unicode, to_bytes
+from authlib.common.encoding import to_unicode
 
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import JWS, JSON, JSON_OBJ, DID_URL
 from didcomm.core.anoncrypt import unpack_anoncrypt, is_anoncrypted
 from didcomm.core.authcrypt import is_authcrypted, unpack_authcrypt
+from didcomm.core.from_prior import unpack_from_prior_in_place
+from didcomm.core.keys.forward_next_keys_selector import has_keys_for_forward_next
 from didcomm.core.serialization import (
     json_bytes_to_dict,
     json_str_to_dict,
@@ -17,7 +19,6 @@ from didcomm.core.serialization import (
 )
 from didcomm.core.sign import is_signed, unpack_sign
 from didcomm.errors import DIDCommValueError
-from didcomm.core.from_prior import unpack_from_prior_in_place
 from didcomm.message import Message
 from didcomm.protocols.routing.forward import is_forward, ForwardMessage
 
@@ -44,11 +45,9 @@ async def unpack(
     unpack_config = unpack_config or UnpackConfig()
 
     if isinstance(packed_msg, str):
-        msg = to_bytes(packed_msg)
-        msg_as_dict = json_str_to_dict(packed_msg)
+        packed_msg = json_str_to_dict(packed_msg)
     elif isinstance(packed_msg, dict):
-        msg = dict_to_json_bytes(packed_msg)
-        msg_as_dict = packed_msg
+        pass
     else:
         # FIXME in python it should be a kind of TypeError instead
         raise DIDCommValueError(
@@ -61,6 +60,18 @@ async def unpack(
         non_repudiation=False,
         anonymous_sender=False,
     )
+
+    return await _do_unpack(resolvers_config, packed_msg, unpack_config, metadata)
+
+
+async def _do_unpack(
+    resolvers_config: ResolversConfig,
+    packed_msg: JSON_OBJ,
+    unpack_config: UnpackConfig,
+    metadata: Metadata,
+) -> UnpackResult:
+    msg = dict_to_json_bytes(packed_msg)
+    msg_as_dict = packed_msg
 
     if is_anoncrypted(msg_as_dict):
         unwrap_anoncrypt_result = await unpack_anoncrypt(
@@ -76,11 +87,13 @@ async def unpack(
         metadata.encrypted_to = unwrap_anoncrypt_result.to_kids
         metadata.enc_alg_anon = unwrap_anoncrypt_result.alg
 
-        if is_forward(msg_as_dict) and unpack_config.unwrap_re_wrapping_forward:
+        if unpack_config.unwrap_re_wrapping_forward and is_forward(msg_as_dict):
             fwd_msg = ForwardMessage.from_json(msg)
-            msg_as_dict = fwd_msg.forwarded_msg
-            msg = dict_to_json_bytes(msg_as_dict)
-            metadata.re_wrapped_in_forward = True
+            if await has_keys_for_forward_next(fwd_msg.body.next, resolvers_config):
+                metadata.re_wrapped_in_forward = True
+                return await _do_unpack(
+                    resolvers_config, fwd_msg.forwarded_msg, unpack_config, metadata
+                )
 
     if is_authcrypted(msg_as_dict):
         unwrap_authcrypt_result = await unpack_authcrypt(
