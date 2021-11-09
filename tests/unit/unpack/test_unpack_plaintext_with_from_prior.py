@@ -14,7 +14,7 @@ PACKED_MESSAGE = json_dumps(
         "to": ["did:example:bob"],
         "created_time": 1516269022,
         "expires_time": 1516385931,
-        "from_prior": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSIsImtpZCI6ImRpZDpleGFtcGxlOmNoYXJsaWUja2V5LTEifQ.eyJpc3MiOiJkaWQ6ZXhhbXBsZTpjaGFybGllIiwic3ViIjoiZGlkOmV4YW1wbGU6YWxpY2UiLCJhdWQiOiIxMjMiLCJleHAiOjEyMzQsIm5iZiI6MTIzNDUsImlhdCI6MTIzNDU2LCJqdGkiOiJkZmcifQ.9F1o6duu_lC6LTZN-RN3R6uUl_p63ma30i8nNu2xoCmOc-lE9G1z1-iZ2jZ81kFmq5aOMyhcVXat6TOGJdcVDA",
+        "from_prior": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6ImRpZDpleGFtcGxlOmNoYXJsaWUja2V5LTEifQ.eyJpc3MiOiJkaWQ6ZXhhbXBsZTpjaGFybGllIiwic3ViIjoiZGlkOmV4YW1wbGU6YWxpY2UiLCJhdWQiOiIxMjMiLCJleHAiOjEyMzQsIm5iZiI6MTIzNDUsImlhdCI6MTIzNDU2LCJqdGkiOiJkZmcifQ.xIdfOLizPZMOZPAqMatEuBk0OrVge6jN1nxYlWUISz0XUXdW6TbwDbMgTinx2CLxtxev_gqEuZw5c98E3-eaAQ",
         "body": {"messagespecificattribute": "and its value"},
     }
 )
