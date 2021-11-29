@@ -1,5 +1,6 @@
 # DIDComm Python
 
+
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Unit Tests](https://github.com/sicpa-dlab/didcomm-python/workflows/verify/badge.svg)](https://github.com/sicpa-dlab/didcomm-python/actions/workflows/verify.yml)
 [![Python Package](https://img.shields.io/pypi/v/didcomm)](https://pypi.org/project/didcomm/)
