@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "didcomm"
+version = "0.3.0"
+description = "Basic DIDComm v2 support in python"
+authors = ["SICPA <DLCHOpenSourceContrib@sicpa.com>", "Daniel Bluhm <dbluhm@pm.me>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/sicpa-dlab/didcomm-python"
+repository = "https://github.com/sicpa-dlab/didcomm-python"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+Authlib = ">=1.0.0b1"
+pycryptodomex = "~=3.10"
+base58 = "~=2.1"
+varint = "~=1.0.2"
+attrs = "~=21.2"
+packaging = "~=21.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.3"
+pytest-asyncio = "^0.19.0"
+pytest-xdist = "^2.5.0"
+flake8 = "^5.0.4"
+black = "^22.10.0"
+pytest-mock = "^3.10.0"
+mock = "^4.0.3"
+tox = "^3.26.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+mock_use_standalone_module = true
+addopts = "-n auto"
