@@ -65,6 +65,7 @@ jobs:
         with:
           python-version: '3.7'
           cache: 'pip'
+          cache-dependency-path: '.github/workflows/verify.yml'
 
       - name: Install black
         if: steps.setup.outputs.cache-hit != 'true'
@@ -84,6 +85,7 @@ jobs:
         with:
           python-version: '3.7'
           cache: 'pip'
+          cache-dependency-path: '.github/workflows/verify.yml'
 
       - name: Install flake8
         if: steps.setup.outputs.cache-hit != 'true'
