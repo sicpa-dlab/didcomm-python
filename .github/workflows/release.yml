@@ -31,20 +31,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - uses: actions/setup-python@v2
+      - name: Setup Python
+        id: setup
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-
+          cache: 'pip'
+      - name: Install dependencies
+        if: steps.setup.outputs.cache-hit != 'true'
+        run: pip install tomli
       - name: Get current version
         id: current_version
-        run: |
-          python -m pip install . --no-deps
-          out="$(pip show ${{ env.PKG_NAME }} | grep 'Version:' | awk '{print $2}')"
-          echo "$out"
-          echo "::set-output name=current_version::$out"
-        shell: bash
-
+        run: ./.github/scripts/current_version.py
+        shell: python
       - name: Get release info
         id: release_info
         run: |
@@ -66,7 +65,6 @@ jobs:
           upload_url="$(echo "$release_info" | jq -r '.upload_url')"
           echo "::set-output name=upload_url::$upload_url"
           echo "$upload_url"
-        shell: bash
 
       - name: check if already deployed to PyPI
         id: check_in_pypi
@@ -87,27 +85,32 @@ jobs:
     runs-on: ubuntu-latest
     needs: checks
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v2
+      - name: Install poetry
+        run: pipx install poetry
+
+      - uses: actions/setup-python@v4
+        id: setup
         with:
           python-version: '3.x'
+          cache: 'poetry'
+
+      - name: Install dependencies
+        if: steps.setup.outputs.cache-hit != 'true'
+        run: poetry install
 
       - name: build dist
         id: build_assets
         if: ${{ !(needs.checks.outputs.asset_tgz_url && needs.checks.outputs.asset_whl_url) }}
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install --upgrade build
-          python -m build
-          ls dist
+          poetry build
 
           asset_tgz_name="$(find dist -name '*.tar.gz' -printf '%f')"
           echo "::set-output name=asset_tgz_name::$asset_tgz_name"
 
           asset_whl_name="$(find dist -name '*.whl' -printf '%f')"
           echo "::set-output name=asset_whl_name::$asset_whl_name"
-        shell: bash
 
       - name: Create Release
         id: create_release
@@ -157,7 +160,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [checks, release-github]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
 
       - name: download GitHub artifacts
         run: |
@@ -167,62 +173,50 @@ jobs:
             | jq -r ".assets[] | select(.name | contains(\"${{ env.PKG_NAME }}\")) | .browser_download_url" \
             | wget -i -
           ls
-        shell: bash
 
-      # NOTE uncomment once community actions are allowed for the github org
-      # - name: Publish to PyPI
-      #   uses: pypa/gh-action-pypi-publish@v1.4.2
-      #   with:
-      #       user: __token__
-      #       password: ${{ secrets.PYPI_API_TOKEN }}
-
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      - name: Prepare python env
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install --upgrade twine
-        shell: bash
-
       - name: Publish to PyPI
         env:
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: python -m twine upload --non-interactive --username __token__ dist/*
-        shell: bash
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_API_TOKEN }}
+        run: poetry publish
 
   deploy-test-pypi:
     name: Deploy to TestPyPI
     if: github.ref != 'refs/heads/stable' && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v2
+      - name: Install poetry
+        run: pipx install poetry
+
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.x'
+          cache: 'poetry'
+
+      - name: Install dependencies
+        if: steps.setup.outputs.cache-hit != 'true'
+        run: poetry install
+
+      - name: Get current version
+        id: current_version
+        run: ./.github/scripts/current_version.py
+        shell: python
 
       - name: set dev version
         run: |
-          sed -i -r "s~__version__ = \"(.+)\"~__version__ = \"\1.dev${{ github.event.inputs.devN }}\"~" ./didcomm/__init__.py
-          grep version ./setup.py
-        shell: bash
+          poetry version "${{ steps.current_version.outputs.current_version }}.dev${{ github.event.inputs.devN }}"
 
       - name: build dist
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install --upgrade build
-          python -m build
-          ls dist
-        shell: bash
+        run: poetry build
 
-      - name: install twine
-        run: python -m pip install --upgrade twine
-        shell: bash
-
-      - name: Publish to TestPyPI
+      - name: Publish to Test PyPI
         env:
-          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        run: python -m twine upload --non-interactive --username __token__ --repository testpypi dist/*
-        shell: bash
+          POETRY_PYPI_TOKEN_TEST_PYPI: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          poetry config repositories.test-pypi https://test.pypi.org/legacy/
+          poetry publish -r test-pypi
