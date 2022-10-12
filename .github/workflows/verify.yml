@@ -22,10 +22,8 @@ jobs:
         id: setup
         with:
           python-version: '3.x'
-          cache: 'pip'
 
       - name: Install dependencies
-        if: steps.setup.outputs.cache-hit != 'true'
         run: pip install tomli
 
       - name: Get current version
@@ -64,12 +62,9 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.7'
-          cache: 'pip'
-          cache-dependency-path: '.github/workflows/verify.yml'
 
       - name: Install black
-        if: steps.setup.outputs.cache-hit != 'true'
-        run: pip install black
+        run: pipx install black
 
       - name: Black Format Check
         run: black --check .
@@ -84,12 +79,9 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.7'
-          cache: 'pip'
-          cache-dependency-path: '.github/workflows/verify.yml'
 
       - name: Install flake8
-        if: steps.setup.outputs.cache-hit != 'true'
-        run: pip install flake8
+        run: pipx install flake8
 
       - name: Lint with flake8
         run: flake8 .
