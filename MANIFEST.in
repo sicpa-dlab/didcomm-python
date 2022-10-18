@@ -1,5 +1,0 @@
-include LICENSE README.md
-
-recursive-include provisioner LICENSE LICENSE* *LICENSE*
-
-global-exclude *.py[cod] __pycache__ *.so
