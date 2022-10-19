@@ -40,8 +40,7 @@ jobs:
         run: pip install tomli
       - name: Get current version
         id: current_version
-        run: .github/scripts/current_version.py
-        shell: python
+        run: python ./.github/scripts/current_version.py
       - name: Get release info
         id: release_info
         run: |
