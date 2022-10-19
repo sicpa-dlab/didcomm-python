@@ -1,7 +1,7 @@
 from typing import Optional
 
 from authlib.common.encoding import to_unicode, to_bytes, json_loads, urlsafe_b64decode
-from authlib.jose import JsonWebToken
+from authlib.jose import jwt
 from authlib.jose.errors import BadSignatureError
 
 from didcomm.common.resolvers import ResolversConfig
@@ -58,8 +58,6 @@ async def pack_from_prior_in_place(
 
     issuer_did_or_kid = issuer_kid or from_prior["iss"]
 
-    jwt = JsonWebToken()
-
     secret = await find_signing_key(issuer_did_or_kid, resolvers_config)
     private_key = extract_key(
         secret, align_kid=True
@@ -104,7 +102,6 @@ async def unpack_from_prior_in_place(
     public_key = extract_key(verification_method)
 
     try:
-        jwt = JsonWebToken()
         message["from_prior"] = jwt.decode(to_bytes(from_prior_jwt), public_key)
     except BadSignatureError as exc:
         raise MalformedMessageError(
