@@ -28,7 +28,7 @@ jobs:
 
       - name: Get current version
         id: current_version
-        run: ./.github/scripts/current_version.py
+        run: '.github/scripts/current_version.py'
         shell: python
 
       - name: Check version format
