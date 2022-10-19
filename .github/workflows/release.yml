@@ -187,6 +187,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Get current version
+        id: current_version
+        run: |
+          pip install tomli
+          python ./.github/scripts/current_version.py
+
       - name: Install poetry
         run: pipx install poetry
 
@@ -199,10 +205,6 @@ jobs:
       - name: Install dependencies
         if: steps.setup.outputs.cache-hit != 'true'
         run: poetry install
-
-      - name: Get current version
-        id: current_version
-        run: python ./.github/scripts/current_version.py
 
       - name: set dev version
         run: |
