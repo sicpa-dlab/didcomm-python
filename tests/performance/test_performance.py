@@ -1,6 +1,7 @@
 from time import perf_counter_ns
 
 import pytest
+import pytest_asyncio
 
 from didcomm.pack_encrypted import PackEncryptedConfig, pack_encrypted
 from didcomm.unpack import unpack, UnpackConfig
@@ -56,7 +57,7 @@ def resolvers_config_bob(resolvers_config_bob_all_in_secrets):
     return resolvers_config_bob_all_in_secrets
 
 
-@pytest.fixture
+@pytest_asyncio.fixture()
 async def all_bob_key_agreement_kids(resolvers_config_alice):
     bob_did_doc = await resolvers_config_alice.did_resolver.resolve(BOB_DID)
     all_key_agreement_kids = bob_did_doc.key_agreement_kids
