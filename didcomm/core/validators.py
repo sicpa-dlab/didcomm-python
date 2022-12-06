@@ -90,7 +90,9 @@ def validator__did(instance, attribute, value) -> None:
 
 # TODO TEST
 def validator__did_url(instance, attribute, value) -> None:
-    validator__check_f(is_did_with_uri_fragment, "is not a did url with a fragment")(instance, attribute, value)
+    validator__check_f(is_did_with_uri_fragment, "is not a did url with a fragment")(
+        instance, attribute, value
+    )
 
 
 # TODO TEST

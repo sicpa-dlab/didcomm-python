@@ -7,7 +7,12 @@ from authlib.jose.errors import BadSignatureError
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import DID_URL
 from didcomm.core.keys.sign_keys_selector import find_signing_key, find_verification_key
-from didcomm.core.utils import extract_key, extract_sign_alg, is_did_with_uri_fragment, get_did
+from didcomm.core.utils import (
+    extract_key,
+    extract_sign_alg,
+    is_did_with_uri_fragment,
+    get_did,
+)
 from didcomm.errors import (
     MalformedMessageError,
     MalformedMessageCode,
