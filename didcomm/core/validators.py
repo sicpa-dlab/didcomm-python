@@ -6,7 +6,7 @@ from pathlib import Path
 
 from didcomm.errors import DIDCommValueError
 from didcomm.core.types import DIDCOMM_ORG_DOMAIN
-from didcomm.core.utils import is_did, is_did_url, is_did_or_did_url
+from didcomm.core.utils import is_did, is_did_with_uri_fragment, is_did_or_did_url
 
 
 # TODO TEST
@@ -90,7 +90,9 @@ def validator__did(instance, attribute, value) -> None:
 
 # TODO TEST
 def validator__did_url(instance, attribute, value) -> None:
-    validator__check_f(is_did_url, "is not a did url")(instance, attribute, value)
+    validator__check_f(is_did_with_uri_fragment, "is not a did url with a fragment")(
+        instance, attribute, value
+    )
 
 
 # TODO TEST
