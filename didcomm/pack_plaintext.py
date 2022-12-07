@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JSON, DID_URL
+from didcomm.common.types import JSON, DID_URL, JSON_OBJ
 from didcomm.core.serialization import dict_to_json
 from didcomm.core.from_prior import pack_from_prior_in_place
 from didcomm.message import Message
@@ -12,7 +12,7 @@ from didcomm.message import Message
 
 async def pack_plaintext(
     resolvers_config: ResolversConfig,
-    message: Message,
+    message: Union[Message, JSON_OBJ],
     pack_params: Optional[PackPlaintextParameters] = None,
 ) -> PackPlaintextResult:
     """
@@ -41,7 +41,8 @@ async def pack_plaintext(
     """
     pack_params = pack_params or PackPlaintextParameters()
 
-    message = message.as_dict()
+    if isinstance(message, Message):
+        message = message.as_dict()
 
     from_prior_issuer_kid = await pack_from_prior_in_place(
         message,
