@@ -65,7 +65,6 @@ class DIDCommMessageProtocolTypes(Enum):
 
 
 class JOSEFields:
-
     # JOSE Header fields as defined in JWS and JWE specs
     # (RFCs 7515, 7516, 7518, 7519, 7797, 8225, 8555)
     # https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-header-parameters

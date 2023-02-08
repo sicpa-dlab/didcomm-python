@@ -346,7 +346,6 @@ async def __forward_if_needed(
     pack_config: PackEncryptedConfig,
     pack_params: PackEncryptedParameters,
 ) -> Optional[ForwardPackResult]:
-
     if not pack_config.forward:
         logger.debug("forward is turned off")
         return None
