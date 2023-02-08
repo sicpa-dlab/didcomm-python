@@ -41,7 +41,6 @@ def validator__deep_iterable(member_validator: Callable, iterable_validator=None
 def validator__didcomm_protocol_mturi(
     p_name: str, p_version_specifier: SpecifierSet, p_msg_t: str
 ) -> Callable:
-
     # TODO strict check as per
     #      https://github.com/hyperledger/aries-rfcs/blob/main/concepts/0003-protocols/README.md#mturi
     def _f(instance, attribute, value):

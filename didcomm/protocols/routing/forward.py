@@ -137,7 +137,6 @@ class ForwardResult:
 async def find_did_service(
     resolvers_config: ResolversConfig, to: DID_OR_DID_URL, service_id: str = None
 ) -> DIDCommService:
-
     to_did = get_did(to)
     did_doc = await resolvers_config.did_resolver.resolve(to_did)
 
@@ -175,7 +174,6 @@ async def resolve_did_services_chain(
     service_id: str = None,
     did_recursion=False,
 ) -> List[DIDCommService]:
-
     res = []
 
     to_did_service = await find_did_service(resolvers_config, to, service_id)
