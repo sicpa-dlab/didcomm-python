@@ -88,9 +88,10 @@ jobs:
   unit:
     strategy:
       matrix:
-        python-version: [ '3.7', '3.8', '3.9', '3.10' ]
+        python-version: [ '3.7', '3.8', '3.9', '3.10', '3.11' ]
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         include:
+          - {python-version: '3.11', toxenv: py311}
           - {python-version: '3.10', toxenv: py310}
           - {python-version: '3.9', toxenv: py39}
           - {python-version: '3.8', toxenv: py38}
