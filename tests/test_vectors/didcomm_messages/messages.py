@@ -241,6 +241,7 @@ def attachment_multi_2_msg():
     ]
     return msg
 
+
 def ack_msg():
     msg = copy.deepcopy(TEST_MESSAGE)
     msg.please_ack = ["a_msg"]
