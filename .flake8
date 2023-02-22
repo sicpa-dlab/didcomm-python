@@ -1,0 +1,10 @@
+[flake8]
+# set the same as 'black' uses
+max-line-length = 88
+# TODO mention the reasons why we ignore the following
+# E203 slice notation whitespace
+# E501 line length
+# W503 line break before binary operator
+# W504 line break after binary operator
+# F841 local variable name is assigned to but never used
+ignore = E203,E501,W503,W504,F841
