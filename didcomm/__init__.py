@@ -1,7 +1,10 @@
 __version__ = "0.3.0"
 
+# ignore 'Module imported but unused (F401)'
+# flake8: noqa: F401
+
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
-from didcomm.common.resolvers import DIDResolver, ResolversConfig, SecretsResolver
+from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import (
     DIDCommMessageMediaTypes,
     DIDCommMessageProtocolTypes,
@@ -12,6 +15,7 @@ from didcomm.common.types import (
     VerificationMaterialFormat,
 )
 from didcomm.did_doc.did_doc import DIDDoc, DIDCommService, VerificationMethod
+from didcomm.did_doc.did_resolver import DIDResolver
 from didcomm.did_doc.did_resolver_in_memory import DIDResolverInMemory
 from didcomm.message import (
     Attachment,
@@ -23,8 +27,17 @@ from didcomm.message import (
     Message,
 )
 from didcomm import pack_encrypted as pack_encrypted_module
-from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig, PackEncryptedParameters, PackEncryptedResult
-from didcomm.pack_plaintext import pack_plaintext, PackPlaintextParameters, PackPlaintextResult
+from didcomm.pack_encrypted import (
+    pack_encrypted,
+    PackEncryptedConfig,
+    PackEncryptedParameters,
+    PackEncryptedResult,
+)
+from didcomm.pack_plaintext import (
+    pack_plaintext,
+    PackPlaintextParameters,
+    PackPlaintextResult,
+)
 from didcomm.pack_signed import pack_signed, PackSignedParameters, PackSignedResult
 from didcomm.protocols.routing.forward import (
     is_forward,

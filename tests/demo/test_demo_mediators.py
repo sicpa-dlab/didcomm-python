@@ -1,6 +1,13 @@
 import pytest as pytest
 
-from didcomm import Message, pack_encrypted, unpack_forward, wrap_in_forward, unpack, UnpackConfig
+from didcomm import (
+    Message,
+    pack_encrypted,
+    unpack_forward,
+    wrap_in_forward,
+    unpack,
+    UnpackConfig,
+)
 from didcomm.core.serialization import dict_to_json
 from tests.test_vectors.common import ALICE_DID, BOB_DID
 

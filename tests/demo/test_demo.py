@@ -1,6 +1,14 @@
 import pytest as pytest
 
-from didcomm import Message, pack_encrypted, PackEncryptedConfig, pack_plaintext, pack_signed, unpack_forward, unpack
+from didcomm import (
+    Message,
+    pack_encrypted,
+    PackEncryptedConfig,
+    pack_plaintext,
+    pack_signed,
+    unpack_forward,
+    unpack,
+)
 from tests.test_vectors.common import ALICE_DID, BOB_DID, CHARLIE_DID
 
 

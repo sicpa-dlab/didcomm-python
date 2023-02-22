@@ -5,7 +5,14 @@ import attr
 from typing import List
 
 from didcomm.common.types import JSON_OBJ, DID_OR_DID_URL
-from didcomm import DIDDoc, DIDCommService, ResolversConfig, AnonCryptAlg, PackEncryptedConfig, PackEncryptedParameters
+from didcomm import (
+    DIDDoc,
+    DIDCommService,
+    ResolversConfig,
+    AnonCryptAlg,
+    PackEncryptedConfig,
+    PackEncryptedParameters,
+)
 
 from didcomm.pack_encrypted import __forward_if_needed
 
@@ -19,7 +26,7 @@ def did_doc(did) -> DIDDoc:
 
 @pytest.fixture
 def wrap_in_forward_mock(mocker) -> mock_module.AsyncMock:
-    return mocker.patch.object(sys.modules['didcomm.pack_encrypted'], "wrap_in_forward")
+    return mocker.patch.object(sys.modules["didcomm.pack_encrypted"], "wrap_in_forward")
 
 
 @attr.s(auto_attribs=True)
