@@ -1,6 +1,6 @@
 import pytest
 
-from didcomm.core.utils import is_did_url, get_did
+from didcomm.core.utils import is_did_with_uri_fragment, get_did
 from didcomm.pack_signed import pack_signed, PackSignedParameters
 from didcomm.unpack import unpack
 from tests.test_vectors.common import ALICE_DID, CHARLIE_DID
@@ -57,6 +57,6 @@ async def test_pack_plaintext_with_from_prior_and_no_issuer_kid(
     unpack_result = await unpack(resolvers_config_bob, pack_result.packed_msg)
 
     assert unpack_result.message == message
-    assert is_did_url(unpack_result.metadata.from_prior_issuer_kid)
+    assert is_did_with_uri_fragment(unpack_result.metadata.from_prior_issuer_kid)
     assert get_did(unpack_result.metadata.from_prior_issuer_kid) == CHARLIE_DID
     assert unpack_result.metadata.from_prior_jwt is not None

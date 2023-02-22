@@ -1,13 +1,18 @@
 from typing import Optional
 
 from authlib.common.encoding import to_unicode, to_bytes, json_loads, urlsafe_b64decode
-from authlib.jose import JsonWebToken
+from authlib.jose import jwt
 from authlib.jose.errors import BadSignatureError
 
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import DID_URL
 from didcomm.core.keys.sign_keys_selector import find_signing_key, find_verification_key
-from didcomm.core.utils import extract_key, extract_sign_alg, is_did_url, get_did
+from didcomm.core.utils import (
+    extract_key,
+    extract_sign_alg,
+    is_did_with_uri_fragment,
+    get_did,
+)
 from didcomm.errors import (
     MalformedMessageError,
     MalformedMessageCode,
@@ -58,8 +63,6 @@ async def pack_from_prior_in_place(
 
     issuer_did_or_kid = issuer_kid or from_prior["iss"]
 
-    jwt = JsonWebToken()
-
     secret = await find_signing_key(issuer_did_or_kid, resolvers_config)
     private_key = extract_key(
         secret, align_kid=True
@@ -104,7 +107,6 @@ async def unpack_from_prior_in_place(
     public_key = extract_key(verification_method)
 
     try:
-        jwt = JsonWebToken()
         message["from_prior"] = jwt.decode(to_bytes(from_prior_jwt), public_key)
     except BadSignatureError as exc:
         raise MalformedMessageError(
@@ -124,9 +126,9 @@ def __extract_from_prior_kid(from_prior_jwt: str) -> DID_URL:
         from_prior_jwt = to_bytes(from_prior_jwt)
         protected_segment = from_prior_jwt.split(b".")[0]
         protected = json_loads(urlsafe_b64decode(protected_segment).decode("utf-8"))
-        if not is_did_url(protected.get("kid")):
+        if not is_did_with_uri_fragment(protected.get("kid")):
             raise DIDCommValueError(
-                f"from_prior `kid` value is not a valid DID URL: {protected.get('kid')}"
+                f"from_prior `kid` value is not a valid DID URL containing a fragment: {protected.get('kid')}"
             )
         return protected["kid"]
     except Exception as exc:

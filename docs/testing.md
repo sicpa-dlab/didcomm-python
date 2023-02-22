@@ -14,7 +14,7 @@
 ## Development Environment Setup
 
 ```bash
-pip install -e .[tests]
+poetry install
 ```
 
 ## Static Testing
@@ -24,7 +24,7 @@ pip install -e .[tests]
 Run [flake8](https://flake8.pycqa.org/en/latest/) as follows:
 
 ```bash
-$ flake8 .
+$ poetry run flake8 .
 ```
 
 ### black
@@ -32,13 +32,13 @@ $ flake8 .
 Run [black](https://black.readthedocs.io/en/stable/usage_and_configuration/index.html) for a dry check as follows:
 
 ```bash
-$ black --check .
+$ poetry run black --check .
 ```
 
 or to auto-format:
 
 ```bash
-$ black .
+$ poetry run black .
 ```
 
 ## Unit Testing
@@ -46,11 +46,11 @@ $ black .
 To run [pytest](https://docs.pytest.org/en/stable/) in your environment:
 
 ```bash
-pytest
+poetry run pytest
 ```
 
 To run tests in all supported environments (like CI does) using [tox](https://tox.wiki/en/latest/index.html):
 
 ```bash
-tox
+poetry run tox
 ```

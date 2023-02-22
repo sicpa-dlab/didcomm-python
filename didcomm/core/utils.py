@@ -353,7 +353,7 @@ def is_did(v: Any) -> bool:
 
 
 # TODO TEST
-def is_did_url(v: Any) -> bool:
+def is_did_with_uri_fragment(v: Any) -> bool:
     # TODO
     #   - consider other presentations (e.g bytes)
     #   - verifications for after-did parts
@@ -366,7 +366,7 @@ def is_did_url(v: Any) -> bool:
 
 # TODO TEST
 def is_did_or_did_url(v: Any) -> bool:
-    return is_did(v) or is_did_url(v)
+    return is_did(v) or is_did_with_uri_fragment(v)
 
 
 def get_did(did_or_did_url: DID_OR_DID_URL) -> DID:
@@ -374,7 +374,7 @@ def get_did(did_or_did_url: DID_OR_DID_URL) -> DID:
 
 
 def get_did_and_optionally_kid(did_or_kid: DID_OR_DID_URL) -> (DID, Optional[DID_URL]):
-    if is_did_url(did_or_kid):
+    if is_did_with_uri_fragment(did_or_kid):
         did = get_did(did_or_kid)
         kid = did_or_kid
     else:

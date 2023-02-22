@@ -163,9 +163,9 @@ class GenericMessage(Generic[T]):
             or self.expires_time is not None
             and not isinstance(self.expires_time, int)
             or self.please_ack is not None
-            and not isinstance(self.please_ack, bool)
+            and not isinstance(self.please_ack, List)
             or self.ack is not None
-            and not isinstance(self.ack, str)
+            and not isinstance(self.ack, List)
             or self.thid is not None
             and not isinstance(self.thid, str)
             or self.pthid is not None

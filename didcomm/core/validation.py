@@ -1,6 +1,10 @@
 from authlib.common.encoding import to_bytes, urlsafe_b64decode, to_unicode
 
-from didcomm.core.utils import is_did_url, parse_base64url_encoded_json, calculate_apv
+from didcomm.core.utils import (
+    is_did_with_uri_fragment,
+    parse_base64url_encoded_json,
+    calculate_apv,
+)
 from didcomm.errors import MalformedMessageError, MalformedMessageCode
 
 
@@ -38,7 +42,7 @@ def validate_authcrypt_jwe(msg: dict):
     for r in msg["recipients"]:
         if "header" not in r or "kid" not in r["header"]:
             raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
-        if not is_did_url(r["header"]["kid"]):
+        if not is_did_with_uri_fragment(r["header"]["kid"]):
             raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
 
     # 2. Decode protected header
@@ -51,7 +55,7 @@ def validate_authcrypt_jwe(msg: dict):
         apu = to_unicode(urlsafe_b64decode(to_bytes(protected_header["apu"])))
     except Exception as exc:
         raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE) from exc
-    if not is_did_url(apu):
+    if not is_did_with_uri_fragment(apu):
         raise MalformedMessageError(MalformedMessageCode.INVALID_MESSAGE)
 
     # 4. Check skid
