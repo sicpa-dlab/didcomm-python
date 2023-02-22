@@ -107,7 +107,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install poetry
-        run: pipx install poetry --python ${{ matrix.python-path }}
+        run: pipx install poetry --python ${{ steps.setup.outputs.python-path }}
 
       - name: Install dependencies
         run: poetry install
