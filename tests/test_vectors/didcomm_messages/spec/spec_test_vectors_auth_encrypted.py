@@ -1,7 +1,6 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.common.algorithms import AuthCryptAlg, SignAlg, AnonCryptAlg
-from didcomm.unpack import Metadata
+from didcomm import AuthCryptAlg, SignAlg, AnonCryptAlg, Metadata
 from tests.test_vectors.common import TTestVector
 
 TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH_X25519 = json_dumps(

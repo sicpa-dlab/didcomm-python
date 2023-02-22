@@ -1,11 +1,9 @@
 from enum import Enum
 from typing import List, Union
 
-from didcomm.common.types import VerificationMethodType, VerificationMaterialFormat
+from didcomm import VerificationMethodType, VerificationMaterialFormat, VerificationMethod, Secret
 from didcomm.core.serialization import json_str_to_dict
-from didcomm.did_doc.did_doc import VerificationMethod
 from didcomm.errors import DIDCommValueError
-from didcomm.secrets.secrets_resolver import Secret
 from tests.test_vectors.did_doc import (
     DID_DOC_ALICE_WITH_NO_SECRETS,
     DID_DOC_BOB_WITH_NO_SECRETS,

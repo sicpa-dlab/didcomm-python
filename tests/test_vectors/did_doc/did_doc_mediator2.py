@@ -1,11 +1,13 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.common.types import (
+from didcomm import (
+    DIDDoc,
+    DIDCommService,
     VerificationMethodType,
     VerificationMaterial,
     VerificationMaterialFormat,
+    VerificationMethod,
 )
-from didcomm.did_doc.did_doc import VerificationMethod, DIDDoc, DIDCommService
 
 # FIXME build verification material
 #       (currently it's a copy-paste from Bob's ones)

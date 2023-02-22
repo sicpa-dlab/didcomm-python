@@ -1,11 +1,6 @@
 import pytest as pytest
 
-from didcomm.message import Message
-from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
-from didcomm.pack_plaintext import pack_plaintext
-from didcomm.pack_signed import pack_signed
-from didcomm.protocols.routing.forward import unpack_forward
-from didcomm.unpack import unpack
+from didcomm import Message, pack_encrypted, PackEncryptedConfig, pack_plaintext, pack_signed, unpack_forward, unpack
 from tests.test_vectors.common import ALICE_DID, BOB_DID, CHARLIE_DID
 
 

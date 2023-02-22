@@ -1,7 +1,7 @@
 import copy
 
 from didcomm.errors import DIDCommValueError
-from didcomm.message import (
+from didcomm import (
     Message,
     Attachment,
     AttachmentDataBase64,

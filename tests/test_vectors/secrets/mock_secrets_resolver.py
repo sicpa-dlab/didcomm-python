@@ -1,8 +1,7 @@
 from typing import List, Optional
 
 from didcomm.common.types import DID_URL
-from didcomm.secrets.secrets_resolver import Secret
-from didcomm.secrets.secrets_resolver_in_memory import SecretsResolverInMemory
+from didcomm import Secret, SecretsResolverInMemory
 
 
 class MockSecretsResolverInMemory(SecretsResolverInMemory):
