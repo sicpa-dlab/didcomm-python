@@ -111,7 +111,6 @@ jobs:
           cache: 'poetry'
 
       - name: Install dependencies
-        if: steps.setup.outputs.cache-hit != 'true'
         run: poetry install
 
       - name: Test with pytest
