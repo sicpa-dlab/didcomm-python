@@ -74,34 +74,66 @@ See `pack_encrypted` documentation for more details.
 
 ```
 # ALICE
-message = Message(body={"aaa": 1, "bbb": 2},
-                  id="1234567890", type="my-protocol/1.0",
-                  frm=ALICE_DID, to=[BOB_DID])
-pack_result = await pack_encrypted(message=message, frm=ALICE_DID, to=BOB_DID)
+message = Message(
+    body={"aaa": 1, "bbb": 2},
+    id="1234567890",
+    type="my-protocol/1.0",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+)
+pack_result = await pack_encrypted(
+    resolvers_config=resolvers_config_alice,
+    message=message,
+    frm=ALICE_DID,
+    to=BOB_DID,
+    pack_config=PackEncryptedConfig(),
+)
 packed_msg = pack_result.packed_msg
 print(f"Sending ${packed_msg} to ${pack_result.service_metadata.service_endpoint}")
 
 # BOB
-unpack_result = await unpack(packed_msg)
+unpack_result = await unpack(resolvers_config_bob, packed_msg)
 print(f"Got ${unpack_result.message} message")
 ```
 
 **Anonymous encryption** example:
 
 ```
-message = Message(body={"aaa": 1, "bbb": 2},
-                  id="1234567890", type="my-protocol/1.0",
-                  frm=ALICE_DID, to=[BOB_DID])
-pack_result = await pack_encrypted(message=message, to=BOB_DID)
+message = Message(
+    body={"aaa": 1, "bbb": 2},
+    id="1234567890",
+    type="my-protocol/1.0",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+)
+
+pack_result = await pack_encrypted(
+    resolvers_config=resolvers_config_alice,
+    message=message,
+    to=BOB_DID,
+    pack_config=PackEncryptedConfig(),
+)
 ```
 
 **Encryption with non-repudiation** example:
 
 ```
-message = Message(body={"aaa": 1, "bbb": 2},
-                  id="1234567890", type="my-protocol/1.0",
-                  frm=ALICE_DID, to=[BOB_DID])
-pack_result = await pack_encrypted(message=message, frm=ALICE_DID, to=BOB_DID, sign_frm=ALICE_DID)
+message = Message(
+    body={"aaa": 1, "bbb": 2},
+    id="1234567890",
+    type="my-protocol/1.0",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+)
+
+pack_result = await pack_encrypted(
+    resolvers_config=resolvers_config_alice,
+    message=message,
+    frm=ALICE_DID,
+    sign_frm=ALICE_DID,
+    to=BOB_DID,
+    pack_config=PackEncryptedConfig(),
+)
 ```
 
 ### 2. Build an unencrypted but Signed DIDComm message
@@ -118,15 +150,23 @@ See `pack_signed` documentation for more details.
 
 ```
 # ALICE
-message = Message(body={"aaa": 1, "bbb": 2},
-                  id="1234567890", type="my-protocol/1.0",
-                  frm=ALICE_DID, to=[BOB_DID])
-packed_msg = await pack_signed(message=message, sign_frm=ALICE_DID)
+message = Message(
+    body={"aaa": 1, "bbb": 2},
+    id="1234567890",
+    type="my-protocol/1.0",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+)
+pack_result = await pack_signed(
+    resolvers_config=resolvers_config_alice,
+    message=message,
+    sign_frm=ALICE_DID
+)
 packed_msg = pack_result.packed_msg
 print(f"Publishing ${packed_msg}")
 
 # BOB
-unpack_result = await unpack(packed_msg)
+unpack_result = await unpack(resolvers_config_bob, packed_msg)
 print(f"Got ${unpack_result.message} message signed as ${unpack_result.metadata.signed_message}")
 ```
 
@@ -141,15 +181,19 @@ They are therefore not normally transported across security boundaries.
 
 ```
 # ALICE
-message = Message(body={"aaa": 1, "bbb": 2},
-                  id="1234567890", type="my-protocol/1.0",
-                  frm=ALICE_DID, to=[BOB_DID])
-packed_msg = await pack_plaintext(message)
-print(f"Publishing ${packed_msg}")
+message = Message(
+    body={"aaa": 1, "bbb": 2},
+    id="1234567890",
+    type="my-protocol/1.0",
+    frm=ALICE_DID,
+    to=[BOB_DID],
+)
+pack_result = await pack_plaintext(resolvers_config=resolvers_config_alice, message)
+print(f"Publishing ${pack_result.packed_msg}")
 
 # BOB
-unpack_result = await unpack(packed_msg)
-print(f"Got ${unpack_result.plaintext} message")
+unpack_result = await unpack(resolvers_config_bob, pack_result.packed_msg)
+print(f"Got ${unpack_result.message} message")
 ```
 
 ## Contribution
