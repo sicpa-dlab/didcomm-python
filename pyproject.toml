@@ -26,7 +26,6 @@ base58 = "~=2.1"
 varint = "~=1.0.2"
 attrs = "~=22.2"
 packaging = "~=23.0"
-black = "~=23.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.3"
