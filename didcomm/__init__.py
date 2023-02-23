@@ -1,4 +1,4 @@
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig
