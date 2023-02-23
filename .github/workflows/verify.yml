@@ -90,29 +90,21 @@ jobs:
       matrix:
         python-version: [ '3.7', '3.8', '3.9', '3.10', '3.11' ]
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-        include:
-          - {python-version: '3.11', toxenv: py311}
-          - {python-version: '3.10', toxenv: py310}
-          - {python-version: '3.9', toxenv: py39}
-          - {python-version: '3.8', toxenv: py38}
-          - {python-version: '3.7', toxenv: py37}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install poetry
-        run: pipx install poetry
 
       - name: Set up Python ${{ matrix.python-version }}
         id: setup
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'poetry'
+
+      - name: Install poetry
+        run: pipx install poetry --python ${{ steps.setup.outputs.python-path }}
 
       - name: Install dependencies
-        if: steps.setup.outputs.cache-hit != 'true'
         run: poetry install
 
       - name: Test with pytest
-        run: poetry run tox -e ${{ matrix.toxenv }}
+        run: poetry run pytest
