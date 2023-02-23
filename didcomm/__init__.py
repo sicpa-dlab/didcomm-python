@@ -1,8 +1,5 @@
 __version__ = "0.3.0"
 
-# ignore 'Module imported but unused (F401)'
-# flake8: noqa: F401
-
 from didcomm.common.algorithms import AnonCryptAlg, AuthCryptAlg, SignAlg
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.types import (
