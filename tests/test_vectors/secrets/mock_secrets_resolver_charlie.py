@@ -1,11 +1,11 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.common.types import (
+from didcomm import (
     VerificationMethodType,
     VerificationMaterial,
     VerificationMaterialFormat,
+    Secret,
 )
-from didcomm.secrets.secrets_resolver import Secret
 from tests.test_vectors.secrets.mock_secrets_resolver import MockSecretsResolverInMemory
 
 CHARLIE_SECRET_KEY_AGREEMENT_KEY_X25519 = Secret(

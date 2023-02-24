@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from didcomm.common.types import JSON
-from didcomm.unpack import Metadata
+from didcomm import Metadata
 
 ALICE_DID = "did:example:alice"
 BOB_DID = "did:example:bob"

@@ -1,11 +1,13 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.common.types import (
+from didcomm import (
+    DIDDoc,
+    DIDCommService,
     VerificationMethodType,
     VerificationMaterial,
     VerificationMaterialFormat,
+    VerificationMethod,
 )
-from didcomm.did_doc.did_doc import VerificationMethod, DIDDoc, DIDCommService
 from didcomm.protocols.routing.forward import (
     PROFILE_DIDCOMM_V2,
     PROFILE_DIDCOMM_AIP2_ENV_RFC587,

@@ -1,7 +1,6 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.common.algorithms import AnonCryptAlg
-from didcomm.unpack import Metadata
+from didcomm import AnonCryptAlg, Metadata
 from tests.test_vectors.common import TTestVector
 
 TEST_ENCRYPTED_DIDCOMM_MESSAGE_ANON_XC20P_1 = json_dumps(
