@@ -13,7 +13,7 @@ from didcomm.common.types import (
     JSON,
     DIDCommMessageTypes,
 )
-from didcomm.core.converters import converter__id
+from didcomm.core.converters import converter__id, converter__didcomm_id
 from didcomm.core.serialization import json_str_to_dict, json_bytes_to_dict
 from didcomm.core.utils import dataclass_to_dict, attrs_to_dict, is_did
 from didcomm.core.validators import validator__instance_of
@@ -39,9 +39,14 @@ class GenericMessage(Generic[T]):
     - `pack_plaintext` to build a Plaintext DIDComm message
     """
 
-    id: str
     type: str
     body: T
+    # if not specified would be auto-generated
+    id: Optional[Union[str, Callable]] = attr.ib(
+        converter=converter__didcomm_id,
+        validator=validator__instance_of(str),
+        default=None,
+    )
     frm: Optional[DID] = None
     to: Optional[List[DID]] = None
     created_time: Optional[int] = None
