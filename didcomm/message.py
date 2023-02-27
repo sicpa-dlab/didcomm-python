@@ -33,6 +33,7 @@ T = TypeVar("T")
 class GenericMessage(Generic[T]):
     """
     Message consisting of headers and application/protocol specific data (body).
+    If no ID is specified, a UUID will be generated.
     In order to convert a message to a DIDComm message for further transporting, call one of the following:
     - `pack_encrypted` to build an Encrypted DIDComm message
     - `pack_signed` to build a signed DIDComm message
