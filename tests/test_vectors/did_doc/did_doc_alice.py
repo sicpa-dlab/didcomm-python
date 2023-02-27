@@ -1,11 +1,12 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.common.types import (
+from didcomm import (
     VerificationMethodType,
     VerificationMaterial,
     VerificationMaterialFormat,
+    VerificationMethod,
+    DIDDoc,
 )
-from didcomm.did_doc.did_doc import VerificationMethod, DIDDoc
 
 ALICE_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRET = VerificationMethod(
     id="did:example:alice#key-x25519-not-in-secrets-1",

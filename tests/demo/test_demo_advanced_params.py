@@ -1,14 +1,15 @@
 import pytest as pytest
 
-from didcomm.common.algorithms import AnonCryptAlg
-from didcomm.message import Message
-from didcomm.pack_encrypted import (
+from didcomm import (
+    AnonCryptAlg,
+    Message,
     PackEncryptedConfig,
     PackEncryptedParameters,
     pack_encrypted,
+    unpack_forward,
+    unpack,
+    UnpackConfig,
 )
-from didcomm.protocols.routing.forward import unpack_forward
-from didcomm.unpack import unpack, UnpackConfig
 from tests.test_vectors.common import ALICE_DID, BOB_DID
 
 
