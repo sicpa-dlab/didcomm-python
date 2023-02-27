@@ -3,8 +3,7 @@ from time import perf_counter_ns
 import pytest
 import pytest_asyncio
 
-from didcomm.pack_encrypted import PackEncryptedConfig, pack_encrypted
-from didcomm.unpack import unpack, UnpackConfig
+from didcomm import PackEncryptedConfig, pack_encrypted, unpack, UnpackConfig
 from tests.test_vectors.common import BOB_DID, ALICE_DID
 from tests.test_vectors.didcomm_messages.messages import TEST_MESSAGE
 

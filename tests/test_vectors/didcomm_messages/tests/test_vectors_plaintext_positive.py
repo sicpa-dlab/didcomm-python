@@ -1,6 +1,6 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.unpack import Metadata
+from didcomm import Metadata
 
 PLAINTEXT_EXPECTED_METADATA = Metadata(
     encrypted=False,

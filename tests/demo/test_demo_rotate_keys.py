@@ -1,15 +1,16 @@
 import pytest as pytest
 
-from didcomm.common.resolvers import ResolversConfig
-from didcomm.message import Message, FromPrior
-from didcomm.pack_encrypted import (
+from didcomm import (
+    ResolversConfig,
+    Message,
+    FromPrior,
     pack_encrypted,
     PackEncryptedConfig,
     PackEncryptedParameters,
+    unpack_forward,
+    SecretsResolverInMemory,
+    unpack,
 )
-from didcomm.protocols.routing.forward import unpack_forward
-from didcomm.secrets.secrets_resolver_in_memory import SecretsResolverInMemory
-from didcomm.unpack import unpack
 from tests.test_vectors.common import CHARLIE_DID, BOB_DID, ALICE_DID
 from tests.test_vectors.secrets.mock_secrets_resolver_alice import (
     MockSecretsResolverAlice,
