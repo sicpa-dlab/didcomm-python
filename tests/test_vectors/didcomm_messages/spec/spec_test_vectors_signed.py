@@ -8,11 +8,11 @@ from tests.test_vectors.common import TTestVector
 
 TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_1 = json_dumps(
     {
-        "payload": "eyJpZCI6IjEyMzQ1Njc4OTAiLCJ0eXAiOiJhcHBsaWNhdGlvbi9kaWRjb21tLXBsYWluK2pzb24iLCJ0eXBlIjoiaHR0cDovL2V4YW1wbGUuY29tL3Byb3RvY29scy9sZXRzX2RvX2x1bmNoLzEuMC9wcm9wb3NhbCIsImZyb20iOiJkaWQ6ZXhhbXBsZTphbGljZSIsInRvIjpbImRpZDpleGFtcGxlOmJvYiJdLCJjcmVhdGVkX3RpbWUiOjE1MTYyNjkwMjIsImV4cGlyZXNfdGltZSI6MTUxNjM4NTkzMSwiYm9keSI6eyJtZXNzYWdlc3BlY2lmaWNhdHRyaWJ1dGUiOiJhbmQgaXRzIHZhbHVlIn19",
+        "payload": "eyJ0eXBlIjoiaHR0cDovL2V4YW1wbGUuY29tL3Byb3RvY29scy9sZXRzX2RvX2x1bmNoLzEuMC9wcm9wb3NhbCIsImJvZHkiOnsibWVzc2FnZXNwZWNpZmljYXR0cmlidXRlIjoiYW5kIGl0cyB2YWx1ZSJ9LCJpZCI6IjEyMzQ1Njc4OTAiLCJ0byI6WyJkaWQ6ZXhhbXBsZTpib2IiXSwiY3JlYXRlZF90aW1lIjoxNTE2MjY5MDIyLCJleHBpcmVzX3RpbWUiOjE1MTYzODU5MzEsInRoaWQiOiIxMjM0NTY3ODkwIiwiZnJvbSI6ImRpZDpleGFtcGxlOmFsaWNlIiwidHlwIjoiYXBwbGljYXRpb24vZGlkY29tbS1wbGFpbitqc29uIn0",
         "signatures": [
             {
                 "protected": "eyJ0eXAiOiJhcHBsaWNhdGlvbi9kaWRjb21tLXNpZ25lZCtqc29uIiwiYWxnIjoiRWREU0EifQ",
-                "signature": "FW33NnvOHV0Ted9-F7GZbkia-vYAfBKtH4oBxbrttWAhBZ6UFJMxcGjL3lwOl4YohI3kyyd08LHPWNMgP2EVCQ",
+                "signature": "D3aEM0sIPobl-qnJh7kF1Hol6Wz_CKmyqHfgwGbFKmjyWvUoXhCI09ZiE5qmJlyyPo_ubqEqWOiPYcroEjJ9Ag",
                 "header": {"kid": "did:example:alice#key-1"},
             }
         ],
@@ -21,11 +21,11 @@ TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_1 = json_dumps(
 
 TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_2 = json_dumps(
     {
-        "payload": "eyJpZCI6IjEyMzQ1Njc4OTAiLCJ0eXAiOiJhcHBsaWNhdGlvbi9kaWRjb21tLXBsYWluK2pzb24iLCJ0eXBlIjoiaHR0cDovL2V4YW1wbGUuY29tL3Byb3RvY29scy9sZXRzX2RvX2x1bmNoLzEuMC9wcm9wb3NhbCIsImZyb20iOiJkaWQ6ZXhhbXBsZTphbGljZSIsInRvIjpbImRpZDpleGFtcGxlOmJvYiJdLCJjcmVhdGVkX3RpbWUiOjE1MTYyNjkwMjIsImV4cGlyZXNfdGltZSI6MTUxNjM4NTkzMSwiYm9keSI6eyJtZXNzYWdlc3BlY2lmaWNhdHRyaWJ1dGUiOiJhbmQgaXRzIHZhbHVlIn19",
+        "payload": "eyJ0eXBlIjoiaHR0cDovL2V4YW1wbGUuY29tL3Byb3RvY29scy9sZXRzX2RvX2x1bmNoLzEuMC9wcm9wb3NhbCIsImJvZHkiOnsibWVzc2FnZXNwZWNpZmljYXR0cmlidXRlIjoiYW5kIGl0cyB2YWx1ZSJ9LCJpZCI6IjEyMzQ1Njc4OTAiLCJ0byI6WyJkaWQ6ZXhhbXBsZTpib2IiXSwiY3JlYXRlZF90aW1lIjoxNTE2MjY5MDIyLCJleHBpcmVzX3RpbWUiOjE1MTYzODU5MzEsInRoaWQiOiIxMjM0NTY3ODkwIiwiZnJvbSI6ImRpZDpleGFtcGxlOmFsaWNlIiwidHlwIjoiYXBwbGljYXRpb24vZGlkY29tbS1wbGFpbitqc29uIn0",
         "signatures": [
             {
                 "protected": "eyJ0eXAiOiJhcHBsaWNhdGlvbi9kaWRjb21tLXNpZ25lZCtqc29uIiwiYWxnIjoiRVMyNTYifQ",
-                "signature": "gcW3lVifhyR48mLHbbpnGZQuziskR5-wXf6IoBlpa9SzERfSG9I7oQ9pssmHZwbvJvyMvxskpH5oudw1W3X5Qg",
+                "signature": "YktGGyR1i23DGdMz0_yhrb5o4zLKja3VT-qKMFD2VhIX2Vb12SkbD2kREc6HZE-NcIBXmpTGu1P-HtWRp-Ys0g",
                 "header": {"kid": "did:example:alice#key-2"},
             }
         ],
@@ -34,11 +34,11 @@ TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_2 = json_dumps(
 
 TEST_SIGNED_DIDCOMM_MESSAGE_ALICE_KEY_3 = json_dumps(
     {
-        "payload": "eyJpZCI6IjEyMzQ1Njc4OTAiLCJ0eXAiOiJhcHBsaWNhdGlvbi9kaWRjb21tLXBsYWluK2pzb24iLCJ0eXBlIjoiaHR0cDovL2V4YW1wbGUuY29tL3Byb3RvY29scy9sZXRzX2RvX2x1bmNoLzEuMC9wcm9wb3NhbCIsImZyb20iOiJkaWQ6ZXhhbXBsZTphbGljZSIsInRvIjpbImRpZDpleGFtcGxlOmJvYiJdLCJjcmVhdGVkX3RpbWUiOjE1MTYyNjkwMjIsImV4cGlyZXNfdGltZSI6MTUxNjM4NTkzMSwiYm9keSI6eyJtZXNzYWdlc3BlY2lmaWNhdHRyaWJ1dGUiOiJhbmQgaXRzIHZhbHVlIn19",
+        "payload": "eyJ0eXBlIjoiaHR0cDovL2V4YW1wbGUuY29tL3Byb3RvY29scy9sZXRzX2RvX2x1bmNoLzEuMC9wcm9wb3NhbCIsImJvZHkiOnsibWVzc2FnZXNwZWNpZmljYXR0cmlidXRlIjoiYW5kIGl0cyB2YWx1ZSJ9LCJpZCI6IjEyMzQ1Njc4OTAiLCJ0byI6WyJkaWQ6ZXhhbXBsZTpib2IiXSwiY3JlYXRlZF90aW1lIjoxNTE2MjY5MDIyLCJleHBpcmVzX3RpbWUiOjE1MTYzODU5MzEsInRoaWQiOiIxMjM0NTY3ODkwIiwiZnJvbSI6ImRpZDpleGFtcGxlOmFsaWNlIiwidHlwIjoiYXBwbGljYXRpb24vZGlkY29tbS1wbGFpbitqc29uIn0",
         "signatures": [
             {
                 "protected": "eyJ0eXAiOiJhcHBsaWNhdGlvbi9kaWRjb21tLXNpZ25lZCtqc29uIiwiYWxnIjoiRVMyNTZLIn0",
-                "signature": "EGjhIcts6tqiJgqtxaTiTY3EUvL-_rLjn9lxaZ4eRUwa1-CS1nknZoyJWbyY5NQnUafWh5nvCtQpdpMyzH3blw",
+                "signature": "mYLZAUz97lodaWbwED6IvBf9_8Zj41-dM6r_3gTE9AkVZI3AJlz-agDBNSmNHd3CjRKW1KNS10pND57123b9aA",
                 "header": {"kid": "did:example:alice#key-3"},
             }
         ],

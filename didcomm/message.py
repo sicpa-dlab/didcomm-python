@@ -33,7 +33,8 @@ T = TypeVar("T")
 class GenericMessage(Generic[T]):
     """
     Message consisting of headers and application/protocol specific data (body).
-    If no ID is specified, a UUID will be generated.
+    If no `id` is specified, a UUID will be generated.
+    If no `thid` is specified, it defaults to the `id` value.
     In order to convert a message to a DIDComm message for further transporting, call one of the following:
     - `pack_encrypted` to build an Encrypted DIDComm message
     - `pack_signed` to build a signed DIDComm message
@@ -76,6 +77,11 @@ class GenericMessage(Generic[T]):
         "pthid",
         "attachments",
     }
+
+    def __attrs_post_init__(self):
+        # If not present, the thid defaults to id (see https://identity.foundation/didcomm-messaging/spec/#threads-2)
+        if self.thid is None:
+            self.thid = self.id
 
     def _body_as_dict(self):
         if dataclasses.is_dataclass(self.body):

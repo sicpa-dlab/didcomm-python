@@ -12,6 +12,7 @@ PLAINTEXT_EXPECTED_METADATA = Metadata(
 TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",
