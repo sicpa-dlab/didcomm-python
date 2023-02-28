@@ -13,7 +13,7 @@ from didcomm.common.types import (
     JSON,
     DIDCommMessageTypes,
 )
-from didcomm.core.converters import converter__id
+from didcomm.core.converters import converter__id, converter__didcomm_id
 from didcomm.core.serialization import json_str_to_dict, json_bytes_to_dict
 from didcomm.core.utils import dataclass_to_dict, attrs_to_dict, is_did
 from didcomm.core.validators import validator__instance_of
@@ -33,15 +33,22 @@ T = TypeVar("T")
 class GenericMessage(Generic[T]):
     """
     Message consisting of headers and application/protocol specific data (body).
+    If no `id` is specified, a UUID will be generated.
+    If no `thid` is specified, it defaults to the `id` value.
     In order to convert a message to a DIDComm message for further transporting, call one of the following:
     - `pack_encrypted` to build an Encrypted DIDComm message
     - `pack_signed` to build a signed DIDComm message
     - `pack_plaintext` to build a Plaintext DIDComm message
     """
 
-    id: str
     type: str
     body: T
+    # if not specified would be auto-generated
+    id: Optional[Union[str, Callable]] = attr.ib(
+        converter=converter__didcomm_id,
+        validator=validator__instance_of(str),
+        default=None,
+    )
     frm: Optional[DID] = None
     to: Optional[List[DID]] = None
     created_time: Optional[int] = None
@@ -70,6 +77,11 @@ class GenericMessage(Generic[T]):
         "pthid",
         "attachments",
     }
+
+    def __attrs_post_init__(self):
+        # If not present, the thid defaults to id (see https://identity.foundation/didcomm-messaging/spec/#threads-2)
+        if self.thid is None:
+            self.thid = self.id
 
     def _body_as_dict(self):
         if dataclasses.is_dataclass(self.body):

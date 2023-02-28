@@ -12,6 +12,7 @@ PLAINTEXT_EXPECTED_METADATA = Metadata(
 TEST_PLAINTEXT_DIDCOMM_MESSAGE_MINIMAL = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "body": {},
@@ -34,6 +35,7 @@ TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE = json_dumps(
 TEST_PLAINTEXT_ATTACHMENT_BASE64 = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",
@@ -48,6 +50,7 @@ TEST_PLAINTEXT_ATTACHMENT_BASE64 = json_dumps(
 TEST_PLAINTEXT_ATTACHMENT_LINKS = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",
@@ -64,6 +67,7 @@ TEST_PLAINTEXT_ATTACHMENT_LINKS = json_dumps(
 TEST_PLAINTEXT_ATTACHMENT_JSON = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",
@@ -80,6 +84,7 @@ TEST_PLAINTEXT_ATTACHMENT_JSON = json_dumps(
 TEST_PLAINTEXT_ATTACHMENT_MULTI_1 = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",
@@ -97,6 +102,7 @@ TEST_PLAINTEXT_ATTACHMENT_MULTI_1 = json_dumps(
 TEST_PLAINTEXT_ATTACHMENT_MULTI_2 = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",
@@ -115,6 +121,7 @@ TEST_PLAINTEXT_ATTACHMENT_MULTI_2 = json_dumps(
 TEST_PLAINTEXT_ACKS = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",

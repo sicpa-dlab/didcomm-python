@@ -18,6 +18,7 @@ from tests.test_vectors.common import (
 
 TEST_MESSAGE = Message(
     id="1234567890",
+    thid="1234567890",
     type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
     frm=ALICE_DID,
     to=[BOB_DID],

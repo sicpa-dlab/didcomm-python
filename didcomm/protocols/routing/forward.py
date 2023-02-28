@@ -4,7 +4,7 @@ from copy import deepcopy
 import logging
 import attr
 from dataclasses import dataclass
-from typing import List, Union, Optional, Callable, Dict
+from typing import List, Union, Optional, Dict
 from packaging.specifiers import SpecifierSet
 from enum import Enum
 
@@ -27,7 +27,6 @@ from didcomm.common.algorithms import AnonCryptAlg
 from didcomm.message import GenericMessage, Header, Attachment, AttachmentDataJson
 from didcomm.core.types import EncryptResult, DIDCommGeneratorType, DIDCOMM_ORG_DOMAIN
 from didcomm.core.defaults import DEF_ENC_ALG_ANON
-from didcomm.core.converters import converter__didcomm_id
 from didcomm.core.validators import (
     validator__instance_of,
     validator__didcomm_protocol_mturi,
@@ -70,12 +69,6 @@ class ForwardBody:
 
 @attr.s(auto_attribs=True)
 class ForwardMessage(GenericMessage[ForwardBody]):
-    # if not specified would be auto-generated
-    id: Optional[Union[str, Callable]] = attr.ib(
-        converter=converter__didcomm_id,
-        validator=validator__instance_of(str),
-        default=None,
-    )
     type: Optional[str] = attr.ib(
         validator=[
             validator__instance_of(str),

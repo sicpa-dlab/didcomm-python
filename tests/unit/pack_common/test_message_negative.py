@@ -70,8 +70,6 @@ def update_msg_field(field_name, value):
 @pytest.mark.asyncio
 async def test_no_required_param(resolvers_config_alice):
     with pytest.raises(TypeError):
-        Message(type="http://example.com/protocols/lets_do_lunch/1.0/proposal", body={})
-    with pytest.raises(TypeError):
         Message(
             id="1234567890",
             type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
@@ -129,7 +127,6 @@ async def test_custom_header_equals_to_default(msg, resolvers_config_alice):
 @pytest.mark.parametrize(
     "msg",
     [
-        update_msg_field("id", 123),
         update_msg_field("type", 123),
         update_msg_field("frm", 123),
         update_msg_field("to", 123),
