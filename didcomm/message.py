@@ -16,209 +16,39 @@ from didcomm.common.types import (
 from didcomm.core.converters import converter__id, converter__didcomm_id
 from didcomm.core.serialization import json_str_to_dict, json_bytes_to_dict
 from didcomm.core.utils import dataclass_to_dict, attrs_to_dict, is_did
-from didcomm.core.validators import validator__instance_of
+from didcomm.core.validators import (
+    validator__instance_of,
+    validator__deep_iterable,
+    validator__optional,
+    validator__deep_mapping,
+    validator__not_in_,
+    validator__and_,
+)
 from didcomm.errors import (
     MalformedMessageError,
     MalformedMessageCode,
     DIDCommValueError,
 )
 
-Header = Dict[str, JSON_VALUE]
+HeaderKeyType = str
+HeaderValueType = JSON_VALUE
+Header = Dict[HeaderKeyType, HeaderValueType]
 T = TypeVar("T")
-
-
-# TODO use attrs' API (validators, converters, helpers) to improve
-#      validation and from_dict routine
-@attr.s(auto_attribs=True)
-class GenericMessage(Generic[T]):
-    """
-    Message consisting of headers and application/protocol specific data (body).
-    If no `id` is specified, a UUID will be generated.
-    If no `thid` is specified, it defaults to the `id` value.
-    In order to convert a message to a DIDComm message for further transporting, call one of the following:
-    - `pack_encrypted` to build an Encrypted DIDComm message
-    - `pack_signed` to build a signed DIDComm message
-    - `pack_plaintext` to build a Plaintext DIDComm message
-    """
-
-    type: str
-    body: T
-    # if not specified would be auto-generated
-    id: Optional[Union[str, Callable]] = attr.ib(
-        converter=converter__didcomm_id,
-        validator=validator__instance_of(str),
-        default=None,
-    )
-    frm: Optional[DID] = None
-    to: Optional[List[DID]] = None
-    created_time: Optional[int] = None
-    expires_time: Optional[int] = None
-    from_prior: Optional[FromPrior] = None
-    please_ack: Optional[bool] = None
-    ack: Optional[List[str]] = None
-    thid: Optional[str] = None
-    pthid: Optional[str] = None
-    attachments: Optional[List[Attachment]] = None
-    custom_headers: Optional[List[Header]] = None
-
-    # TODO: refactor
-    __DEFAULT_FIELDS = {
-        "id",
-        "type",
-        "body",
-        "frm",
-        "to",
-        "created_time",
-        "expires_time",
-        "from_prior",
-        "please_ack",
-        "ack",
-        "thid",
-        "pthid",
-        "attachments",
-    }
-
-    def __attrs_post_init__(self):
-        # If not present, the thid defaults to id (see https://identity.foundation/didcomm-messaging/spec/#threads-2)
-        if self.thid is None:
-            self.thid = self.id
-
-    def _body_as_dict(self):
-        if dataclasses.is_dataclass(self.body):
-            return dataclass_to_dict(self.body)
-        elif attr.has(type(self.body)):
-            return attrs_to_dict(self.body)
-        else:
-            return self.body
-
-    def as_dict(self) -> dict:
-        d = attrs_to_dict(self)
-
-        d["body"] = self._body_as_dict()
-
-        self._validate()
-
-        if "frm" in d:
-            d["from"] = d["frm"]
-            del d["frm"]
-
-        d["typ"] = DIDCommMessageTypes.PLAINTEXT.value
-
-        if self.attachments:
-            d["attachments"] = [a.as_dict() for a in self.attachments]
-        if self.from_prior:
-            d["from_prior"] = self.from_prior.as_dict()
-
-        return d
-
-    @staticmethod
-    def _body_from_dict(body: dict) -> T:
-        return body
-
-    # TODO TEST
-    @classmethod
-    def from_json(cls, msg: Union[JSON, bytes]) -> Message:
-        return cls.from_dict(
-            json_bytes_to_dict(msg) if isinstance(msg, bytes) else json_str_to_dict(msg)
-        )
-
-    @classmethod
-    def from_dict(cls, d: dict) -> Message:
-        # WARNING: that API shouldn't be called with a dict
-        #          referenced from other places, from_json is better for that
-        if not isinstance(d, Dict):
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-
-        # TODO TEST missed fields
-        for f in ("id", "type", "body", "typ"):
-            if f not in d:
-                raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-
-        if d["typ"] != DIDCommMessageTypes.PLAINTEXT.value:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-        del d["typ"]
-
-        if "from" in d:
-            d["frm"] = d["from"]
-            del d["from"]
-
-        if "body" not in d:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-        d["body"] = cls._body_from_dict(d["body"])
-
-        # XXX do we expect undefined () from_prior ???
-        if d.get("from_prior"):
-            d["from_prior"] = FromPrior.from_dict(d["from_prior"])
-
-        # XXX do we expect undefined (None) or empty attachments ???
-        if d.get("attachments"):
-            d["attachments"] = [Attachment.from_dict(e) for e in d["attachments"]]
-
-        try:
-            msg = cls(**d)
-            msg._validate()
-        except Exception:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-
-        return msg
-
-    def _validate(self):
-        if (
-            not isinstance(self.id, str)
-            or not isinstance(self.type, str)
-            or self.frm is not None
-            and not isinstance(self.frm, str)
-            or self.to is not None
-            and not isinstance(self.to, List)
-            or self.created_time is not None
-            and not isinstance(self.created_time, int)
-            or self.expires_time is not None
-            and not isinstance(self.expires_time, int)
-            or self.please_ack is not None
-            and not isinstance(self.please_ack, List)
-            or self.ack is not None
-            and not isinstance(self.ack, List)
-            or self.thid is not None
-            and not isinstance(self.thid, str)
-            or self.pthid is not None
-            and not isinstance(self.pthid, str)
-            or self.from_prior is not None
-            and not isinstance(self.from_prior, FromPrior)
-            or self.attachments is not None
-            and not isinstance(self.attachments, List)
-            or self.custom_headers is not None
-            and not isinstance(self.custom_headers, List)
-        ):
-            raise DIDCommValueError(f"Plaintext message structure is invalid: {self}")
-
-        if self.to is not None:
-            for to in self.to:
-                if not isinstance(to, str):
-                    raise DIDCommValueError(f"`to` field element is invalid: {to}")
-        if self.attachments is not None:
-            for attachment in self.attachments:
-                if not isinstance(attachment, Attachment):
-                    raise DIDCommValueError(
-                        f"`attachments` field element is invalid: {attachment}"
-                    )
-        if self.custom_headers is not None:
-            for custom_header in self.custom_headers:
-                if not isinstance(custom_header, Dict):
-                    raise DIDCommValueError(
-                        f"`custom_headers` field element is invalid: {custom_header}"
-                    )
-                for k in custom_header.keys():
-                    if k in self.__DEFAULT_FIELDS:
-                        raise DIDCommValueError(
-                            f"`custom_headers` field element contains a default field {k}"
-                        )
-
-
-class Message(GenericMessage[JSON_OBJ]):
-    def as_dict(self) -> dict:
-        if not isinstance(self.body, Dict):
-            raise DIDCommValueError(f"Body structure is invalid: {self.body}")
-        return super().as_dict()
+MESSAGE_DEFAULT_FIELDS = {
+    "id",
+    "type",
+    "body",
+    "frm",
+    "to",
+    "created_time",
+    "expires_time",
+    "from_prior",
+    "please_ack",
+    "ack",
+    "thid",
+    "pthid",
+    "attachments",
+}
 
 
 @attr.s(auto_attribs=True)
@@ -429,3 +259,184 @@ class FromPrior:
             and not isinstance(self.jti, str)
         ):
             raise DIDCommValueError(f"FromPrior structure is invalid: {self}")
+
+
+@attr.s(auto_attribs=True)
+class GenericMessage(Generic[T]):
+    """
+    Message consisting of headers and application/protocol specific data (body).
+    If no `id` is specified, a UUID will be generated.
+    If no `thid` is specified, it defaults to the `id` value.
+    In order to convert a message to a DIDComm message for further transporting, call one of the following:
+    - `pack_encrypted` to build an Encrypted DIDComm message
+    - `pack_signed` to build a signed DIDComm message
+    - `pack_plaintext` to build a Plaintext DIDComm message
+    """
+
+    type: str = attr.ib(validator=validator__instance_of(str))
+    body: T
+    # if not specified would be auto-generated
+    id: Optional[Union[str, Callable]] = attr.ib(
+        converter=converter__didcomm_id,
+        validator=validator__optional(validator__instance_of(Union[str, Callable])),
+        default=None,
+    )
+    frm: Optional[DID] = attr.ib(
+        validator=validator__optional(validator__instance_of(DID)),
+        default=None,
+    )
+    to: Optional[List[DID]] = attr.ib(
+        validator=validator__optional(
+            validator__deep_iterable(
+                validator__instance_of(DID),
+                iterable_validator=validator__instance_of(List),
+            )
+        ),
+        default=None,
+    )
+    created_time: Optional[int] = attr.ib(
+        validator=validator__optional(validator__instance_of(int)), default=None
+    )
+    expires_time: Optional[int] = attr.ib(
+        validator=validator__optional(validator__instance_of(int)), default=None
+    )
+    from_prior: Optional[FromPrior] = attr.ib(
+        validator=validator__optional(validator__instance_of(FromPrior)), default=None
+    )
+    please_ack: Optional[List[str]] = attr.ib(
+        validator=validator__optional(
+            validator__deep_iterable(
+                validator__instance_of(str),
+                iterable_validator=validator__instance_of(List),
+            )
+        ),
+        default=None,
+    )
+    ack: Optional[List[str]] = attr.ib(
+        validator=validator__optional(
+            validator__deep_iterable(
+                validator__instance_of(str),
+                iterable_validator=validator__instance_of(List),
+            )
+        ),
+        default=None,
+    )
+    thid: Optional[str] = attr.ib(
+        validator=validator__optional(validator__instance_of(str)), default=None
+    )
+    pthid: Optional[str] = attr.ib(
+        validator=validator__optional(validator__instance_of(str)), default=None
+    )
+    attachments: Optional[List[Attachment]] = attr.ib(
+        validator=validator__optional(
+            validator__deep_iterable(
+                validator__instance_of(Attachment),
+                iterable_validator=validator__instance_of(List),
+            )
+        ),
+        default=None,
+    )
+    custom_headers: Optional[List[Header]] = attr.ib(
+        validator=validator__optional(
+            validator__deep_iterable(
+                validator__deep_mapping(
+                    key_validator=validator__and_(
+                        validator__instance_of(HeaderKeyType),
+                        validator__not_in_(MESSAGE_DEFAULT_FIELDS),
+                    ),
+                    value_validator=validator__instance_of(HeaderValueType),
+                    mapping_validator=validator__instance_of(Dict),
+                ),
+                iterable_validator=validator__instance_of(List),
+            )
+        ),
+        default=None,
+    )
+
+    def __attrs_post_init__(self):
+        # If not present, the thid defaults to id (see https://identity.foundation/didcomm-messaging/spec/#threads-2)
+        if self.thid is None:
+            self.thid = self.id
+
+    def _body_as_dict(self):
+        if dataclasses.is_dataclass(self.body):
+            return dataclass_to_dict(self.body)
+        elif attr.has(type(self.body)):
+            return attrs_to_dict(self.body)
+        else:
+            return self.body
+
+    def as_dict(self) -> dict:
+        d = attrs_to_dict(self)
+
+        d["body"] = self._body_as_dict()
+
+        if "frm" in d:
+            d["from"] = d["frm"]
+            del d["frm"]
+
+        d["typ"] = DIDCommMessageTypes.PLAINTEXT.value
+
+        if self.attachments:
+            d["attachments"] = [a.as_dict() for a in self.attachments]
+        if self.from_prior:
+            d["from_prior"] = self.from_prior.as_dict()
+
+        return d
+
+    @staticmethod
+    def _body_from_dict(body: dict) -> T:
+        return body
+
+    # TODO TEST
+    @classmethod
+    def from_json(cls, msg: Union[JSON, bytes]) -> Message:
+        return cls.from_dict(
+            json_bytes_to_dict(msg) if isinstance(msg, bytes) else json_str_to_dict(msg)
+        )
+
+    @classmethod
+    def from_dict(cls, d: dict) -> Message:
+        # WARNING: that API shouldn't be called with a dict
+        #          referenced from other places, from_json is better for that
+        if not isinstance(d, Dict):
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        # TODO TEST missed fields
+        for f in ("id", "type", "body", "typ"):
+            if f not in d:
+                raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        if d["typ"] != DIDCommMessageTypes.PLAINTEXT.value:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+        del d["typ"]
+
+        if "from" in d:
+            d["frm"] = d["from"]
+            del d["from"]
+
+        if "body" not in d:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+        d["body"] = cls._body_from_dict(d["body"])
+
+        # XXX do we expect undefined () from_prior ???
+        if d.get("from_prior"):
+            d["from_prior"] = FromPrior.from_dict(d["from_prior"])
+
+        # XXX do we expect undefined (None) or empty attachments ???
+        if d.get("attachments"):
+            d["attachments"] = [Attachment.from_dict(e) for e in d["attachments"]]
+
+        try:
+            msg = cls(**d)
+        except Exception:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        return msg
+
+
+class Message(GenericMessage[JSON_OBJ]):
+    def as_dict(self) -> dict:
+        if not isinstance(self.body, Dict):
+            raise DIDCommValueError(f"Body structure is invalid: {self.body}")
+        return super().as_dict()

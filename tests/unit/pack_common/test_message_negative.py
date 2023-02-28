@@ -80,71 +80,49 @@ async def test_no_required_param(resolvers_config_alice):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "msg",
+    "custom_header",
     [
-        Message(
-            id="1234567890",
-            type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
-            body={},
-            created_time=1516269022,
-            custom_headers=[{"id": "abc"}],
-        ),
-        Message(
-            id="1234567890",
-            type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
-            created_time=1516269022,
-            body={},
-            custom_headers=[{"type": "abc"}],
-        ),
-        Message(
-            id="1234567890",
-            type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
-            created_time=1516269022,
-            body={},
-            custom_headers=[{"body": "abc"}],
-        ),
-        Message(
-            id="1234567890",
-            type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
-            created_time=1516269022,
-            body={},
-            custom_headers=[{"created_time": 1516269022}],
-        ),
-        Message(
-            id="1234567890",
-            type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
-            created_time=1516269022,
-            body={},
-            custom_headers=[{"created_time": "1516269022"}],
-        ),
+        [{"id": "abc"}],
+        [{"type": "abc"}],
+        [{"body": "abc"}],
+        [{"created_time": 1516269022}],
+        [{"created_time": "1516269022"}],
     ],
 )
-async def test_custom_header_equals_to_default(msg, resolvers_config_alice):
-    await check_invalid_pack_msg(msg, resolvers_config_alice)
+async def test_custom_header_equals_to_default(custom_header):
+    with pytest.raises(DIDCommValueError):
+        Message(
+            id="1234567890",
+            type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
+            created_time=1516269022,
+            custom_headers=custom_header,
+            body={},
+        )
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "msg",
+    "new_fields",
     [
-        update_msg_field("type", 123),
-        update_msg_field("frm", 123),
-        update_msg_field("to", 123),
-        update_msg_field("to", [123]),
-        update_msg_field("created_time", "123"),
-        update_msg_field("expires_time", "123"),
-        update_msg_field("please_ack", 1),
-        update_msg_field("ack", 1),
-        update_msg_field("thid", 1),
-        update_msg_field("pthid", 1),
-        update_msg_field("from_prior", {}),
-        update_msg_field("attachments", {}),
-        update_msg_field("attachments", [{}]),
-        update_msg_field("custom_headers", {}),
+        ("type", 123),
+        ("frm", 123),
+        ("to", 123),
+        ("to", [123]),
+        ("created_time", "123"),
+        ("expires_time", "123"),
+        ("please_ack", 1),
+        ("ack", 1),
+        ("thid", 1),
+        ("pthid", 1),
+        ("from_prior", {}),
+        ("attachments", {}),
+        ("attachments", [{}]),
+        ("custom_headers", {}),
     ],
 )
-async def test_message_invalid_types(msg, resolvers_config_alice):
-    await check_invalid_pack_msg(msg, resolvers_config_alice)
+async def test_message_invalid_types(new_fields):
+    with pytest.raises(DIDCommValueError):
+        update_field(TEST_MESSAGE, *new_fields)
 
 
 @pytest.mark.asyncio

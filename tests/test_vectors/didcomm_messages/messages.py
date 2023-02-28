@@ -94,18 +94,6 @@ TEST_MESSAGE_FROM_PRIOR = Message(
 )
 
 
-TEST_MESSAGE_INVALID_FROM_PRIOR = Message(
-    id="1234567890",
-    type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
-    frm=ALICE_DID,
-    to=[BOB_DID],
-    created_time=1516269022,
-    expires_time=1516385931,
-    from_prior="invalid",
-    body={"messagespecificattribute": "and its value"},
-)
-
-
 TEST_MESSAGE_INVALID_FROM_PRIOR_ISS = Message(
     id="1234567890",
     type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
@@ -167,7 +155,6 @@ TEST_MESSAGE_MISMATCHED_FROM_PRIOR_SUB = Message(
 
 
 INVALID_FROM_PRIOR_MESSAGES = [
-    TEST_MESSAGE_INVALID_FROM_PRIOR,
     TEST_MESSAGE_INVALID_FROM_PRIOR_ISS,
     TEST_MESSAGE_INVALID_FROM_PRIOR_SUB,
     TEST_MESSAGE_INVALID_FROM_PRIOR_EQUAL_ISS_AND_SUB,
