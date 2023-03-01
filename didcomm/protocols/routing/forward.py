@@ -245,6 +245,7 @@ async def wrap_in_forward(
     # wrap forward msgs in reversed order so the message to final
     # recipient 'to' will be the innermost one
     for _to, _next in zip(routing_keys[::-1], (routing_keys[1:] + [to])[::-1]):
+        print(packed_msg, type(packed_msg))
         fwd_attach = Attachment(data=AttachmentDataJson(packed_msg))
 
         fwd_msg = ForwardMessage(

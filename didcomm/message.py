@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Optional, List, Union, Dict, TypeVar, Generic, Callable
 
 import attr
+import attrs
 
 from didcomm.common.types import (
     JSON_VALUE,
@@ -34,7 +35,7 @@ HeaderKeyType = str
 HeaderValueType = JSON_VALUE
 Header = Dict[HeaderKeyType, HeaderValueType]
 T = TypeVar("T")
-MESSAGE_DEFAULT_FIELDS = {
+_MESSAGE_DEFAULT_FIELDS = {
     "id",
     "type",
     "body",
@@ -51,78 +52,18 @@ MESSAGE_DEFAULT_FIELDS = {
 }
 
 
-@attr.s(auto_attribs=True)
-class Attachment:
-    """Plaintext attachment"""
-
-    data: Union[AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson]
-    id: Optional[Union[str, Callable]] = attr.ib(
-        converter=converter__id, validator=validator__instance_of(str), default=None
-    )
-    description: Optional[str] = None
-    filename: Optional[str] = None
-    media_type: Optional[str] = None
-    format: Optional[str] = None
-    lastmod_time: Optional[int] = None
-    byte_count: Optional[int] = None
-
-    def as_dict(self) -> dict:
-        self._validate()
-        d = attrs_to_dict(self)
-        d["data"] = self.data.as_dict()
-        return d
-
-    @staticmethod
-    def from_dict(d: dict) -> Attachment:
-        if not isinstance(d, Dict):
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-
-        if "data" in d:
-            if not isinstance(d["data"], Dict):
-                raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-            if "links" in d["data"]:
-                d["data"] = AttachmentDataLinks.from_dict(d["data"])
-            elif "base64" in d["data"]:
-                d["data"] = AttachmentDataBase64.from_dict(d["data"])
-            elif "json" in d["data"]:
-                d["data"] = AttachmentDataJson.from_dict(d["data"])
-
-        try:
-            msg = Attachment(**d)
-            msg._validate()
-        except Exception:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-
-        return msg
-
-    def _validate(self):
-        if (
-            not isinstance(self.id, str)
-            or not isinstance(
-                self.data,
-                (AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson),
-            )
-            or self.description is not None
-            and not isinstance(self.description, str)
-            or self.filename is not None
-            and not isinstance(self.filename, str)
-            or self.media_type is not None
-            and not isinstance(self.media_type, str)
-            or self.format is not None
-            and not isinstance(self.format, str)
-            or self.lastmod_time is not None
-            and not isinstance(self.lastmod_time, int)
-            or self.byte_count is not None
-            and not isinstance(self.byte_count, int)
-        ):
-            raise DIDCommValueError(f"Attachment structure is invalid: {self}")
-
-
 @dataclass
+@attrs.define(auto_attribs=True)
 class AttachmentDataLinks:
-    links: List[str]
-    hash: str
-    jws: Optional[JSON_OBJ] = None
+    links: List[str] = attr.ib(
+        validator=validator__deep_iterable(
+            validator__instance_of(str), validator__instance_of(List)
+        )
+    )
+    hash: str = attr.ib(validator=validator__instance_of(str))
+    jws: Optional[JSON_OBJ] = attr.ib(
+        validator=validator__optional(validator__instance_of(Dict)), default=None
+    )
 
     def as_dict(self) -> dict:
         self._validate()
@@ -152,10 +93,15 @@ class AttachmentDataLinks:
 
 
 @dataclass
+@attrs.define(auto_attribs=True)
 class AttachmentDataBase64:
-    base64: str
-    hash: Optional[str] = None
-    jws: Optional[JSON_OBJ] = None
+    base64: str = attr.ib(validator=validator__instance_of(str))
+    hash: Optional[str] = attr.ib(
+        validator=validator__optional(validator__instance_of(str)), default=None
+    )
+    jws: Optional[JSON_OBJ] = attr.ib(
+        validator=validator__optional(validator__instance_of(Dict)), default=None
+    )
 
     def as_dict(self) -> dict:
         self._validate()
@@ -185,10 +131,17 @@ class AttachmentDataBase64:
 
 
 @dataclass
+@attrs.define(auto_attribs=True)
 class AttachmentDataJson:
-    json: JSON_VALUE
-    hash: Optional[str] = None
-    jws: Optional[JSON_OBJ] = None
+    json: JSON_VALUE = attr.ib(
+        validator=validator__instance_of((str, int, bool, float, Dict, List))
+    )
+    hash: Optional[str] = attr.ib(
+        validator=validator__optional(validator__instance_of(str)), default=None
+    )
+    jws: Optional[JSON_OBJ] = attr.ib(
+        validator=validator__optional(validator__instance_of(Dict)), default=None
+    )
 
     def as_dict(self) -> dict:
         self._validate()
@@ -213,6 +166,67 @@ class AttachmentDataJson:
             and not isinstance(self.jws, Dict)
         ):
             raise DIDCommValueError(f"AttachmentDataJson structure is invalid: {self}")
+
+
+@attrs.define(auto_attribs=True)
+class Attachment:
+    """Plaintext attachment"""
+
+    data: Union[
+        AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson
+    ] = attr.ib(
+        validator=validator__instance_of(
+            Union[AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson]
+        ),
+    )
+    id: Optional[Union[str, Callable]] = attr.ib(
+        converter=converter__id, validator=validator__instance_of(str), default=None
+    )
+    description: Optional[str] = attr.ib(
+        validator=validator__optional(validator__instance_of(str)), default=None
+    )
+    filename: Optional[str] = attr.ib(
+        validator=validator__optional(validator__instance_of(str)), default=None
+    )
+    media_type: Optional[str] = attr.ib(
+        validator=validator__optional(validator__instance_of(str)), default=None
+    )
+    format: Optional[str] = attr.ib(
+        validator=validator__optional(validator__instance_of(str)), default=None
+    )
+    lastmod_time: Optional[int] = attr.ib(
+        validator=validator__optional(validator__instance_of(int)), default=None
+    )
+    byte_count: Optional[int] = attr.ib(
+        validator=validator__optional(validator__instance_of(int)), default=None
+    )
+
+    def as_dict(self) -> dict:
+        d = attrs_to_dict(self)
+        d["data"] = self.data.as_dict()
+        return d
+
+    @staticmethod
+    def from_dict(d: dict) -> Attachment:
+        if not isinstance(d, Dict):
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        if "data" in d:
+            if not isinstance(d["data"], Dict):
+                raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+            if "links" in d["data"]:
+                d["data"] = AttachmentDataLinks.from_dict(d["data"])
+            elif "base64" in d["data"]:
+                d["data"] = AttachmentDataBase64.from_dict(d["data"])
+            elif "json" in d["data"]:
+                d["data"] = AttachmentDataJson.from_dict(d["data"])
+
+        try:
+            msg = Attachment(**d)
+        except Exception:
+            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
+
+        return msg
 
 
 @dataclass(frozen=True)
@@ -342,7 +356,7 @@ class GenericMessage(Generic[T]):
                 validator__deep_mapping(
                     key_validator=validator__and_(
                         validator__instance_of(HeaderKeyType),
-                        validator__not_in_(MESSAGE_DEFAULT_FIELDS),
+                        validator__not_in_(_MESSAGE_DEFAULT_FIELDS),
                     ),
                     value_validator=validator__instance_of(HeaderValueType),
                     mapping_validator=validator__instance_of(Dict),

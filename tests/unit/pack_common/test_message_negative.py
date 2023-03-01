@@ -2,6 +2,7 @@ import copy
 import dataclasses
 
 import attr
+import attrs
 import pytest
 
 from didcomm.errors import DIDCommValueError
@@ -38,8 +39,7 @@ async def check_invalid_pack_msg(msg: Message, resolvers_config_alice):
 def update_attachment_field(attcmnt, field_name, value):
     msg = copy.deepcopy(TEST_MESSAGE)
     attcmnt = copy.deepcopy(attcmnt)
-    # to hack / workaround Attachment frozen setting
-    object.__setattr__(attcmnt, field_name, value)
+    attrs.evolve(attcmnt, **{field_name: value})
     msg.attachments = [attcmnt]
     return msg
 
@@ -158,8 +158,8 @@ async def test_message_invalid_body_type(msg, resolvers_config_alice):
 async def test_message_invalid_attachemnt_fields(
     attachment, new_fields, resolvers_config_alice
 ):
-    msg = update_attachment_field(attachment, *new_fields)
-    await check_invalid_pack_msg(msg, resolvers_config_alice)
+    with pytest.raises(DIDCommValueError):
+        update_attachment_field(attachment, *new_fields)
 
 
 @pytest.mark.asyncio
@@ -187,55 +187,46 @@ async def test_message_invalid_from_prior_fields(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("attachment", [TEST_ATTACHMENT, TEST_ATTACHMENT_MINIMAL])
 @pytest.mark.parametrize(
-    "links",
+    "links, hashh, jws",
     [
-        AttachmentDataLinks(links={}, hash="abc"),
-        AttachmentDataLinks(links=[123], hash="abc"),
-        AttachmentDataLinks(links=[123], hash="abc"),
-        AttachmentDataLinks(links=["123"], hash=123),
-        AttachmentDataLinks(links=["123"], hash="123", jws=123),
-        AttachmentDataLinks(links=["123"], hash="123", jws="123"),
-        AttachmentDataLinks(links=["123"], hash="123", jws=[]),
+        ({}, "abc", None),
+        ([123], "abc", None),
+        ([123], "abc", None),
+        (["123"], 123, None),
+        (["123"], "123", 123),
+        (["123"], "123", "123"),
+        (["123"], "123", []),
     ],
 )
-async def test_message_invalid_attachment_data_links(
-    attachment, links, resolvers_config_alice
-):
-    msg = update_attachment_field(attachment, "data", links)
-    await check_invalid_pack_msg(msg, resolvers_config_alice)
+async def test_message_invalid_attachment_data_links(links, hashh, jws):
+    with pytest.raises(DIDCommValueError):
+        AttachmentDataLinks(links, hashh, jws)
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("attachment", [TEST_ATTACHMENT, TEST_ATTACHMENT_MINIMAL])
 @pytest.mark.parametrize(
-    "base64",
+    "base64, hashh, jws",
     [
-        AttachmentDataBase64(base64=123),
-        AttachmentDataBase64(base64="123", hash=123),
-        AttachmentDataBase64(base64="123", hash="123", jws="{}"),
+        (123, None, None),
+        ("123", 123, None),
+        ("123", "123", "{}"),
     ],
 )
-async def test_message_invalid_attachment_data_base64(
-    attachment, base64, resolvers_config_alice
-):
-    msg = update_attachment_field(attachment, "data", base64)
-    await check_invalid_pack_msg(msg, resolvers_config_alice)
+async def test_message_invalid_attachment_data_base64(base64, hashh, jws):
+    with pytest.raises(DIDCommValueError):
+        AttachmentDataBase64(base64, hashh, jws)
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("attachment", [TEST_ATTACHMENT, TEST_ATTACHMENT_MINIMAL])
 @pytest.mark.parametrize(
-    "json_data",
+    "json_data, hashh, jws",
     [
-        AttachmentDataJson(json=AttachmentDataJson(json={})),
-        AttachmentDataJson(json={}, hash=123),
-        AttachmentDataJson(json={}, hash="123", jws="{}"),
+        (AttachmentDataJson(json={}), None, None),
+        ({}, 123, None),
+        ({}, "123", "{}"),
     ],
 )
-async def test_message_invalid_attachment_data_json(
-    attachment, json_data, resolvers_config_alice
-):
-    msg = update_attachment_field(attachment, "data", json_data)
-    await check_invalid_pack_msg(msg, resolvers_config_alice)
+async def test_message_invalid_attachment_data_json(json_data, hashh, jws):
+    with pytest.raises(DIDCommValueError):
+        AttachmentDataJson(json_data, hashh, jws)
