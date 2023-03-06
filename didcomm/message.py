@@ -275,7 +275,7 @@ class GenericMessage(Generic[T]):
     # if not specified would be auto-generated
     id: Optional[Union[str, Callable]] = attr.ib(
         converter=converter__didcomm_id,
-        validator=validator__optional(validator__instance_of(Union[str, Callable])),
+        validator=validator__optional(validator__instance_of((str, Callable))),
         default=None,
     )
     frm: Optional[DID] = attr.ib(
