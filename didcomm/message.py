@@ -152,7 +152,7 @@ class Attachment:
         AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson
     ] = attr.ib(
         validator=validator__instance_of(
-            Union[AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson]
+            (AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson)
         ),
     )
     id: Optional[Union[str, Callable]] = attr.ib(
