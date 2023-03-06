@@ -106,8 +106,8 @@ def validator__check_f(
 
 
 # TODO TEST
-def validator__did(instance, attribute, value) -> None:
-    validator__check_f(is_did, "is not a did")(instance, attribute, value)
+def validator__did() -> Callable:
+    return validator__check_f(is_did, "is not a did")
 
 
 # TODO TEST

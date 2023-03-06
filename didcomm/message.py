@@ -16,7 +16,7 @@ from didcomm.common.types import (
 )
 from didcomm.core.converters import converter__id, converter__didcomm_id
 from didcomm.core.serialization import json_str_to_dict, json_bytes_to_dict
-from didcomm.core.utils import dataclass_to_dict, attrs_to_dict, is_did
+from didcomm.core.utils import dataclass_to_dict, attrs_to_dict
 from didcomm.core.validators import (
     validator__instance_of,
     validator__deep_iterable,
@@ -24,6 +24,7 @@ from didcomm.core.validators import (
     validator__deep_mapping,
     validator__not_in_,
     validator__and_,
+    validator__did,
 )
 from didcomm.errors import (
     MalformedMessageError,
@@ -229,25 +230,46 @@ class Attachment:
         return msg
 
 
-@dataclass(frozen=True)
+@dataclass
+@attrs.define(auto_attribs=True)
 class FromPrior:
-    iss: DID
-    sub: DID
-    aud: Optional[str] = None
-    exp: Optional[int] = None
-    nbf: Optional[int] = None
-    iat: Optional[int] = None
-    jti: Optional[str] = None
+    iss: DID = attr.ib(
+        validator=validator__and_(validator__instance_of(DID), validator__did()),
+    )
+    sub: DID = attr.ib(
+        validator=validator__and_(validator__instance_of(DID), validator__did()),
+    )
+    aud: Optional[str] = attr.ib(
+        validator=validator__optional(validator__instance_of(str)), default=None
+    )
+
+    exp: Optional[int] = attr.ib(
+        validator=validator__optional(validator__instance_of(int)), default=None
+    )
+
+    nbf: Optional[int] = attr.ib(
+        validator=validator__optional(validator__instance_of(int)), default=None
+    )
+
+    iat: Optional[int] = attr.ib(
+        validator=validator__optional(validator__instance_of(int)), default=None
+    )
+
+    jti: Optional[str] = attr.ib(
+        validator=validator__optional(validator__instance_of(str)), default=None
+    )
 
     def as_dict(self) -> dict:
-        self._validate()
+        try:
+            attr.validate(self)
+        except Exception as exc:
+            raise DIDCommValueError(str(exc)) from exc
         return dataclass_to_dict(self)
 
     @staticmethod
     def from_dict(d: dict) -> FromPrior:
         try:
             msg = FromPrior(**d)
-            msg._validate()
         except Exception:
             raise MalformedMessageError(
                 MalformedMessageCode.INVALID_PLAINTEXT,
@@ -255,24 +277,6 @@ class FromPrior:
             )
 
         return msg
-
-    def _validate(self):
-        if (
-            not is_did(self.iss)
-            or not is_did(self.sub)
-            or not isinstance(self.sub, str)
-            or self.aud is not None
-            and not isinstance(self.aud, str)
-            or self.exp is not None
-            and not isinstance(self.exp, int)
-            or self.nbf is not None
-            and not isinstance(self.nbf, int)
-            or self.iat is not None
-            and not isinstance(self.iat, int)
-            or self.jti is not None
-            and not isinstance(self.jti, str)
-        ):
-            raise DIDCommValueError(f"FromPrior structure is invalid: {self}")
 
 
 @attr.s(auto_attribs=True)

@@ -11,11 +11,12 @@ from didcomm.message import (
     AttachmentDataLinks,
     AttachmentDataBase64,
     AttachmentDataJson,
+    FromPrior,
 )
 from didcomm.pack_encrypted import pack_encrypted
 from didcomm.pack_plaintext import pack_plaintext
 from didcomm.pack_signed import pack_signed
-from tests.test_vectors.common import ALICE_DID, BOB_DID
+from tests.test_vectors.common import ALICE_DID, BOB_DID, CHARLIE_DID
 from tests.test_vectors.didcomm_messages.messages import (
     TEST_MESSAGE,
     TEST_ATTACHMENT,
@@ -184,6 +185,19 @@ async def test_message_invalid_from_prior_fields(
 ):
     msg = update_from_prior_field(from_prior, *new_fields)
     await check_invalid_pack_msg(msg, resolvers_config_alice)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "iss, sub",
+    [
+        ("invalid", ALICE_DID),
+        (CHARLIE_DID, "invalid"),
+    ],
+)
+async def test_message_invalid_from_prior_construction(iss, sub):
+    with pytest.raises(DIDCommValueError):
+        FromPrior(iss, sub)
 
 
 @pytest.mark.asyncio
