@@ -14,19 +14,14 @@ from didcomm.secrets.secrets_resolver import Secret
 def test_extract_sign_alg_from_json_web_key_2020_verification_method_with_p256_key():
     verification_method = VerificationMethod(
         id="did:example:alice#key-2",
-        controller="did:example:alice#key-2",
+        controller="did:example:alice",
         type=VerificationMethodType.JSON_WEB_KEY_2020,
-        verification_material=VerificationMaterial(
-            format=VerificationMaterialFormat.JWK,
-            value=json_dumps(
-                {
-                    "kty": "EC",
-                    "crv": "P-256",
-                    "x": "2syLh57B-dGpa0F8p1JrO6JU7UUSF6j7qL-vfk1eOoY",
-                    "y": "BgsGtI7UPsObMRjdElxLOrgAO9JggNMjOcfzEPox18w",
-                }
-            ),
-        ),
+        public_key_jwk={
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "2syLh57B-dGpa0F8p1JrO6JU7UUSF6j7qL-vfk1eOoY",
+            "y": "BgsGtI7UPsObMRjdElxLOrgAO9JggNMjOcfzEPox18w",
+        },
     )
 
     sign_alg = extract_sign_alg(verification_method)
@@ -60,19 +55,14 @@ def test_extract_sign_alg_from_json_web_key_2020_secret_with_p256_key():
 def test_extract_sign_alg_from_json_web_key_2020_verification_method_with_secp256k1_key():
     verification_method = VerificationMethod(
         id="did:example:alice#key-3",
-        controller="did:example:alice#key-3",
+        controller="did:example:alice",
         type=VerificationMethodType.JSON_WEB_KEY_2020,
-        verification_material=VerificationMaterial(
-            format=VerificationMaterialFormat.JWK,
-            value=json_dumps(
-                {
-                    "kty": "EC",
-                    "crv": "secp256k1",
-                    "x": "aToW5EaTq5mlAf8C5ECYDSkqsJycrW-e1SQ6_GJcAOk",
-                    "y": "JAGX94caA21WKreXwYUaOCYTBMrqaX4KWIlsQZTHWCk",
-                }
-            ),
-        ),
+        public_key_jwk={
+            "kty": "EC",
+            "crv": "secp256k1",
+            "x": "aToW5EaTq5mlAf8C5ECYDSkqsJycrW-e1SQ6_GJcAOk",
+            "y": "JAGX94caA21WKreXwYUaOCYTBMrqaX4KWIlsQZTHWCk",
+        },
     )
 
     sign_alg = extract_sign_alg(verification_method)
@@ -106,18 +96,13 @@ def test_extract_sign_alg_from_json_web_key_2020_secret_with_secp256k1_key():
 def test_extract_sign_alg_from_json_web_key_2020_verification_method_with_ed25519_key():
     verification_method = VerificationMethod(
         id="did:example:alice#key-1",
-        controller="did:example:alice#key-1",
+        controller="did:example:alice",
         type=VerificationMethodType.JSON_WEB_KEY_2020,
-        verification_material=VerificationMaterial(
-            format=VerificationMaterialFormat.JWK,
-            value=json_dumps(
-                {
-                    "kty": "OKP",
-                    "crv": "Ed25519",
-                    "x": "G-boxFB6vOZBu-wXkm-9Lh79I8nf9Z50cILaOgKKGww",
-                }
-            ),
-        ),
+        public_key_jwk={
+            "kty": "OKP",
+            "crv": "Ed25519",
+            "x": "G-boxFB6vOZBu-wXkm-9Lh79I8nf9Z50cILaOgKKGww",
+        },
     )
 
     sign_alg = extract_sign_alg(verification_method)
@@ -150,12 +135,9 @@ def test_extract_sign_alg_from_json_web_key_2020_secret_with_ed25519_key():
 def test_extract_sign_alg_from_ed25519_verification_key_2018_verification_method():
     verification_method = VerificationMethod(
         id="did:example:dave#key-ed25519-1",
-        controller="did:example:dave#key-ed25519-1",
+        controller="did:example:dave",
         type=VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
-        verification_material=VerificationMaterial(
-            format=VerificationMaterialFormat.BASE58,
-            value="ByHnpUCFb1vAfh9CFZ8ZkmUZguURW8nSw889hy6rD8L7",
-        ),
+        public_key_base58="ByHnpUCFb1vAfh9CFZ8ZkmUZguURW8nSw889hy6rD8L7",
     )
 
     sign_alg = extract_sign_alg(verification_method)
@@ -181,12 +163,9 @@ def test_extract_sign_alg_from_ed25519_verification_key_2018_secret():
 def test_extract_sign_alg_from_ed25519_verification_key_2020_verification_method():
     verification_method = VerificationMethod(
         id="did:example:dave#key-ed25519-2",
-        controller="did:example:dave#key-ed25519-2",
+        controller="did:example:dave",
         type=VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
-        verification_material=VerificationMaterial(
-            format=VerificationMaterialFormat.MULTIBASE,
-            value="z6MkqRYqQiSgvZQdnBytw86Qbs2ZWUkGv22od935YF4s8M7V",
-        ),
+        public_key_multibase="z6MkqRYqQiSgvZQdnBytw86Qbs2ZWUkGv22od935YF4s8M7V",
     )
 
     sign_alg = extract_sign_alg(verification_method)

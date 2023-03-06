@@ -59,7 +59,7 @@ async def _find_anoncrypt_pack_recipient_public_keys_by_kid(
     if did_doc is None:
         raise DIDDocNotResolvedError(to_did)
 
-    if to_kid not in did_doc.key_agreement_kids:
+    if not did_doc.key_agreement or to_kid not in did_doc.key_agreement:
         raise DIDUrlNotFoundError(
             f"DID URL `{to_kid}` is not found in keyAgreement verification relationships of DID `{to_did}`"
         )
@@ -78,7 +78,7 @@ async def _find_anoncrypt_pack_recipient_public_keys_by_did(
     if did_doc is None:
         raise DIDDocNotResolvedError(to_did)
 
-    kids = did_doc.key_agreement_kids
+    kids = did_doc.key_agreement
     if not kids:
         raise DIDUrlNotFoundError(
             f"No keyAgreement verification relationships are found for DID `{to_did}`"

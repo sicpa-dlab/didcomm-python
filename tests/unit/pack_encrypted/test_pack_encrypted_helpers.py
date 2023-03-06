@@ -42,7 +42,7 @@ class _TestData:
 @pytest.fixture
 def test_data(resolvers_config_mock, didcomm_service, pack_config, pack_params):
     msg = "somemsg"
-    to = "someto"
+    to = "did:example:some_to"
 
     def id_gen_func():
         return "123"
@@ -77,7 +77,17 @@ async def test_forward_if_needed__no_did_services(wrap_in_forward_mock, test_dat
 
 @pytest.mark.asyncio
 async def test_forward_if_needed__no_routing_keys(wrap_in_forward_mock, test_data):
-    test_data.did_services_chain[-1].routing_keys = []
+    src = test_data.did_services_chain[-1]
+    test_data.did_services_chain = [
+        DIDCommService(
+            id=src.id,
+            service_endpoint=src.service_endpoint,
+            routing_keys=[],  # no routing keys
+            recipient_keys=src.recipient_keys,
+            accept=src.accept,
+        )
+    ]
+
     res = await __forward_if_needed(**attr.asdict(test_data, recurse=False))
     assert res is None
 

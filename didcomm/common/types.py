@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Any, Union, List
+from pydid.did import DID, DIDUrl
 
 JSON_OBJ = Dict[str, Any]
 JSON_VALUE = Union[None, str, int, bool, float, JSON_OBJ, List[Any]]
@@ -10,19 +11,18 @@ JSON = str
 JWK = JSON
 JWT = JSON
 JWS = JSON
-DID = str
-DID_URL = str
+DID_URL = DIDUrl
 DID_OR_DID_URL = Union[DID, DID_URL]
 
 
-class VerificationMethodType(Enum):
-    JSON_WEB_KEY_2020 = 1
-    X25519_KEY_AGREEMENT_KEY_2019 = 2
-    ED25519_VERIFICATION_KEY_2018 = 3
-    X25519_KEY_AGREEMENT_KEY_2020 = 4
-    ED25519_VERIFICATION_KEY_2020 = 5
+class VerificationMethodType:
+    JSON_WEB_KEY_2020 = "JsonWebKey2020"
+    X25519_KEY_AGREEMENT_KEY_2019 = "X25519KeyAgreementKey2019"
+    ED25519_VERIFICATION_KEY_2018 = "Ed25519VerificationKey2018"
+    X25519_KEY_AGREEMENT_KEY_2020 = "X25519KeyAgreementKey2020"
+    ED25519_VERIFICATION_KEY_2020 = "Ed25519VerificationKey2020"
     # ECDSA_SECP_256K1_VERIFICATION_KEY_2019 = 6 - not supported now
-    OTHER = 1000
+    OTHER = "Other"
 
 
 class VerificationMaterialFormat(Enum):
