@@ -67,30 +67,21 @@ class AttachmentDataLinks:
     )
 
     def as_dict(self) -> dict:
-        self._validate()
+        try:
+            attr.validate(self)
+        except Exception as exc:
+            raise DIDCommValueError(str(exc)) from exc
         return dataclass_to_dict(self)
 
     @staticmethod
     def from_dict(d: dict) -> AttachmentDataLinks:
         try:
             msg = AttachmentDataLinks(**d)
-            msg._validate()
+            attr.validate(msg)
         except Exception:
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
 
         return msg
-
-    def _validate(self):
-        if (
-            not isinstance(self.links, List)
-            or not isinstance(self.hash, str)
-            or self.jws is not None
-            and not isinstance(self.jws, Dict)
-        ):
-            raise DIDCommValueError(f"AttachmentDataLinks structure is invalid: {self}")
-        for link in self.links:
-            if not isinstance(link, str):
-                raise DIDCommValueError(f"Attachment data link is invalid: {link}")
 
 
 @dataclass
@@ -105,30 +96,21 @@ class AttachmentDataBase64:
     )
 
     def as_dict(self) -> dict:
-        self._validate()
+        try:
+            attr.validate(self)
+        except Exception as exc:
+            raise DIDCommValueError(str(exc)) from exc
         return dataclass_to_dict(self)
 
     @staticmethod
     def from_dict(d: dict) -> AttachmentDataBase64:
         try:
             msg = AttachmentDataBase64(**d)
-            msg._validate()
+            attr.validate(msg)
         except Exception:
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
 
         return msg
-
-    def _validate(self):
-        if (
-            not isinstance(self.base64, str)
-            or self.hash
-            and not isinstance(self.hash, str)
-            or self.jws is not None
-            and not isinstance(self.jws, Dict)
-        ):
-            raise DIDCommValueError(
-                f"AttachmentDataBase64 structure is invalid: {self}"
-            )
 
 
 @dataclass
@@ -145,28 +127,21 @@ class AttachmentDataJson:
     )
 
     def as_dict(self) -> dict:
-        self._validate()
+        try:
+            attr.validate(self)
+        except Exception as exc:
+            raise DIDCommValueError(str(exc)) from exc
         return dataclass_to_dict(self)
 
     @staticmethod
     def from_dict(d: dict) -> AttachmentDataJson:
         try:
             msg = AttachmentDataJson(**d)
-            msg._validate()
+            attr.validate(msg)
         except Exception:
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
 
         return msg
-
-    def _validate(self):
-        if (
-            not isinstance(self.json, (str, int, bool, float, Dict, List))
-            or self.hash
-            and not isinstance(self.hash, str)
-            or self.jws is not None
-            and not isinstance(self.jws, Dict)
-        ):
-            raise DIDCommValueError(f"AttachmentDataJson structure is invalid: {self}")
 
 
 @attrs.define(auto_attribs=True)
@@ -205,6 +180,10 @@ class Attachment:
     def as_dict(self) -> dict:
         d = attrs_to_dict(self)
         d["data"] = self.data.as_dict()
+        try:
+            attr.validate(self)
+        except Exception as exc:
+            raise DIDCommValueError(str(exc)) from exc
         return d
 
     @staticmethod
@@ -399,6 +378,11 @@ class GenericMessage(Generic[T]):
             d["attachments"] = [a.as_dict() for a in self.attachments]
         if self.from_prior:
             d["from_prior"] = self.from_prior.as_dict()
+
+        try:
+            attr.validate(self)
+        except Exception as exc:
+            raise DIDCommValueError(str(exc)) from exc
 
         return d
 
