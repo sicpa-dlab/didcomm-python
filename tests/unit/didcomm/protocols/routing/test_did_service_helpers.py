@@ -152,7 +152,7 @@ async def test_resolve_did_services_chain__uri_as_endpoint(
 async def test_resolve_did_services_chain__did_as_endpoint(
     resolvers_config_mock, did1, find_did_service_mock
 ):
-    service1 = build_didcomm_service(service_endpoint=did1)
+    service1 = build_didcomm_service(service_endpoint=did1 + "#1")
     service2 = build_didcomm_service(service_endpoint="https://some.domain")
     find_did_service_return = [service1, service2]
     expected_res = list(reversed(find_did_service_return))
@@ -167,7 +167,7 @@ async def test_resolve_did_services_chain__did_as_endpoint(
 async def test_resolve_did_services_chain__no_mediator_did_service(
     resolvers_config_mock, did1, did2, find_did_service_mock
 ):
-    service1 = build_didcomm_service(service_endpoint=did1)
+    service1 = build_didcomm_service(service_endpoint=did1 + "#1")
     find_did_service_return = [service1, None]
 
     find_did_service_mock.side_effect = (x for x in find_did_service_return)
@@ -196,8 +196,8 @@ async def test_resolve_did_services_chain__did_endpoint_recursion(
     did2,
     find_did_service_mock,
 ):
-    service1 = build_didcomm_service(service_endpoint=did1)
-    service2 = build_didcomm_service(service_endpoint=did2)
+    service1 = build_didcomm_service(service_endpoint=did1 + "#1")
+    service2 = build_didcomm_service(service_endpoint=did2 + "#1")
     service3 = build_didcomm_service(service_endpoint="https://some.domain")
 
     find_did_service_mock.side_effect = (x for x in [service1, service2, service3])
