@@ -102,7 +102,7 @@ class GenericMessage(Generic[T]):
             d["from"] = d["frm"]
             del d["frm"]
 
-        d["typ"] = DIDCommMessageTypes.PLAINTEXT.value
+        d["typ"] = DIDCommMessageTypes.PLAINTEXT.value # this is not part of the official specification
 
         if self.attachments:
             d["attachments"] = [a.as_dict() for a in self.attachments]
@@ -130,13 +130,9 @@ class GenericMessage(Generic[T]):
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
 
         # TODO TEST missed fields
-        for f in ("id", "type", "body", "typ"):
+        for f in ("id", "type", "body"):
             if f not in d:
                 raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-
-        if d["typ"] != DIDCommMessageTypes.PLAINTEXT.value:
-            raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-        del d["typ"]
 
         if "from" in d:
             d["frm"] = d["from"]
