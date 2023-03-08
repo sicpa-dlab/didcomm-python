@@ -21,7 +21,7 @@ class VerificationMethodType:
     ED25519_VERIFICATION_KEY_2018 = "Ed25519VerificationKey2018"
     X25519_KEY_AGREEMENT_KEY_2020 = "X25519KeyAgreementKey2020"
     ED25519_VERIFICATION_KEY_2020 = "Ed25519VerificationKey2020"
-    # ECDSA_SECP_256K1_VERIFICATION_KEY_2019 = 6 - not supported now
+    # ECDSA_SECP_256K1_VERIFICATION_KEY_2019 = "EcdsaSecp256k1VerificationKey2019" - not supported now
     OTHER = "Other"
 
 
