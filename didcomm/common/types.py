@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from types import NoneType
 from typing import Dict, Any, Union, List
 
 JSON_OBJ = Dict[str, Any]
-JSON_VALUE = Union[NoneType, str, int, bool, float, Dict, List]
+JSON_VALUE = Union[type(None), str, int, bool, float, Dict, List]
 JSON = str
 JWK = JSON
 JWT = JSON
