@@ -34,22 +34,23 @@ from didcomm.errors import (
 
 HeaderKeyType = str
 HeaderValueType = JSON_VALUE
-Header = Dict[HeaderKeyType, HeaderValueType]
+Headers = Dict[HeaderKeyType, HeaderValueType]
 T = TypeVar("T")
-_MESSAGE_DEFAULT_FIELDS = {
-    "id",
-    "type",
+_MESSAGE_RESERVED_FIELDS = {
+    "ack",
+    "attachments",
     "body",
-    "frm",
-    "to",
     "created_time",
     "expires_time",
+    "frm",
+    "from",
     "from_prior",
+    "id",
     "please_ack",
-    "ack",
-    "thid",
     "pthid",
-    "attachments",
+    "thid",
+    "to",
+    "type",
 }
 
 
@@ -333,19 +334,16 @@ class GenericMessage(Generic[T]):
         ),
         default=None,
     )
-    custom_headers: Optional[List[Header]] = attr.ib(
+    custom_headers: Optional[Headers] = attr.ib(
         validator=validator__optional(
-            validator__deep_iterable(
-                validator__deep_mapping(
-                    key_validator=validator__and_(
-                        validator__instance_of(HeaderKeyType),
-                        validator__not_in_(_MESSAGE_DEFAULT_FIELDS),
-                    ),
-                    value_validator=validator__instance_of(HeaderValueType),
-                    mapping_validator=validator__instance_of(Dict),
+            validator__deep_mapping(
+                key_validator=validator__and_(
+                    validator__instance_of(HeaderKeyType),
+                    validator__not_in_(_MESSAGE_RESERVED_FIELDS),
                 ),
-                iterable_validator=validator__instance_of(List),
-            )
+                value_validator=validator__instance_of(HeaderValueType),
+                mapping_validator=validator__instance_of(Dict),
+            ),
         ),
         default=None,
     )
@@ -364,6 +362,11 @@ class GenericMessage(Generic[T]):
             return self.body
 
     def as_dict(self) -> dict:
+        try:
+            attr.validate(self)
+        except Exception as exc:
+            raise DIDCommValueError(str(exc)) from exc
+
         d = attrs_to_dict(self)
 
         d["body"] = self._body_as_dict()
@@ -379,10 +382,9 @@ class GenericMessage(Generic[T]):
         if self.from_prior:
             d["from_prior"] = self.from_prior.as_dict()
 
-        try:
-            attr.validate(self)
-        except Exception as exc:
-            raise DIDCommValueError(str(exc)) from exc
+        if self.custom_headers:
+            del d["custom_headers"]
+            d.update(self.custom_headers)
 
         return d
 
@@ -412,6 +414,14 @@ class GenericMessage(Generic[T]):
         if d["typ"] != DIDCommMessageTypes.PLAINTEXT.value:
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
         del d["typ"]
+
+        custom_header_keys = d.keys() - _MESSAGE_RESERVED_FIELDS
+        if custom_header_keys:
+            custom_headers = {}
+            for key in custom_header_keys:
+                custom_headers[key] = d[key]
+                del d[key]
+            d["custom_headers"] = custom_headers
 
         if "from" in d:
             d["frm"] = d["from"]

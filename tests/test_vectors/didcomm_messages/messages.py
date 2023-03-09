@@ -143,6 +143,19 @@ def minimal_msg():
     )
 
 
+def custom_headers_msg():
+    msg = copy.deepcopy(TEST_MESSAGE)
+    msg.custom_headers = {
+        "my_string": "string value",
+        "my_int": 123,
+        "my_bool": False,
+        "my_float": 1.23,
+        "my_json": {"key": "value"},
+        "my_list": [1, 2, 3],
+    }
+    return msg
+
+
 def attachment_base64_msg():
     msg = copy.deepcopy(TEST_MESSAGE)
     msg.attachments = [Attachment(id="23", data=AttachmentDataBase64(base64="qwerty"))]
