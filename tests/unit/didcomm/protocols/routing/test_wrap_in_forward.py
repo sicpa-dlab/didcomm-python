@@ -24,7 +24,7 @@ def encrypted_msg2() -> dict:
 @pytest.fixture
 def encrypt_result1(did: DID, encrypted_msg1: dict) -> EncryptResult:
     return EncryptResult(
-        msg=encrypt_result1, to_kids=[did], to_keys=["not", "important", "for", "now"]
+        msg=encrypted_msg1, to_kids=[did], to_keys=["not", "important", "for", "now"]
     )
 
 
