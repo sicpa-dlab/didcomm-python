@@ -49,6 +49,7 @@ TEST_PLAINTEXT_DIDCOMM_MESSAGE_WITH_CUSTOM_HEADERS = json_dumps(
         "my_float": 1.23,
         "my_json": {"key": "value"},
         "my_list": [1, 2, 3],
+        "my_none": None,
     }
 )
 

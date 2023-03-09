@@ -152,6 +152,7 @@ def custom_headers_msg():
         "my_float": 1.23,
         "my_json": {"key": "value"},
         "my_list": [1, 2, 3],
+        "my_none": None,
     }
     return msg
 

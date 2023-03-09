@@ -32,6 +32,7 @@ from didcomm.errors import (
     DIDCommValueError,
 )
 
+NoneType = type(None)
 HeaderKeyType = str
 HeaderValueType = JSON_VALUE
 Headers = Dict[HeaderKeyType, HeaderValueType]
@@ -341,7 +342,9 @@ class GenericMessage(Generic[T]):
                     validator__instance_of(HeaderKeyType),
                     validator__not_in_(_MESSAGE_RESERVED_FIELDS),
                 ),
-                value_validator=validator__instance_of(HeaderValueType),
+                value_validator=validator__instance_of(
+                    (str, int, bool, float, Dict, List, NoneType)
+                ),
                 mapping_validator=validator__instance_of(Dict),
             ),
         ),
