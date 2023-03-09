@@ -20,9 +20,17 @@ def _attr_validator_wrapper(attr_validator):
     return _f
 
 
+def validator__optional(validator: Callable) -> Callable:
+    return _attr_validator_wrapper(attr.validators.optional(validator))
+
+
 # TODO TEST
 def validator__instance_of(classinfo) -> Callable:
     return _attr_validator_wrapper(attr.validators.instance_of(classinfo))
+
+
+def validator__and_(*validators: Callable):
+    return _attr_validator_wrapper(attr.validators.and_(*validators))
 
 
 # TODO TEST
@@ -30,10 +38,25 @@ def validator__in_(options) -> Callable:
     return _attr_validator_wrapper(attr.validators.in_(options))
 
 
+def validator__not_in_(options) -> Callable:
+    return _attr_validator_wrapper(attr.validators.not_(attr.validators.in_(options)))
+
+
 # TODO TEST
 def validator__deep_iterable(member_validator: Callable, iterable_validator=None):
     return _attr_validator_wrapper(
         attr.validators.deep_iterable(member_validator, iterable_validator)
+    )
+
+
+# TODO TEST
+def validator__deep_mapping(
+    key_validator: Callable,
+    value_validator: Callable,
+    mapping_validator: Callable = None,
+):
+    return _attr_validator_wrapper(
+        attr.validators.deep_mapping(key_validator, value_validator, mapping_validator)
     )
 
 
@@ -83,8 +106,8 @@ def validator__check_f(
 
 
 # TODO TEST
-def validator__did(instance, attribute, value) -> None:
-    validator__check_f(is_did, "is not a did")(instance, attribute, value)
+def validator__did() -> Callable:
+    return validator__check_f(is_did, "is not a did")
 
 
 # TODO TEST
