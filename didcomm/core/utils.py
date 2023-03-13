@@ -390,7 +390,7 @@ class _Crv(Enum):
 
 def _get_crv_for_verification_method(
     key: VerificationMethod,
-) -> Optional[str]:  # TODO switch to optionnal
+) -> Optional[str]:
     if key.type in {
         VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
         VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
