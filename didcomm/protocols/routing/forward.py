@@ -24,7 +24,7 @@ from didcomm.common.types import (
 )
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.algorithms import AnonCryptAlg
-from didcomm.message import GenericMessage, Header, Attachment, AttachmentDataJson
+from didcomm.message import GenericMessage, Headers, Attachment, AttachmentDataJson
 from didcomm.core.types import EncryptResult, DIDCommGeneratorType, DIDCOMM_ORG_DOMAIN
 from didcomm.core.defaults import DEF_ENC_ALG_ANON
 from didcomm.core.validators import (
@@ -209,7 +209,7 @@ async def wrap_in_forward(
     to: DID_OR_DID_URL,
     routing_keys: List[DID_OR_DID_URL],
     enc_alg_anon: Optional[AnonCryptAlg] = DEF_ENC_ALG_ANON,
-    headers: Optional[Header] = None,
+    headers: Optional[Headers] = None,
     didcomm_id_generator: Optional[DIDCommGeneratorType] = None,
 ) -> Optional[ForwardPackResult]:
     """
