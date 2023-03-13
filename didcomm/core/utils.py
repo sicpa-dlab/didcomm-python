@@ -420,25 +420,6 @@ def are_keys_compatible(
     return crv_1 == crv_2
 
 
-def are_keys_compatible_old(
-    method1: Union[Secret, VerificationMethod], method2: VerificationMethod
-) -> bool:
-    if method1.type == method2.type and (
-        method1.verification_material.format == method2.verification_material.format
-    ):
-        if method1.verification_material.format == VerificationMaterialFormat.JWK:
-            private_jwk = json_str_to_dict(method1.verification_material.value)
-            public_jwk = json_str_to_dict(method2.verification_material.value)
-            return (
-                private_jwk["kty"] == public_jwk["kty"]
-                and private_jwk["crv"] == public_jwk["crv"]
-            )
-        else:
-            return True
-    else:
-        return False
-
-
 def parse_base64url_encoded_json(base64url):
     return json_str_to_dict(to_unicode(urlsafe_b64decode(to_bytes(base64url))))
 
