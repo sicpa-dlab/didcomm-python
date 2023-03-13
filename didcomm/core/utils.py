@@ -384,7 +384,7 @@ def get_did_and_optionally_kid(did_or_kid: DID_OR_DID_URL) -> (DID, Optional[DID
 
 
 class _Crv(Enum):
-    ED25519 = "ED25519"
+    ED25519 = "Ed25519"
     X25519 = "X25519"
 
 
