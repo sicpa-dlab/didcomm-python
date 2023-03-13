@@ -38,11 +38,11 @@ async def find_authcrypt_pack_sender_and_recipient_keys(
         sender_did_doc = await resolvers_config.did_resolver.resolve(frm_did)
         if sender_did_doc is None:
             raise DIDDocNotResolvedError(frm_did)
-        if not sender_did_doc.key_agreement_kids:
+        if not sender_did_doc.key_agreement:
             raise DIDUrlNotFoundError(
                 f"No keyAgreement verification relationships are found for DID `{frm_did}`"
             )
-        sender_kids = sender_did_doc.key_agreement_kids
+        sender_kids = sender_did_doc.key_agreement
     else:
         sender_kids = [frm_kid]
 
@@ -51,13 +51,13 @@ async def find_authcrypt_pack_sender_and_recipient_keys(
         raise DIDDocNotResolvedError(to_did)
 
     if to_kid is None:
-        if not recipient_did_doc.key_agreement_kids:
+        if not recipient_did_doc.key_agreement:
             raise DIDUrlNotFoundError(
                 f"No keyAgreement verification relationships are found for DID `{to_did}`"
             )
-        recipient_kids = recipient_did_doc.key_agreement_kids
+        recipient_kids = recipient_did_doc.key_agreement
     else:
-        if to_kid not in recipient_did_doc.key_agreement_kids:
+        if to_kid not in recipient_did_doc.key_agreement:
             raise DIDUrlNotFoundError(
                 f"DID URL `{to_kid}` is not found in keyAgreement verification relationships of DID `{to_did}`"
             )
@@ -104,7 +104,7 @@ async def find_authcrypt_unpack_sender_and_recipient_keys(
     sender_did_doc = await resolvers_config.did_resolver.resolve(frm_did)
     if sender_did_doc is None:
         raise DIDDocNotResolvedError(frm_did)
-    if not sender_did_doc.key_agreement_kids:
+    if not sender_did_doc.key_agreement:
         raise DIDUrlNotFoundError(
             f"No keyAgreement verification relationships are found for DID `{frm_did}`"
         )

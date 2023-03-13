@@ -24,7 +24,7 @@ from didcomm.common.types import (
 )
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.common.algorithms import AnonCryptAlg
-from didcomm.message import GenericMessage, Header, Attachment, AttachmentDataJson
+from didcomm.message import GenericMessage, Headers, Attachment, AttachmentDataJson
 from didcomm.core.types import EncryptResult, DIDCommGeneratorType, DIDCOMM_ORG_DOMAIN
 from didcomm.core.defaults import DEF_ENC_ALG_ANON
 from didcomm.core.validators import (
@@ -129,7 +129,7 @@ class ForwardResult:
 
 async def find_did_service(
     resolvers_config: ResolversConfig, to: DID_OR_DID_URL, service_id: str = None
-) -> DIDCommService:
+) -> Optional[DIDCommService]:
     to_did = get_did(to)
     did_doc = await resolvers_config.did_resolver.resolve(to_did)
 
@@ -155,9 +155,10 @@ async def find_did_service(
         # > but any endpoint MAY be selected by the sender, typically
         # > by protocol availability or preference.
         # https://identity.foundation/didcomm-messaging/spec/#multiple-endpoints
-        for did_service in did_doc.didcomm_services:
-            if PROFILE_DIDCOMM_V2 in did_service.accept:
-                return did_service
+        if did_doc.service:
+            for did_service in did_doc.service:
+                if PROFILE_DIDCOMM_V2 in did_service.accept:
+                    return did_service
         return None
 
 
@@ -209,7 +210,7 @@ async def wrap_in_forward(
     to: DID_OR_DID_URL,
     routing_keys: List[DID_OR_DID_URL],
     enc_alg_anon: Optional[AnonCryptAlg] = DEF_ENC_ALG_ANON,
-    headers: Optional[Header] = None,
+    headers: Optional[Headers] = None,
     didcomm_id_generator: Optional[DIDCommGeneratorType] = None,
 ) -> Optional[ForwardPackResult]:
     """
@@ -221,10 +222,10 @@ async def wrap_in_forward(
     :param packed_msg: the message to be wrapped in Forward messages
     :param to: recipient's DID (DID URL)
     :param routing_keys: list of routing keys
-    :param enc_alg_anon (AnonCryptAlg): The encryption algorithm to be used for
+    :param enc_alg_anon: (AnonCryptAlg), The encryption algorithm to be used for
         anonymous encryption (anon_crypt).
     :param headers: optional headers for Forward message
-    :param didcomm_id_generator (Callable): optional callable to use
+    :param didcomm_id_generator: (Callable), optional callable to use
         for forward messages ``id`` generation, ``didcomm_id_generator_default``
         is used by default
 

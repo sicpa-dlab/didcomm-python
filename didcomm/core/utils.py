@@ -45,25 +45,16 @@ def extract_key(
     method: Union[VerificationMethod, Secret], align_kid=False
 ) -> AsymmetricKey:
     if isinstance(method, VerificationMethod):
-        return _extract_key_from_verifciation_method(method, align_kid)
+        return _extract_key_from_verification_method(method, align_kid)
     else:
         return _extract_key_from_secret(method, align_kid)
 
 
-def _extract_key_from_verifciation_method(
+def _extract_key_from_verification_method(
     verification_method: VerificationMethod, align_kid
 ) -> AsymmetricKey:
     if verification_method.type == VerificationMethodType.JSON_WEB_KEY_2020:
-        if (
-            verification_method.verification_material.format
-            != VerificationMaterialFormat.JWK
-        ):
-            raise DIDCommValueError(
-                f"Verification material format {verification_method.verification_material.format} "
-                f"is not supported for verification method type {verification_method.type}"
-            )
-
-        jwk = json_str_to_dict(verification_method.verification_material.value)
+        jwk = verification_method.public_key_jwk
 
         if align_kid:
             jwk["kid"] = verification_method.id
@@ -79,16 +70,7 @@ def _extract_key_from_verifciation_method(
         VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019,
         VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
     ]:
-        if (
-            verification_method.verification_material.format
-            != VerificationMaterialFormat.BASE58
-        ):
-            raise DIDCommValueError(
-                f"Verification material format {verification_method.verification_material.format} "
-                f"is not supported for verification method type {verification_method.type}"
-            )
-
-        raw_value = base58.b58decode(verification_method.verification_material.value)
+        raw_value = base58.b58decode(verification_method.public_key_base58)
         base64url_value = urlsafe_b64encode(raw_value)
 
         jwk = {
@@ -109,24 +91,15 @@ def _extract_key_from_verifciation_method(
         VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
         VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
     ]:
-        if (
-            verification_method.verification_material.format
-            != VerificationMaterialFormat.MULTIBASE
-        ):
-            raise DIDCommValueError(
-                f"Verification material format {verification_method.verification_material.format} "
-                f"is not supported for verification method type {verification_method.type}"
-            )
-
         # Currently only base58btc encoding is supported in scope of multibase support
-        if verification_method.verification_material.value.startswith("z"):
+        if verification_method.public_key_multibase.startswith("z"):
             prefixed_raw_value = base58.b58decode(
-                verification_method.verification_material.value[1:]
+                verification_method.public_key_multibase[1:]
             )
         else:
             raise DIDCommValueError(
                 f"Multibase keys containing internally Base58 values only are currently supported "
-                f"but got the value: {verification_method.verification_material.value}"
+                f"but got the value: {verification_method.public_key_multibase}"
             )
 
         codec, raw_value = _from_multicodec(prefixed_raw_value)
@@ -306,13 +279,15 @@ def _from_multicodec(value: bytes) -> (_Codec, bytes):
 
 def extract_sign_alg(method: Union[VerificationMethod, Secret]) -> SignAlg:
     if method.type == VerificationMethodType.JSON_WEB_KEY_2020:
-        if method.verification_material.format != VerificationMaterialFormat.JWK:
-            raise DIDCommValueError(
-                f"Verification material format {method.verification_material.format} "
-                f"is not supported for verification method type {method.type}"
-            )
-
-        jwk = json_str_to_dict(method.verification_material.value)
+        if isinstance(method, Secret):
+            if method.verification_material.format != VerificationMaterialFormat.JWK:
+                raise DIDCommValueError(
+                    f"Verification material format {method.verification_material.format} "
+                    f"is not supported for verification method type {method.type}"
+                )
+            jwk = json_str_to_dict(method.verification_material.value)
+        else:
+            jwk = method.public_key_jwk  # instance of VerificationMethod
 
         if jwk["kty"] == "EC" and jwk["crv"] == "P-256":
             return SignAlg.ES256
@@ -389,7 +364,7 @@ class _Crv(Enum):
 
 
 def _get_crv_for_verification_method(
-    key: VerificationMethod,
+    key: Union[VerificationMethod, Secret],
 ) -> Optional[str]:
     if key.type in {
         VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
@@ -402,7 +377,11 @@ def _get_crv_for_verification_method(
     }:
         return str(_Crv.X25519)
     elif key.type is VerificationMethodType.JSON_WEB_KEY_2020:
-        jwk = json_str_to_dict(key.verification_material.value)
+        jwk = (
+            json_str_to_dict(key.verification_material.value)
+            if isinstance(key, Secret)
+            else key.public_key_jwk
+        )
         return jwk["crv"]
     else:
         return None

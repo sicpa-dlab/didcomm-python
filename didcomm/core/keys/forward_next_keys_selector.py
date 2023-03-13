@@ -12,7 +12,7 @@ async def has_keys_for_forward_next(
         next_did_doc = await resolvers_config.did_resolver.resolve(_next)
         if next_did_doc is None:
             return False
-        next_kids = next_did_doc.key_agreement_kids
+        next_kids = next_did_doc.key_agreement
 
     secret_ids = await resolvers_config.secrets_resolver.get_keys(next_kids)
     return len(secret_ids) > 0

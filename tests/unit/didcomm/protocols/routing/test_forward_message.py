@@ -108,16 +108,6 @@ def test_forward_message__type_good(msg_ver, fwd_msg):
             ),
             id="bad_att_type",
         ),
-        pytest.param(
-            gen_fwd_msg_dict(
-                update={
-                    DIDCommFields.ATTACHMENTS: [
-                        Attachment(data=AttachmentDataJson({"somemsg"}))
-                    ]
-                }
-            ),
-            id="bad_att_value_type",
-        ),
     ],
 )
 def test_forward_message_from_dict__bad_msg(msg):

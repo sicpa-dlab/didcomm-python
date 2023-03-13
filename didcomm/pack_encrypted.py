@@ -17,7 +17,7 @@ from didcomm.core.utils import get_did, is_did, didcomm_id_generator_default
 from didcomm.did_doc.did_doc import DIDCommService
 from didcomm.errors import DIDCommValueError
 from didcomm.core.from_prior import pack_from_prior_in_place
-from didcomm.message import Message, Header
+from didcomm.message import Message, Headers
 from didcomm.protocols.routing.forward import (
     wrap_in_forward,
     resolve_did_services_chain,
@@ -261,7 +261,7 @@ class PackEncryptedParameters:
             in the packed message
     """
 
-    forward_headers: Optional[Header] = None
+    forward_headers: Optional[Headers] = None
     forward_service_id: Optional[str] = None
     forward_didcomm_id_generator: Optional[
         DIDCommGeneratorType
