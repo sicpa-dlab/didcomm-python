@@ -215,10 +215,10 @@ class Attachment:
 @attrs.define(auto_attribs=True)
 class FromPrior:
     iss: DID = attr.ib(
-        validator=validator__and_(validator__instance_of(DID), validator__did()),
+        validator=validator__and_(validator__instance_of((DID, str)), validator__did()),
     )
     sub: DID = attr.ib(
-        validator=validator__and_(validator__instance_of(DID), validator__did()),
+        validator=validator__and_(validator__instance_of((DID, str)), validator__did()),
     )
     aud: Optional[str] = attr.ib(
         validator=validator__optional(validator__instance_of(str)), default=None
@@ -281,13 +281,13 @@ class GenericMessage(Generic[T]):
         default=None,
     )
     frm: Optional[DID] = attr.ib(
-        validator=validator__optional(validator__instance_of(DID)),
+        validator=validator__optional(validator__instance_of((DID, str))),
         default=None,
     )
     to: Optional[List[DID]] = attr.ib(
         validator=validator__optional(
             validator__deep_iterable(
-                validator__instance_of(DID),
+                validator__instance_of((DID, str)),
                 iterable_validator=validator__instance_of(List),
             )
         ),

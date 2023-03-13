@@ -29,7 +29,7 @@ async def find_verification_key(
     if did_doc is None:
         raise DIDDocNotResolvedError(did)
 
-    if frm_kid not in did_doc.authentication_kids:
+    if frm_kid not in did_doc.authentication:
         raise DIDUrlNotFoundError(
             f"DID URL `{frm_kid}` is not found in authentication verification relationships of DID `{did}`"
         )
@@ -60,17 +60,17 @@ async def _find_signing_key_by_did(
     if did_doc is None:
         raise DIDDocNotResolvedError(frm_did)
 
-    if not did_doc.authentication_kids:
+    if not did_doc.authentication:
         raise DIDUrlNotFoundError(
             f"No authentication verification relationships are found for DID `{frm_did}`"
         )
 
     secret_ids = await resolvers_config.secrets_resolver.get_keys(
-        did_doc.authentication_kids
+        did_doc.authentication
     )
     if not secret_ids:
         raise SecretNotFoundError(
-            f"No secrets are found in secrets resolver for DID URLs: {did_doc.authentication_kids}"
+            f"No secrets are found in secrets resolver for DID URLs: {did_doc.authentication}"
         )
 
     kid = secret_ids[0]

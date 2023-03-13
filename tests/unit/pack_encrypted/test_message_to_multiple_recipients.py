@@ -52,8 +52,8 @@ async def test_message_to_multiple_recipients(
     packed_msg_for_charlie = pack_result_for_charlie.packed_msg
 
     assert pack_result_for_charlie.service_metadata == ServiceMetadata(
-        id=DID_DOC_CHARLIE.didcomm_services[0].id,
-        service_endpoint=DID_DOC_MEDIATOR2.didcomm_services[0].service_endpoint,
+        id=DID_DOC_CHARLIE.service[0].id,
+        service_endpoint=DID_DOC_MEDIATOR2.service[0].service_endpoint,
     )
 
     # BOB's MEDIATOR

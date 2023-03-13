@@ -253,7 +253,7 @@ def test_get_alice_authentication_methods():
 def test_alice_first_key_agreement_is_x25519():
     assert (
         get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.X25519)[0]
-        == DID_DOC_ALICE_WITH_NO_SECRETS.verification_methods[0]
+        == DID_DOC_ALICE_WITH_NO_SECRETS.verification_method[0]
     )
 
 
@@ -492,5 +492,5 @@ def test_get_bob_authentication_methods():
 def test_bob_first_key_agreement_is_x25519():
     assert (
         get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.X25519)[0]
-        == DID_DOC_BOB_WITH_NO_SECRETS.verification_methods[0]
+        == DID_DOC_BOB_WITH_NO_SECRETS.verification_method[0]
     )

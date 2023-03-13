@@ -65,9 +65,9 @@ def get_auth_methods_in_secrets(person: Person) -> List[VerificationMethod]:
     secrets_resolver = _get_secrets_resolver(person)
     return [
         vm
-        for vm in did_doc.verification_methods
+        for vm in did_doc.verification_method
         if vm.id in secrets_resolver.get_secret_kids()
-        and vm.id in did_doc.authentication_kids
+        and vm.id in did_doc.authentication
     ]
 
 
@@ -76,9 +76,9 @@ def get_auth_methods_not_in_secrets(person: Person) -> List[VerificationMethod]:
     secrets_resolver = _get_secrets_resolver(person)
     return [
         vm
-        for vm in did_doc.verification_methods
+        for vm in did_doc.verification_method
         if vm.id not in secrets_resolver.get_secret_kids()
-        and vm.id in did_doc.authentication_kids
+        and vm.id in did_doc.authentication
     ]
 
 
@@ -89,9 +89,9 @@ def get_key_agreement_methods_in_secrets(
     secrets_resolver = _get_secrets_resolver(person)
     return [
         vm
-        for vm in did_doc.verification_methods
+        for vm in did_doc.verification_method
         if vm.id in secrets_resolver.get_secret_kids()
-        and vm.id in did_doc.key_agreement_kids
+        and vm.id in did_doc.key_agreement
         and (type == KeyAgreementCurveType.ALL or type == _map_curve_to_type(vm))
     ]
 
@@ -103,9 +103,9 @@ def get_key_agreement_methods_not_in_secrets(
     secrets_resolver = _get_secrets_resolver(person)
     return [
         vm
-        for vm in did_doc.verification_methods
+        for vm in did_doc.verification_method
         if vm.id not in secrets_resolver.get_secret_kids()
-        and vm.id in did_doc.key_agreement_kids
+        and vm.id in did_doc.key_agreement
         and (type == KeyAgreementCurveType.ALL or type == _map_curve_to_type(vm))
     ]
 
@@ -114,9 +114,7 @@ def get_auth_secrets(person: Person) -> List[Secret]:
     did_doc = _get_did_doc(person)
     secrets_resolver = _get_secrets_resolver(person)
     return [
-        s
-        for s in secrets_resolver.get_secrets()
-        if s.kid in did_doc.authentication_kids
+        s for s in secrets_resolver.get_secrets() if s.kid in did_doc.authentication
     ]
 
 
@@ -128,18 +126,14 @@ def get_key_agreement_secrets(
     return [
         s
         for s in secrets_resolver.get_secrets()
-        if s.kid in did_doc.key_agreement_kids
+        if s.kid in did_doc.key_agreement
         and (type == KeyAgreementCurveType.ALL or type == _map_curve_to_type(s))
     ]
 
 
 def get_auth_methods(person: Person) -> List[VerificationMethod]:
     did_doc = _get_did_doc(person)
-    return [
-        vm
-        for vm in did_doc.verification_methods
-        if vm.id in did_doc.authentication_kids
-    ]
+    return [vm for vm in did_doc.verification_method if vm.id in did_doc.authentication]
 
 
 def get_key_agreement_methods(
@@ -148,8 +142,8 @@ def get_key_agreement_methods(
     did_doc = _get_did_doc(person)
     return [
         vm
-        for vm in did_doc.verification_methods
-        if vm.id in did_doc.key_agreement_kids
+        for vm in did_doc.verification_method
+        if vm.id in did_doc.key_agreement
         and (type == KeyAgreementCurveType.ALL or type == _map_curve_to_type(vm))
     ]
 
@@ -157,11 +151,16 @@ def get_key_agreement_methods(
 def _map_curve_to_type(vm: Union[Secret, VerificationMethod]) -> KeyAgreementCurveType:
     # if vm.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019:
     #     return KeyAgreementCurveType.X25519
-    if (
-        vm.type == VerificationMethodType.JSON_WEB_KEY_2020
-        and vm.verification_material.format == VerificationMaterialFormat.JWK
+    if vm.type == VerificationMethodType.JSON_WEB_KEY_2020 and (
+        # we check format only for `Secret`
+        isinstance(vm, VerificationMethod)
+        or vm.verification_material.format == VerificationMaterialFormat.JWK
     ):
-        jwk = json_str_to_dict(vm.verification_material.value)
+        jwk = (
+            json_str_to_dict(vm.verification_material.value)
+            if isinstance(vm, Secret)
+            else vm.public_key_jwk
+        )
         if jwk["crv"] == "X25519":
             return KeyAgreementCurveType.X25519
         if jwk["crv"] == "P-256":
