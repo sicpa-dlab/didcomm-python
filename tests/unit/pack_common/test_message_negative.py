@@ -83,14 +83,14 @@ async def test_no_required_param(resolvers_config_alice):
 @pytest.mark.parametrize(
     "custom_header",
     [
-        [{"id": "abc"}],
-        [{"type": "abc"}],
-        [{"body": "abc"}],
-        [{"created_time": 1516269022}],
-        [{"created_time": "1516269022"}],
+        {"id": "abc"},
+        {"type": "abc"},
+        {"body": "abc"},
+        {"created_time": 1516269022},
+        {"created_time": "1516269022"},
     ],
 )
-async def test_custom_header_equals_to_default(custom_header):
+async def test_custom_header_rejects_reserved_names(custom_header):
     with pytest.raises(DIDCommValueError):
         Message(
             id="1234567890",
@@ -118,7 +118,12 @@ async def test_custom_header_equals_to_default(custom_header):
         ("from_prior", {}),
         ("attachments", {}),
         ("attachments", [{}]),
-        ("custom_headers", {}),
+        ("custom_headers", []),
+        ("custom_headers", "some"),
+        (  # reserved name cannot be used in custom headers
+            "custom_headers",
+            {"type": "something"},
+        ),
     ],
 )
 async def test_message_invalid_types(new_fields):

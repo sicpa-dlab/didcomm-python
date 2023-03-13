@@ -6,7 +6,7 @@ from typing import Dict, Any, Union, List
 from pydid.did import DID, DIDUrl
 
 JSON_OBJ = Dict[str, Any]
-JSON_VALUE = Union[None, str, int, bool, float, JSON_OBJ, List[Any]]
+JSON_VALUE = Union[type(None), str, int, bool, float, Dict, List]
 JSON = str
 JWK = JSON
 JWT = JSON
