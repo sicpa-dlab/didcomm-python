@@ -13,6 +13,7 @@ from tests.test_vectors.common import (
     ALICE_DID,
     BOB_DID,
     CHARLIE_DID,
+    DAVE_DID,
     TTestVectorNegative,
 )
 
@@ -44,8 +45,8 @@ TEST_ATTACHMENT_MINIMAL = Attachment(
 )
 
 TEST_FROM_PRIOR = FromPrior(
-    iss="did:example:charlie",
-    sub="did:example:alice",
+    iss=CHARLIE_DID,
+    sub=ALICE_DID,
     aud="123",
     exp=1234,
     nbf=12345,
@@ -54,8 +55,8 @@ TEST_FROM_PRIOR = FromPrior(
 )
 
 TEST_FROM_PRIOR_MINIMAL = FromPrior(
-    iss="did:example:charlie",
-    sub="did:example:alice",
+    iss=CHARLIE_DID,
+    sub=ALICE_DID,
 )
 
 
@@ -118,7 +119,7 @@ TEST_MESSAGE_MISMATCHED_FROM_PRIOR_SUB = Message(
     expires_time=1516385931,
     from_prior=FromPrior(
         iss=CHARLIE_DID,
-        sub="did:example:dave",
+        sub=DAVE_DID,
     ),
     body={"messagespecificattribute": "and its value"},
 )

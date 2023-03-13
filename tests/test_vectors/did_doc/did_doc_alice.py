@@ -8,6 +8,7 @@ from didcomm.protocols.routing.forward import (
     PROFILE_DIDCOMM_V2,
     PROFILE_DIDCOMM_AIP2_ENV_RFC587,
 )
+from tests.test_vectors.common import ALICE_DID
 
 ALICE_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRET = VerificationMethod(
     id="did:example:alice#key-x25519-not-in-secrets-1",
@@ -96,7 +97,7 @@ ALICE_AUTH_METHOD_SECPP256K1 = VerificationMethod(
 )
 
 DID_DOC_ALICE_SPEC_TEST_VECTORS = DIDDoc(
-    id="did:example:alice",
+    id=ALICE_DID,
     authentication=[
         "did:example:alice#key-1",
         "did:example:alice#key-2",
@@ -131,7 +132,7 @@ DID_DOC_ALICE_SPEC_TEST_VECTORS = DIDDoc(
 )
 
 DID_DOC_ALICE_WITH_NO_SECRETS = DIDDoc(
-    id="did:example:alice",
+    id=ALICE_DID,
     authentication=[
         "did:example:alice#key-not-in-secrets-1",
         "did:example:alice#key-1",

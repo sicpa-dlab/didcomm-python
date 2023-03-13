@@ -3,6 +3,7 @@ from didcomm.protocols.routing.forward import (
     PROFILE_DIDCOMM_V2,
     PROFILE_DIDCOMM_AIP2_ENV_RFC587,
 )
+from tests.test_vectors.common import BOB_DID
 
 BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1 = VerificationMethod(
     id="did:example:bob#key-x25519-1",
@@ -145,7 +146,7 @@ BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_NOT_IN_SECRETS_1 = VerificationMethod(
 )
 
 DID_DOC_BOB_SPEC_TEST_VECTORS = DIDDoc(
-    id="did:example:bob",
+    id=BOB_DID,
     authentication=[],
     key_agreement=[
         "did:example:bob#key-x25519-1",
@@ -173,7 +174,7 @@ DID_DOC_BOB_SPEC_TEST_VECTORS = DIDDoc(
 )
 
 DID_DOC_BOB_WITH_NO_SECRETS = DIDDoc(
-    id="did:example:bob",
+    id=BOB_DID,
     authentication=[],
     key_agreement=[
         "did:example:bob#key-x25519-1",

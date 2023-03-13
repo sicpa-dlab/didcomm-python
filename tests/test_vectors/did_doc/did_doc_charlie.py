@@ -3,6 +3,7 @@ from didcomm.protocols.routing.forward import (
     PROFILE_DIDCOMM_V2,
     PROFILE_DIDCOMM_AIP2_ENV_RFC587,
 )
+from tests.test_vectors.common import CHARLIE_DID
 
 CHARLIE_VERIFICATION_METHOD_KEY_AGREEM_X25519 = VerificationMethod(
     id="did:example:charlie#key-x25519-1",
@@ -27,7 +28,7 @@ CHARLIE_AUTH_METHOD_25519 = VerificationMethod(
 )
 
 DID_DOC_CHARLIE = DIDDoc(
-    id="did:example:charlie",
+    id=CHARLIE_DID,
     authentication=["did:example:charlie#key-1"],
     key_agreement=["did:example:charlie#key-x25519-1"],
     service=[
