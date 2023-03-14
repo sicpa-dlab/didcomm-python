@@ -56,6 +56,15 @@ BOB_SECRET_KEY_AGREEMENT_KEY_X25519_3 = Secret(
     ),
 )
 
+BOB_SECRET_KEY_AGREEMENT_KEY_X25519_4 = Secret(
+    kid="did:example:bob#key-x25519-4",
+    type=VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
+    verification_material=VerificationMaterial(
+        format=VerificationMaterialFormat.MULTIBASE,
+        value="z3weet6o3WdATuoPDqbd9mtcu3fRRPf9kcbobHPJuRhqc4Zr",
+    ),
+)
+
 BOB_SECRET_KEY_AGREEMENT_KEY_P256_1 = Secret(
     kid="did:example:bob#key-p256-1",
     type=VerificationMethodType.JSON_WEB_KEY_2020,
@@ -166,6 +175,7 @@ class MockSecretsResolverBob(MockSecretsResolverInMemory):
                 BOB_SECRET_KEY_AGREEMENT_KEY_X25519_1,
                 BOB_SECRET_KEY_AGREEMENT_KEY_X25519_2,
                 BOB_SECRET_KEY_AGREEMENT_KEY_X25519_3,
+                BOB_SECRET_KEY_AGREEMENT_KEY_X25519_4,
                 BOB_SECRET_KEY_AGREEMENT_KEY_P256_1,
                 BOB_SECRET_KEY_AGREEMENT_KEY_P256_2,
                 BOB_SECRET_KEY_AGREEMENT_KEY_P384_1,

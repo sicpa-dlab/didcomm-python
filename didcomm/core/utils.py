@@ -370,12 +370,12 @@ def _get_crv_for_verification_method(
         VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
         VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
     }:
-        return str(_Crv.ED25519)
+        return _Crv.ED25519.value
     elif key.type in {
         VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
         VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019,
     }:
-        return str(_Crv.X25519)
+        return _Crv.X25519.value
     elif key.type is VerificationMethodType.JSON_WEB_KEY_2020:
         jwk = (
             json_str_to_dict(key.verification_material.value)
