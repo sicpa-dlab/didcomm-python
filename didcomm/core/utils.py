@@ -358,25 +358,45 @@ def get_did_and_optionally_kid(did_or_kid: DID_OR_DID_URL) -> (DID, Optional[DID
     return did, kid
 
 
+class _Crv(Enum):
+    ED25519 = "Ed25519"
+    X25519 = "X25519"
+
+
+def _get_crv_for_verification_method(
+    key: Union[VerificationMethod, Secret],
+) -> Optional[str]:
+    if key.type in {
+        VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
+        VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
+    }:
+        return _Crv.ED25519.value
+    elif key.type in {
+        VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
+        VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019,
+    }:
+        return _Crv.X25519.value
+    elif key.type is VerificationMethodType.JSON_WEB_KEY_2020:
+        jwk = (
+            json_str_to_dict(key.verification_material.value)
+            if isinstance(key, Secret)
+            else key.public_key_jwk
+        )
+        return jwk["crv"]
+    else:
+        return None
+
+
 def are_keys_compatible(
     method1: Union[Secret, VerificationMethod], method2: VerificationMethod
 ) -> bool:
-    if method1.type == method2.type:
-        if method1.type == VerificationMethodType.JSON_WEB_KEY_2020:
-            private_jwk = (
-                json_str_to_dict(method1.verification_material.value)
-                if isinstance(method1, Secret)
-                else method1.public_key_jwk
-            )
-            public_jwk = method2.public_key_jwk
-            return (
-                private_jwk["kty"] == public_jwk["kty"]
-                and private_jwk["crv"] == public_jwk["crv"]
-            )
-        else:
-            return True
-    else:
+    crv_1 = _get_crv_for_verification_method(method1)
+    crv_2 = _get_crv_for_verification_method(method2)
+
+    if crv_1 is None or crv_2 is None:
         return False
+
+    return crv_1 == crv_2
 
 
 def parse_base64url_encoded_json(base64url):

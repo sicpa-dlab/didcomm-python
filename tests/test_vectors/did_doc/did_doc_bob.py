@@ -35,6 +35,12 @@ BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3 = VerificationMethod(
         "x": "82k2BTUiywKv49fKLZa-WwDi8RBf0tB0M8bvSAUQ3yY",
     },
 )
+BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_4 = VerificationMethod(
+    id="did:example:bob#key-x25519-4",
+    controller="did:example:bob",
+    type=VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
+    public_key_multibase="z6LSp2h4y6EeqhKpLUGeKCaWTcH2PHPWbXo4paERM5QLsstT",
+)
 BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRETS_1 = VerificationMethod(
     id="did:example:bob#key-x25519-not-secrets-1",
     controller="did:example:bob",
@@ -152,6 +158,7 @@ DID_DOC_BOB_SPEC_TEST_VECTORS = DIDDoc(
         "did:example:bob#key-x25519-1",
         "did:example:bob#key-x25519-2",
         "did:example:bob#key-x25519-3",
+        "did:example:bob#key-x25519-4",
         "did:example:bob#key-p256-1",
         "did:example:bob#key-p256-2",
         "did:example:bob#key-p384-1",
@@ -164,6 +171,7 @@ DID_DOC_BOB_SPEC_TEST_VECTORS = DIDDoc(
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_4,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_1,
@@ -180,6 +188,7 @@ DID_DOC_BOB_WITH_NO_SECRETS = DIDDoc(
         "did:example:bob#key-x25519-1",
         "did:example:bob#key-x25519-2",
         "did:example:bob#key-x25519-3",
+        "did:example:bob#key-x25519-4",
         "did:example:bob#key-x25519-not-secrets-1",
         "did:example:bob#key-p256-1",
         "did:example:bob#key-p256-2",
@@ -204,6 +213,7 @@ DID_DOC_BOB_WITH_NO_SECRETS = DIDDoc(
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_4,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRETS_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2,

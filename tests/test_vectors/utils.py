@@ -169,4 +169,9 @@ def _map_curve_to_type(vm: Union[Secret, VerificationMethod]) -> KeyAgreementCur
             return KeyAgreementCurveType.P384
         if jwk["crv"] == "P-521":
             return KeyAgreementCurveType.P521
+    elif (
+        vm.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020
+        or vm.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019
+    ):
+        return KeyAgreementCurveType.X25519
     raise DIDCommValueError("Unknown verification methods curve type: " + str(vm))
