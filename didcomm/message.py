@@ -410,13 +410,15 @@ class GenericMessage(Generic[T]):
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
 
         # TODO TEST missed fields
-        for f in ("id", "type", "body", "typ"):
+        for f in ("id", "type", "body"):
             if f not in d:
                 raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
 
-        if d["typ"] != DIDCommMessageTypes.PLAINTEXT.value:
+        if (
+            d.pop("typ", DIDCommMessageTypes.PLAINTEXT.value)
+            != DIDCommMessageTypes.PLAINTEXT.value
+        ):
             raise MalformedMessageError(MalformedMessageCode.INVALID_PLAINTEXT)
-        del d["typ"]
 
         custom_header_keys = d.keys() - _MESSAGE_RESERVED_FIELDS
         if custom_header_keys:

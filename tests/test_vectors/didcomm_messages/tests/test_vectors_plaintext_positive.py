@@ -19,6 +19,15 @@ TEST_PLAINTEXT_DIDCOMM_MESSAGE_MINIMAL = json_dumps(
     }
 )
 
+TEST_PLAINTEXT_DIDCOMM_MESSAGE_MINIMAL_NO_TYP = json_dumps(
+    {
+        "id": "1234567890",
+        "thid": "1234567890",
+        "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
+        "body": {},
+    }
+)
+
 TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE = json_dumps(
     {
         "id": "1234567890",
