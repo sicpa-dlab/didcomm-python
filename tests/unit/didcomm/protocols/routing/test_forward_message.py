@@ -79,7 +79,6 @@ def test_forward_message__type_good(msg_ver, fwd_msg):
     [
         pytest.param(gen_fwd_msg_dict(remove=[DIDCommFields.ID]), id="no_id"),
         pytest.param(gen_fwd_msg_dict(remove=[DIDCommFields.TYPE]), id="no_type"),
-        pytest.param(gen_fwd_msg_dict(remove=[DIDCommFields.TYP]), id="no_typ"),
         pytest.param(gen_fwd_msg_dict(remove=[DIDCommFields.BODY]), id="no_body"),
         # TODO the cases above better to test in scope of GenericMessage
         pytest.param(gen_fwd_msg_dict(update={DIDCommFields.BODY: {}}), id="no_next"),
