@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "didcomm"
-version = "0.3.1"
+version = "0.3.2"
 description = "Basic DIDComm v2 support in python"
 authors = ["SICPA <DLCHOpenSourceContrib@sicpa.com>", "Daniel Bluhm <dbluhm@pm.me>"]
 license = "Apache-2.0"
