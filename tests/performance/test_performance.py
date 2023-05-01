@@ -1,9 +1,9 @@
 from time import perf_counter_ns
 
 import pytest
+import pytest_asyncio
 
-from didcomm.pack_encrypted import PackEncryptedConfig, pack_encrypted
-from didcomm.unpack import unpack, UnpackConfig
+from didcomm import PackEncryptedConfig, pack_encrypted, unpack, UnpackConfig
 from tests.test_vectors.common import BOB_DID, ALICE_DID
 from tests.test_vectors.didcomm_messages.messages import TEST_MESSAGE
 
@@ -56,12 +56,12 @@ def resolvers_config_bob(resolvers_config_bob_all_in_secrets):
     return resolvers_config_bob_all_in_secrets
 
 
-@pytest.fixture
+@pytest_asyncio.fixture()
 async def all_bob_key_agreement_kids(resolvers_config_alice):
     bob_did_doc = await resolvers_config_alice.did_resolver.resolve(BOB_DID)
-    all_key_agreement_kids = bob_did_doc.key_agreement_kids
+    all_key_agreement_kids = bob_did_doc.key_agreement
     yield all_key_agreement_kids
-    bob_did_doc.key_agreement_kids = all_key_agreement_kids
+    bob_did_doc.key_agreement = all_key_agreement_kids
 
 
 @pytest.mark.skip(reason="disabled to skip on CI")
@@ -77,7 +77,7 @@ async def test_pack_encrypted(
     all_bob_key_agreement_kids,
 ):
     bob_did_doc = await resolvers_config_alice.did_resolver.resolve(BOB_DID)
-    bob_did_doc.key_agreement_kids = all_bob_key_agreement_kids[:recipient_keys_count]
+    bob_did_doc.key_agreement = all_bob_key_agreement_kids[:recipient_keys_count]
 
     async def sample():
         pack_config = PackEncryptedConfig()
@@ -116,7 +116,7 @@ async def test_unpack_encrypted(
     all_bob_key_agreement_kids,
 ):
     bob_did_doc = await resolvers_config_alice.did_resolver.resolve(BOB_DID)
-    bob_did_doc.key_agreement_kids = all_bob_key_agreement_kids[:recipient_keys_count]
+    bob_did_doc.key_agreement = all_bob_key_agreement_kids[:recipient_keys_count]
 
     pack_config = PackEncryptedConfig()
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, List, Union
+from typing import Any, Callable, Optional, List, Union
 
 from authlib.common.encoding import to_unicode
 
@@ -27,6 +27,7 @@ async def unpack(
     resolvers_config: ResolversConfig,
     packed_msg: Union[JSON, JSON_OBJ],
     unpack_config: Optional[UnpackConfig] = None,
+    deserializer: Callable[[JSON_OBJ], Any] = Message.from_dict,
 ) -> UnpackResult:
     """
     Unpacks the packed DIDComm message by doing decryption and verifying the signatures.
@@ -34,6 +35,7 @@ async def unpack(
     :param resolvers_config: secrets and DIDDoc resolvers
     :param packed_msg: packed DIDComm message as JSON string of JSON_OBJ to be unpacked
     :param unpack_config: configuration for unpack. Default parameters are used if not specified.
+    :param deserializer: callable taking a json object and deserializes to desired message type. If not specified, defaults to returning a dictionary.
 
     :raises DIDDocNotResolvedError: If a DID can not be resolved to a DID Doc.
     :raises DIDUrlNotFoundError: If a DID URL (for example a key ID) is not found within a DID Doc
@@ -61,7 +63,9 @@ async def unpack(
         anonymous_sender=False,
     )
 
-    return await _do_unpack(resolvers_config, packed_msg, unpack_config, metadata)
+    return await _do_unpack(
+        resolvers_config, packed_msg, unpack_config, metadata, deserializer
+    )
 
 
 async def _do_unpack(
@@ -69,6 +73,7 @@ async def _do_unpack(
     packed_msg: JSON_OBJ,
     unpack_config: UnpackConfig,
     metadata: Metadata,
+    deserializer: Callable[[JSON_OBJ], Any],
 ) -> UnpackResult:
     msg = dict_to_json_bytes(packed_msg)
     msg_as_dict = packed_msg
@@ -92,7 +97,11 @@ async def _do_unpack(
             if await has_keys_for_forward_next(fwd_msg.body.next, resolvers_config):
                 metadata.re_wrapped_in_forward = True
                 return await _do_unpack(
-                    resolvers_config, fwd_msg.forwarded_msg, unpack_config, metadata
+                    resolvers_config,
+                    fwd_msg.forwarded_msg,
+                    unpack_config,
+                    metadata,
+                    deserializer,
                 )
 
     if is_authcrypted(msg_as_dict):
@@ -128,7 +137,7 @@ async def _do_unpack(
     )
     metadata.from_prior_issuer_kid = from_prior_issuer_kid
 
-    message = Message.from_dict(msg_as_dict)
+    message = deserializer(msg_as_dict)
 
     return UnpackResult(message=message, metadata=metadata)
 
@@ -139,11 +148,11 @@ class UnpackResult:
     Result of unpack operation.
 
     Attributes:
-        message (Message): unpacked message consisting of headers and application/protocol specific data (body)
+        message (Any): unpacked message consisting of headers and application/protocol specific data (body)
         metadata (Metadata): metadata with details about the packed messaged. Can be used for MTC (message trust context) analysis.
     """
 
-    message: Message
+    message: Any
     metadata: Metadata
 
 

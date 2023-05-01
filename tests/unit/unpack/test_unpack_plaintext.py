@@ -9,6 +9,7 @@ from tests.test_vectors.didcomm_messages.messages import (
     attachment_json_msg,
     attachment_multi_1_msg,
     attachment_multi_2_msg,
+    ack_msg,
 )
 from tests.test_vectors.didcomm_messages.spec.spec_test_vectors_plaintext import (
     TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE,
@@ -21,6 +22,8 @@ from tests.test_vectors.didcomm_messages.tests.test_vectors_plaintext_positive i
     TEST_PLAINTEXT_ATTACHMENT_MULTI_1,
     TEST_PLAINTEXT_ATTACHMENT_MULTI_2,
     TEST_PLAINTEXT_DIDCOMM_MESSAGE_MINIMAL,
+    TEST_PLAINTEXT_ACKS,
+    TEST_PLAINTEXT_DIDCOMM_MESSAGE_MINIMAL_NO_TYP,
 )
 
 
@@ -37,6 +40,15 @@ async def test_unpack_simple_plaintext(resolvers_config_bob):
 async def test_unpack_simple_minimal(resolvers_config_bob):
     unpack_result = await unpack(
         resolvers_config_bob, TEST_PLAINTEXT_DIDCOMM_MESSAGE_MINIMAL
+    )
+    assert unpack_result.metadata == PLAINTEXT_EXPECTED_METADATA
+    assert unpack_result.message == minimal_msg()
+
+
+@pytest.mark.asyncio
+async def test_unpack_simple_minimal_no_typ(resolvers_config_bob):
+    unpack_result = await unpack(
+        resolvers_config_bob, TEST_PLAINTEXT_DIDCOMM_MESSAGE_MINIMAL_NO_TYP
     )
     assert unpack_result.metadata == PLAINTEXT_EXPECTED_METADATA
     assert unpack_result.message == minimal_msg()
@@ -79,3 +91,10 @@ async def test_unpack_attachments_multi_2(resolvers_config_bob):
     )
     assert unpack_result.metadata == PLAINTEXT_EXPECTED_METADATA
     assert unpack_result.message == attachment_multi_2_msg()
+
+
+@pytest.mark.asyncio
+async def test_unpack_ack(resolvers_config_bob):
+    unpack_result = await unpack(resolvers_config_bob, TEST_PLAINTEXT_ACKS)
+    assert unpack_result.metadata == PLAINTEXT_EXPECTED_METADATA
+    assert unpack_result.message == ack_msg()

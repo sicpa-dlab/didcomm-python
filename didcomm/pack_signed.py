@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 
 from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.types import JSON, DID_OR_DID_URL, DID_URL
+from didcomm.common.types import JSON, DID_OR_DID_URL, DID_URL, JSON_OBJ
 from didcomm.core.serialization import dict_to_json
 from didcomm.core.sign import sign
 from didcomm.core.utils import is_did
@@ -15,7 +15,7 @@ from didcomm.message import Message
 
 async def pack_signed(
     resolvers_config: ResolversConfig,
-    message: Message,
+    message: Union[Message, JSON_OBJ],
     sign_frm: DID_OR_DID_URL,
     pack_params: Optional[PackSignedParameters] = None,
 ) -> PackSignedResult:
@@ -55,7 +55,9 @@ async def pack_signed(
     pack_params = pack_params or PackSignedParameters()
 
     __validate(sign_frm)
-    message = message.as_dict()
+
+    if isinstance(message, Message):
+        message = message.as_dict()
 
     from_prior_issuer_kid = await pack_from_prior_in_place(
         message,

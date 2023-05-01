@@ -1,6 +1,6 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.unpack import Metadata
+from didcomm import Metadata
 
 PLAINTEXT_EXPECTED_METADATA = Metadata(
     encrypted=False,
@@ -12,7 +12,17 @@ PLAINTEXT_EXPECTED_METADATA = Metadata(
 TEST_PLAINTEXT_DIDCOMM_MESSAGE_MINIMAL = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
+        "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
+        "body": {},
+    }
+)
+
+TEST_PLAINTEXT_DIDCOMM_MESSAGE_MINIMAL_NO_TYP = json_dumps(
+    {
+        "id": "1234567890",
+        "thid": "1234567890",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "body": {},
     }
@@ -31,9 +41,31 @@ TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE = json_dumps(
     }
 )
 
+TEST_PLAINTEXT_DIDCOMM_MESSAGE_WITH_CUSTOM_HEADERS = json_dumps(
+    {
+        "id": "1234567890",
+        "thid": "1234567890",
+        "typ": "application/didcomm-plain+json",
+        "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
+        "from": "did:example:alice",
+        "to": ["did:example:bob"],
+        "created_time": 1516269022,
+        "expires_time": 1516385931,
+        "body": {"messagespecificattribute": "and its value"},
+        "my_string": "string value",
+        "my_int": 123,
+        "my_bool": False,
+        "my_float": 1.23,
+        "my_json": {"key": "value"},
+        "my_list": [1, 2, 3],
+        "my_none": None,
+    }
+)
+
 TEST_PLAINTEXT_ATTACHMENT_BASE64 = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",
@@ -48,6 +80,7 @@ TEST_PLAINTEXT_ATTACHMENT_BASE64 = json_dumps(
 TEST_PLAINTEXT_ATTACHMENT_LINKS = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",
@@ -64,6 +97,7 @@ TEST_PLAINTEXT_ATTACHMENT_LINKS = json_dumps(
 TEST_PLAINTEXT_ATTACHMENT_JSON = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",
@@ -80,6 +114,7 @@ TEST_PLAINTEXT_ATTACHMENT_JSON = json_dumps(
 TEST_PLAINTEXT_ATTACHMENT_MULTI_1 = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",
@@ -97,6 +132,7 @@ TEST_PLAINTEXT_ATTACHMENT_MULTI_1 = json_dumps(
 TEST_PLAINTEXT_ATTACHMENT_MULTI_2 = json_dumps(
     {
         "id": "1234567890",
+        "thid": "1234567890",
         "typ": "application/didcomm-plain+json",
         "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
         "from": "did:example:alice",
@@ -109,5 +145,21 @@ TEST_PLAINTEXT_ATTACHMENT_MULTI_2 = json_dumps(
             {"id": "24", "data": {"base64": "qwerty"}},
             {"id": "25", "data": {"links": ["1", "2", "3", "4"], "hash": "qwerty2"}},
         ],
+    }
+)
+
+TEST_PLAINTEXT_ACKS = json_dumps(
+    {
+        "id": "1234567890",
+        "thid": "1234567890",
+        "typ": "application/didcomm-plain+json",
+        "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
+        "from": "did:example:alice",
+        "to": ["did:example:bob"],
+        "please_ack": ["a_msg"],
+        "ack": ["another_msg"],
+        "created_time": 1516269022,
+        "expires_time": 1516385931,
+        "body": {"messagespecificattribute": "and its value"},
     }
 )

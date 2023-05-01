@@ -3,7 +3,6 @@ import attr
 from typing import Callable
 
 from didcomm.errors import DIDCommValueError, MalformedMessageError
-from didcomm.core import converters
 from didcomm.core.types import DIDCOMM_ORG_DOMAIN, DIDCommFields
 from didcomm.message import Attachment, AttachmentDataJson, AttachmentDataLinks
 from didcomm.protocols.routing.forward import (
@@ -31,26 +30,6 @@ from .helper import diff_type_objects, gen_fwd_msg, gen_fwd_msg_dict
 def test_forward_message__id_bad(m_id, fwd_msg):
     with pytest.raises(DIDCommValueError):
         attr.evolve(fwd_msg, **dict(id=m_id))
-
-
-@pytest.mark.parametrize(
-    "m_id, m_id_expected",
-    [
-        pytest.param("123", "123", id="str"),
-        pytest.param(lambda: "345", "345", id="function"),
-        pytest.param(None, None, id="default"),
-    ],
-)
-def test_forward_message__id_good(m_id, m_id_expected, mocker, fwd_msg):
-    if m_id is None:
-        # XXX mocks in-place of imports doesn't work for attrs calsses
-        #     by some reason
-        spy = mocker.spy(converters, "didcomm_id_generator_default")
-        msg = gen_fwd_msg()
-        assert spy.call_count == 1
-        assert msg.id == spy.spy_return
-    else:
-        assert attr.evolve(fwd_msg, **dict(id=m_id)).id == m_id_expected
 
 
 def _build_mturi(
@@ -100,7 +79,6 @@ def test_forward_message__type_good(msg_ver, fwd_msg):
     [
         pytest.param(gen_fwd_msg_dict(remove=[DIDCommFields.ID]), id="no_id"),
         pytest.param(gen_fwd_msg_dict(remove=[DIDCommFields.TYPE]), id="no_type"),
-        pytest.param(gen_fwd_msg_dict(remove=[DIDCommFields.TYP]), id="no_typ"),
         pytest.param(gen_fwd_msg_dict(remove=[DIDCommFields.BODY]), id="no_body"),
         # TODO the cases above better to test in scope of GenericMessage
         pytest.param(gen_fwd_msg_dict(update={DIDCommFields.BODY: {}}), id="no_next"),
@@ -128,16 +106,6 @@ def test_forward_message__type_good(msg_ver, fwd_msg):
                 }
             ),
             id="bad_att_type",
-        ),
-        pytest.param(
-            gen_fwd_msg_dict(
-                update={
-                    DIDCommFields.ATTACHMENTS: [
-                        Attachment(data=AttachmentDataJson({"somemsg"}))
-                    ]
-                }
-            ),
-            id="bad_att_value_type",
         ),
     ],
 )

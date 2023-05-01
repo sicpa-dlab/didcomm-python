@@ -15,18 +15,13 @@ def test_extract_okp_key_from_json_web_key_2020_verification_method():
     key = extract_key(
         VerificationMethod(
             id="did:example:alice#key-x25519-1",
-            controller="did:example:alice#key-x25519-1",
+            controller="did:example:alice",
             type=VerificationMethodType.JSON_WEB_KEY_2020,
-            verification_material=VerificationMaterial(
-                format=VerificationMaterialFormat.JWK,
-                value=json_dumps(
-                    {
-                        "kty": "OKP",
-                        "crv": "X25519",
-                        "x": "avH0O2Y4tqLAq8y9zpianr8ajii5m4F_mICrzNlatXs",
-                    }
-                ),
-            ),
+            public_key_jwk={
+                "kty": "OKP",
+                "crv": "X25519",
+                "x": "avH0O2Y4tqLAq8y9zpianr8ajii5m4F_mICrzNlatXs",
+            },
         ),
         align_kid=True,
     )
@@ -78,19 +73,14 @@ def test_extract_ec_key_from_json_web_key_2020_verification_method():
     key = extract_key(
         VerificationMethod(
             id="did:example:alice#key-p256-1",
-            controller="did:example:alice#key-p256-1",
+            controller="did:example:alice",
             type=VerificationMethodType.JSON_WEB_KEY_2020,
-            verification_material=VerificationMaterial(
-                format=VerificationMaterialFormat.JWK,
-                value=json_dumps(
-                    {
-                        "kty": "EC",
-                        "crv": "P-256",
-                        "x": "L0crjMN1g0Ih4sYAJ_nGoHUck2cloltUpUVQDhF2nHE",
-                        "y": "SxYgE7CmEJYi7IDhgK5jI4ZiajO8jPRZDldVhqFpYoo",
-                    }
-                ),
-            ),
+            public_key_jwk={
+                "kty": "EC",
+                "crv": "P-256",
+                "x": "L0crjMN1g0Ih4sYAJ_nGoHUck2cloltUpUVQDhF2nHE",
+                "y": "SxYgE7CmEJYi7IDhgK5jI4ZiajO8jPRZDldVhqFpYoo",
+            },
         ),
         align_kid=True,
     )
@@ -145,12 +135,9 @@ def test_extract_key_from_x25519_key_agreement_key_2019_verification_method():
     key = extract_key(
         VerificationMethod(
             id="did:example:dave#key-x25519-1",
-            controller="did:example:dave#key-x25519-1",
+            controller="did:example:dave",
             type=VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019,
-            verification_material=VerificationMaterial(
-                format=VerificationMaterialFormat.BASE58,
-                value="JhNWeSVLMYccCk7iopQW4guaSJTojqpMEELgSLhKwRr",
-            ),
+            public_key_base58="JhNWeSVLMYccCk7iopQW4guaSJTojqpMEELgSLhKwRr",
         ),
         align_kid=True,
     )
@@ -195,12 +182,9 @@ def test_extract_key_from_ed25519_verification_key_2018_verification_method():
     key = extract_key(
         VerificationMethod(
             id="did:example:dave#key-ed25519-1",
-            controller="did:example:dave#key-ed25519-1",
+            controller="did:example:dave",
             type=VerificationMethodType.ED25519_VERIFICATION_KEY_2018,
-            verification_material=VerificationMaterial(
-                format=VerificationMaterialFormat.BASE58,
-                value="ByHnpUCFb1vAfh9CFZ8ZkmUZguURW8nSw889hy6rD8L7",
-            ),
+            public_key_base58="ByHnpUCFb1vAfh9CFZ8ZkmUZguURW8nSw889hy6rD8L7",
         ),
         align_kid=True,
     )
@@ -245,12 +229,9 @@ def test_extract_key_from_x25519_key_agreement_key_2020_verification_method():
     key = extract_key(
         VerificationMethod(
             id="did:example:dave#key-x25519-2",
-            controller="did:example:dave#key-x25519-2",
+            controller="did:example:dave",
             type=VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
-            verification_material=VerificationMaterial(
-                format=VerificationMaterialFormat.MULTIBASE,
-                value="z6LSbysY2xFMRpGMhb7tFTLMpeuPRaqaWM1yECx2AtzE3KCc",
-            ),
+            public_key_multibase="z6LSbysY2xFMRpGMhb7tFTLMpeuPRaqaWM1yECx2AtzE3KCc",
         ),
         align_kid=True,
     )
@@ -295,12 +276,9 @@ def test_extract_key_from_ed25519_verification_key_2020_verification_method():
     key = extract_key(
         VerificationMethod(
             id="did:example:dave#key-ed25519-2",
-            controller="did:example:dave#key-ed25519-2",
+            controller="did:example:dave",
             type=VerificationMethodType.ED25519_VERIFICATION_KEY_2020,
-            verification_material=VerificationMaterial(
-                format=VerificationMaterialFormat.MULTIBASE,
-                value="z6MkqRYqQiSgvZQdnBytw86Qbs2ZWUkGv22od935YF4s8M7V",
-            ),
+            public_key_multibase="z6MkqRYqQiSgvZQdnBytw86Qbs2ZWUkGv22od935YF4s8M7V",
         ),
         align_kid=True,
     )

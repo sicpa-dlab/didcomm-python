@@ -1,7 +1,7 @@
 import copy
 
 from didcomm.errors import DIDCommValueError
-from didcomm.message import (
+from didcomm import (
     Message,
     Attachment,
     AttachmentDataBase64,
@@ -13,11 +13,13 @@ from tests.test_vectors.common import (
     ALICE_DID,
     BOB_DID,
     CHARLIE_DID,
+    DAVE_DID,
     TTestVectorNegative,
 )
 
 TEST_MESSAGE = Message(
     id="1234567890",
+    thid="1234567890",
     type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
     frm=ALICE_DID,
     to=[BOB_DID],
@@ -43,8 +45,8 @@ TEST_ATTACHMENT_MINIMAL = Attachment(
 )
 
 TEST_FROM_PRIOR = FromPrior(
-    iss="did:example:charlie",
-    sub="did:example:alice",
+    iss=CHARLIE_DID,
+    sub=ALICE_DID,
     aud="123",
     exp=1234,
     nbf=12345,
@@ -53,8 +55,8 @@ TEST_FROM_PRIOR = FromPrior(
 )
 
 TEST_FROM_PRIOR_MINIMAL = FromPrior(
-    iss="did:example:charlie",
-    sub="did:example:alice",
+    iss=CHARLIE_DID,
+    sub=ALICE_DID,
 )
 
 
@@ -93,48 +95,6 @@ TEST_MESSAGE_FROM_PRIOR = Message(
 )
 
 
-TEST_MESSAGE_INVALID_FROM_PRIOR = Message(
-    id="1234567890",
-    type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
-    frm=ALICE_DID,
-    to=[BOB_DID],
-    created_time=1516269022,
-    expires_time=1516385931,
-    from_prior="invalid",
-    body={"messagespecificattribute": "and its value"},
-)
-
-
-TEST_MESSAGE_INVALID_FROM_PRIOR_ISS = Message(
-    id="1234567890",
-    type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
-    frm=ALICE_DID,
-    to=[BOB_DID],
-    created_time=1516269022,
-    expires_time=1516385931,
-    from_prior=FromPrior(
-        iss="invalid",
-        sub=ALICE_DID,
-    ),
-    body={"messagespecificattribute": "and its value"},
-)
-
-
-TEST_MESSAGE_INVALID_FROM_PRIOR_SUB = Message(
-    id="1234567890",
-    type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
-    frm=ALICE_DID,
-    to=[BOB_DID],
-    created_time=1516269022,
-    expires_time=1516385931,
-    from_prior=FromPrior(
-        iss=CHARLIE_DID,
-        sub="invalid",
-    ),
-    body={"messagespecificattribute": "and its value"},
-)
-
-
 TEST_MESSAGE_INVALID_FROM_PRIOR_EQUAL_ISS_AND_SUB = Message(
     id="1234567890",
     type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
@@ -159,16 +119,13 @@ TEST_MESSAGE_MISMATCHED_FROM_PRIOR_SUB = Message(
     expires_time=1516385931,
     from_prior=FromPrior(
         iss=CHARLIE_DID,
-        sub="did:example:dave",
+        sub=DAVE_DID,
     ),
     body={"messagespecificattribute": "and its value"},
 )
 
 
 INVALID_FROM_PRIOR_MESSAGES = [
-    TEST_MESSAGE_INVALID_FROM_PRIOR,
-    TEST_MESSAGE_INVALID_FROM_PRIOR_ISS,
-    TEST_MESSAGE_INVALID_FROM_PRIOR_SUB,
     TEST_MESSAGE_INVALID_FROM_PRIOR_EQUAL_ISS_AND_SUB,
     TEST_MESSAGE_MISMATCHED_FROM_PRIOR_SUB,
 ]
@@ -185,6 +142,20 @@ def minimal_msg():
         type="http://example.com/protocols/lets_do_lunch/1.0/proposal",
         body={},
     )
+
+
+def custom_headers_msg():
+    msg = copy.deepcopy(TEST_MESSAGE)
+    msg.custom_headers = {
+        "my_string": "string value",
+        "my_int": 123,
+        "my_bool": False,
+        "my_float": 1.23,
+        "my_json": {"key": "value"},
+        "my_list": [1, 2, 3],
+        "my_none": None,
+    }
+    return msg
 
 
 def attachment_base64_msg():
@@ -239,4 +210,11 @@ def attachment_multi_2_msg():
             data=AttachmentDataLinks(links=["1", "2", "3", "4"], hash="qwerty2"),
         ),
     ]
+    return msg
+
+
+def ack_msg():
+    msg = copy.deepcopy(TEST_MESSAGE)
+    msg.please_ack = ["a_msg"]
+    msg.ack = ["another_msg"]
     return msg

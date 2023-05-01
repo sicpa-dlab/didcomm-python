@@ -11,6 +11,8 @@ from tests.test_vectors.didcomm_messages.messages import (
     minimal_msg,
     attachment_multi_1_msg,
     attachment_multi_2_msg,
+    ack_msg,
+    custom_headers_msg,
 )
 from tests.test_vectors.didcomm_messages.spec.spec_test_vectors_plaintext import (
     TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE,
@@ -22,6 +24,8 @@ from tests.test_vectors.didcomm_messages.tests.test_vectors_plaintext_positive i
     TEST_PLAINTEXT_ATTACHMENT_MULTI_1,
     TEST_PLAINTEXT_ATTACHMENT_MULTI_2,
     TEST_PLAINTEXT_DIDCOMM_MESSAGE_MINIMAL,
+    TEST_PLAINTEXT_ACKS,
+    TEST_PLAINTEXT_DIDCOMM_MESSAGE_WITH_CUSTOM_HEADERS,
 )
 
 
@@ -37,6 +41,15 @@ async def check_pack_plaintext(message, expected_json, resolvers_config_bob):
 async def test_pack_simple_plaintext(resolvers_config_bob):
     await check_pack_plaintext(
         TEST_MESSAGE, TEST_PLAINTEXT_DIDCOMM_MESSAGE_SIMPLE, resolvers_config_bob
+    )
+
+
+@pytest.mark.asyncio
+async def test_pack_plaintext_with_custom_headers(resolvers_config_bob):
+    await check_pack_plaintext(
+        custom_headers_msg(),
+        TEST_PLAINTEXT_DIDCOMM_MESSAGE_WITH_CUSTOM_HEADERS,
+        resolvers_config_bob,
     )
 
 
@@ -82,5 +95,14 @@ async def test_pack_attachments_multi2(resolvers_config_bob):
     await check_pack_plaintext(
         attachment_multi_2_msg(),
         TEST_PLAINTEXT_ATTACHMENT_MULTI_2,
+        resolvers_config_bob,
+    )
+
+
+@pytest.mark.asyncio
+async def test_pack_acks(resolvers_config_bob):
+    await check_pack_plaintext(
+        ack_msg(),
+        TEST_PLAINTEXT_ACKS,
         resolvers_config_bob,
     )

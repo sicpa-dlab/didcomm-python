@@ -1,29 +1,32 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.common.algorithms import AuthCryptAlg, SignAlg, AnonCryptAlg
-from didcomm.unpack import Metadata
+from didcomm import AuthCryptAlg, SignAlg, AnonCryptAlg, Metadata
 from tests.test_vectors.common import TTestVector
 
 TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH_X25519 = json_dumps(
     {
-        "ciphertext": "MJezmxJ8DzUB01rMjiW6JViSaUhsZBhMvYtezkhmwts1qXWtDB63i4-FHZP6cJSyCI7eU-gqH8lBXO_UVuviWIqnIUrTRLaumanZ4q1dNKAnxNL-dHmb3coOqSvy3ZZn6W17lsVudjw7hUUpMbeMbQ5W8GokK9ZCGaaWnqAzd1ZcuGXDuemWeA8BerQsfQw_IQm-aUKancldedHSGrOjVWgozVL97MH966j3i9CJc3k9jS9xDuE0owoWVZa7SxTmhl1PDetmzLnYIIIt-peJtNYGdpd-FcYxIFycQNRUoFEr77h4GBTLbC-vqbQHJC1vW4O2LEKhnhOAVlGyDYkNbA4DSL-LMwKxenQXRARsKSIMn7z-ZIqTE-VCNj9vbtgR",
-        "protected": "eyJlcGsiOnsia3R5IjoiT0tQIiwiY3J2IjoiWDI1NTE5IiwieCI6IkdGY01vcEpsamY0cExaZmNoNGFfR2hUTV9ZQWY2aU5JMWRXREd5VkNhdzAifSwiYXB2IjoiTmNzdUFuclJmUEs2OUEtcmtaMEw5WFdVRzRqTXZOQzNaZzc0QlB6NTNQQSIsInNraWQiOiJkaWQ6ZXhhbXBsZTphbGljZSNrZXkteDI1NTE5LTEiLCJhcHUiOiJaR2xrT21WNFlXMXdiR1U2WVd4cFkyVWphMlY1TFhneU5UVXhPUzB4IiwidHlwIjoiYXBwbGljYXRpb24vZGlkY29tbS1lbmNyeXB0ZWQranNvbiIsImVuYyI6IkEyNTZDQkMtSFM1MTIiLCJhbGciOiJFQ0RILTFQVStBMjU2S1cifQ",
+        "protected": "eyJ0eXAiOiJhcHBsaWNhdGlvbi9kaWRjb21tLWVuY3J5cHRlZCtqc29uIiwiYWxnIjoiRUNESC0xUFUrQTI1NktXIiwiZW5jIjoiQTI1NkNCQy1IUzUxMiIsImFwdSI6IlpHbGtPbVY0WVcxd2JHVTZZV3hwWTJVamEyVjVMWGd5TlRVeE9TMHgiLCJhcHYiOiJZMVl4d29Od1lORzRkSkZQSmp2bS05NGliYXVxQTlIcldLWVpobWNvZVNnIiwic2tpZCI6ImRpZDpleGFtcGxlOmFsaWNlI2tleS14MjU1MTktMSIsImVwayI6eyJjcnYiOiJYMjU1MTkiLCJ4Ijoib2dIbzBwSkRENDNTcVNXZUtPZHJCLXdpb1FIZlV3TGJPSHBJMmY1VU1pZyIsImt0eSI6Ik9LUCJ9fQ",
         "recipients": [
             {
-                "encrypted_key": "o0FJASHkQKhnFo_rTMHTI9qTm_m2mkJp-wv96mKyT5TP7QjBDuiQ0AMKaPI_RLLB7jpyE-Q80Mwos7CvwbMJDhIEBnk2qHVB",
                 "header": {"kid": "did:example:bob#key-x25519-1"},
+                "encrypted_key": "MmT3HsZZjZ_tn5Y8E1W5xY3kW0ay7PTuxYiPSFpTQmigeHyRA3xDPiFpFPDljmzgJQG-_KKa8llAsqcT-JBH4bKYzxAkZPV8",
             },
             {
-                "encrypted_key": "rYlafW0XkNd8kaXCqVbtGJ9GhwBC3lZ9AihHK4B6J6V2kT7vjbSYuIpr1IlAjvxYQOw08yqEJNIwrPpB0ouDzKqk98FVN7rK",
                 "header": {"kid": "did:example:bob#key-x25519-2"},
+                "encrypted_key": "ahZ_wNMeygPtI_gkvCeEv71QlGC040iD5gFiAppu53WF1UglnUKF7Pe5jFcpTRSOZp-6PtJghXpmep9UDdqoD0SKriTiaMpQ",
             },
             {
-                "encrypted_key": "aqfxMY2sV-njsVo-_9Ke9QbOf6hxhGrUVh_m-h_Aq530w3e_4IokChfKWG1tVJvXYv_AffY7vxj0k5aIfKZUxiNmBwC_QsNo",
                 "header": {"kid": "did:example:bob#key-x25519-3"},
+                "encrypted_key": "KRX2BLEhMZnWx7F44umOlRO6B2TLJFS5mBsaJCJW83NJuYYJNoM41TBg03kqkMbGm9Fs4UgunMNYjCAU3mDcjB8UY5oVZoC_",
+            },
+            {
+                "header": {"kid": "did:example:bob#key-x25519-4"},
+                "encrypted_key": "c0v4zw8JhCvOI5pkJo4mXRRsGl_liMyirGFdQkZWULIK_Urw5lm7KqeUXJsqvAPRBz6n9broQP75HCQ4QtDveYmVEVbVA3c3",
             },
         ],
-        "tag": "uYeo7IsZjN7AnvBjUZE5lNryNENbf6_zew_VC-d4b3U",
-        "iv": "o02OXDQ6_-sKz2PX_6oyJg",
+        "iv": "LqyZeQsKsQ_0CezRDIo4ng",
+        "ciphertext": "IvSZruHdIR0JGXRaXchiwAuwce6rqOmNQMBRaBgXn49PrlmroeBAQUa5yq1bek3HBljaNXXtCxWqBiW7i_EN5oJVVfUNQPUwDL_ozRfOncU3LmYnYFeVQ3C9mndFKITnxOxWqG3hhVlJw91IN9-sYXQCj0LbG3dbbiLuaN_CqJa-sIPZaNXpE5H11FQsw8owXzcEELO8zqSIlz_ZizLuRE-S24-_gzROKzpgL2qq-9fgkBVr28GQt0NHlGuSHUEq0tloIYLtILQ3UGoqyD2Ay5EJfEOL9pK4Vu-2_6pFxfvJowAk2EsLYO8fNvZJuM3Jw0HWe4MqtNxFa-_rSh3eNT7nyZecAgQ2vFtdAlIfcPMAbDqIE9UBIm2Ttie310j6F2IIRze1PMKNUH7Wf_PclQ",
+        "tag": "p8QNhwH3n0aFeh9qV6E3g6-iZzXe8hEMP1BbkU86PgY",
     }
 )
 
@@ -104,6 +107,7 @@ TEST_ENCRYPTED_DIDCOMM_MESSAGE_AUTH = [
                 "did:example:bob#key-x25519-1",
                 "did:example:bob#key-x25519-2",
                 "did:example:bob#key-x25519-3",
+                "did:example:bob#key-x25519-4",
             ],
             enc_alg_auth=AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW,
         ),

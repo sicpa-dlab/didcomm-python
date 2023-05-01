@@ -16,13 +16,6 @@ INVALID_MESSAGES = [
     json_dumps(
         {
             "id": "1234567890",
-            "type": "http://example.com/protocols/lets_do_lunch/1.0/proposal",
-            "body": {},
-        }
-    ),
-    json_dumps(
-        {
-            "id": "1234567890",
             "typ": "application/didcomm-plain+json",
             "body": {},
         }

@@ -1,20 +1,23 @@
+import sys
+
 import pytest
 import attr
 from typing import List
 
 from didcomm.common.types import JSON_OBJ, DID_OR_DID_URL
-from didcomm.did_doc.did_doc import DIDDoc, DIDCommService
-from didcomm.common.resolvers import ResolversConfig
-from didcomm.common.algorithms import AnonCryptAlg
-
-from didcomm import pack_encrypted
-from didcomm.pack_encrypted import (
+from didcomm import (
+    DIDDoc,
+    DIDCommService,
+    ResolversConfig,
+    AnonCryptAlg,
     PackEncryptedConfig,
     PackEncryptedParameters,
-    __forward_if_needed,
 )
 
+from didcomm.pack_encrypted import __forward_if_needed
+
 from tests import mock_module
+from tests.unit.conftest import build_didcomm_service
 
 
 @pytest.fixture
@@ -24,7 +27,7 @@ def did_doc(did) -> DIDDoc:
 
 @pytest.fixture
 def wrap_in_forward_mock(mocker) -> mock_module.AsyncMock:
-    return mocker.patch.object(pack_encrypted, "wrap_in_forward")
+    return mocker.patch.object(sys.modules["didcomm.pack_encrypted"], "wrap_in_forward")
 
 
 @attr.s(auto_attribs=True)
@@ -40,7 +43,7 @@ class _TestData:
 @pytest.fixture
 def test_data(resolvers_config_mock, didcomm_service, pack_config, pack_params):
     msg = "somemsg"
-    to = "someto"
+    to = "did:example:some_to"
 
     def id_gen_func():
         return "123"
@@ -75,7 +78,15 @@ async def test_forward_if_needed__no_did_services(wrap_in_forward_mock, test_dat
 
 @pytest.mark.asyncio
 async def test_forward_if_needed__no_routing_keys(wrap_in_forward_mock, test_data):
-    test_data.did_services_chain[-1].routing_keys = []
+    src = test_data.did_services_chain[-1]
+    test_data.did_services_chain[-1] = build_didcomm_service(
+        id=src.id,
+        service_endpoint=src.service_endpoint,
+        routing_keys=[],  # no routing keys
+        recipient_keys=src.recipient_keys,
+        accept=src.accept,
+    )
+
     res = await __forward_if_needed(**attr.asdict(test_data, recurse=False))
     assert res is None
 

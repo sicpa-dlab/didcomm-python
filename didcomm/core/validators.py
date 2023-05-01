@@ -6,7 +6,7 @@ from pathlib import Path
 
 from didcomm.errors import DIDCommValueError
 from didcomm.core.types import DIDCOMM_ORG_DOMAIN
-from didcomm.core.utils import is_did, is_did_url, is_did_or_did_url
+from didcomm.core.utils import is_did, is_did_with_uri_fragment, is_did_or_did_url
 
 
 # TODO TEST
@@ -20,14 +20,26 @@ def _attr_validator_wrapper(attr_validator):
     return _f
 
 
+def validator__optional(validator: Callable) -> Callable:
+    return _attr_validator_wrapper(attr.validators.optional(validator))
+
+
 # TODO TEST
 def validator__instance_of(classinfo) -> Callable:
     return _attr_validator_wrapper(attr.validators.instance_of(classinfo))
 
 
+def validator__and_(*validators: Callable):
+    return _attr_validator_wrapper(attr.validators.and_(*validators))
+
+
 # TODO TEST
 def validator__in_(options) -> Callable:
     return _attr_validator_wrapper(attr.validators.in_(options))
+
+
+def validator__not_in_(options) -> Callable:
+    return _attr_validator_wrapper(attr.validators.not_(attr.validators.in_(options)))
 
 
 # TODO TEST
@@ -38,10 +50,20 @@ def validator__deep_iterable(member_validator: Callable, iterable_validator=None
 
 
 # TODO TEST
+def validator__deep_mapping(
+    key_validator: Callable,
+    value_validator: Callable,
+    mapping_validator: Callable = None,
+):
+    return _attr_validator_wrapper(
+        attr.validators.deep_mapping(key_validator, value_validator, mapping_validator)
+    )
+
+
+# TODO TEST
 def validator__didcomm_protocol_mturi(
     p_name: str, p_version_specifier: SpecifierSet, p_msg_t: str
 ) -> Callable:
-
     # TODO strict check as per
     #      https://github.com/hyperledger/aries-rfcs/blob/main/concepts/0003-protocols/README.md#mturi
     def _f(instance, attribute, value):
@@ -84,13 +106,15 @@ def validator__check_f(
 
 
 # TODO TEST
-def validator__did(instance, attribute, value) -> None:
-    validator__check_f(is_did, "is not a did")(instance, attribute, value)
+def validator__did() -> Callable:
+    return validator__check_f(is_did, "is not a did")
 
 
 # TODO TEST
 def validator__did_url(instance, attribute, value) -> None:
-    validator__check_f(is_did_url, "is not a did url")(instance, attribute, value)
+    validator__check_f(is_did_with_uri_fragment, "is not a did url with a fragment")(
+        instance, attribute, value
+    )
 
 
 # TODO TEST

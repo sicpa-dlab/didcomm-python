@@ -23,6 +23,7 @@ from tests.test_vectors.did_doc.did_doc_bob import (
     BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_2,
     BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_2,
     BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2,
+    BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_4,
 )
 from tests.test_vectors.did_doc.mock_did_resolver import DID_DOC_ALICE_WITH_NO_SECRETS
 from tests.test_vectors.secrets.mock_secrets_resolver_alice import (
@@ -43,6 +44,7 @@ from tests.test_vectors.secrets.mock_secrets_resolver_bob import (
     BOB_SECRET_KEY_AGREEMENT_KEY_P256_2,
     BOB_SECRET_KEY_AGREEMENT_KEY_P384_2,
     BOB_SECRET_KEY_AGREEMENT_KEY_P521_2,
+    BOB_SECRET_KEY_AGREEMENT_KEY_X25519_4,
 )
 from tests.test_vectors.utils import (
     Person,
@@ -253,7 +255,7 @@ def test_get_alice_authentication_methods():
 def test_alice_first_key_agreement_is_x25519():
     assert (
         get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.X25519)[0]
-        == DID_DOC_ALICE_WITH_NO_SECRETS.verification_methods[0]
+        == DID_DOC_ALICE_WITH_NO_SECRETS.verification_method[0]
     )
 
 
@@ -273,6 +275,7 @@ def test_get_bob_key_agreement_verification_methods_in_secrets_all():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_4,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_1,
@@ -288,6 +291,7 @@ def test_get_bob_key_agreement_verification_methods_in_secrets_x25519():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_4,
     ]
     assert (
         get_key_agreement_methods_in_secrets(Person.BOB, KeyAgreementCurveType.X25519)
@@ -381,6 +385,7 @@ def test_get_bob_key_agreement_secrets_all():
         BOB_SECRET_KEY_AGREEMENT_KEY_X25519_1,
         BOB_SECRET_KEY_AGREEMENT_KEY_X25519_2,
         BOB_SECRET_KEY_AGREEMENT_KEY_X25519_3,
+        BOB_SECRET_KEY_AGREEMENT_KEY_X25519_4,
         BOB_SECRET_KEY_AGREEMENT_KEY_P256_1,
         BOB_SECRET_KEY_AGREEMENT_KEY_P256_2,
         BOB_SECRET_KEY_AGREEMENT_KEY_P384_1,
@@ -396,6 +401,7 @@ def test_get_bob_key_agreement_secrets_x25519():
         BOB_SECRET_KEY_AGREEMENT_KEY_X25519_1,
         BOB_SECRET_KEY_AGREEMENT_KEY_X25519_2,
         BOB_SECRET_KEY_AGREEMENT_KEY_X25519_3,
+        BOB_SECRET_KEY_AGREEMENT_KEY_X25519_4,
     ]
     assert (
         get_key_agreement_secrets(Person.BOB, KeyAgreementCurveType.X25519) == expected
@@ -431,6 +437,7 @@ def test_get_bob_key_agreement_methods_all():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_4,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRETS_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2,
@@ -450,6 +457,7 @@ def test_get_bob_key_agreement_methods_x25519():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3,
+        BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_4,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRETS_1,
     ]
     assert (
@@ -492,5 +500,5 @@ def test_get_bob_authentication_methods():
 def test_bob_first_key_agreement_is_x25519():
     assert (
         get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.X25519)[0]
-        == DID_DOC_BOB_WITH_NO_SECRETS.verification_methods[0]
+        == DID_DOC_BOB_WITH_NO_SECRETS.verification_method[0]
     )

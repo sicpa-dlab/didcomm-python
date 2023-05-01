@@ -7,7 +7,7 @@ from didcomm.did_doc.did_resolver import DIDResolver
 
 class DIDResolverInMemory(DIDResolver):
     def __init__(self, did_docs: List[DIDDoc]):
-        self._did_docs = {did_doc.did: did_doc for did_doc in did_docs}
+        self._did_docs = {did_doc.id: did_doc for did_doc in did_docs}
 
     async def resolve(self, did: DID) -> Optional[DIDDoc]:
         return self._did_docs.get(did)

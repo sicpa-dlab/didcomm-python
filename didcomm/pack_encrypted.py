@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
 from didcomm.common.resolvers import ResolversConfig
@@ -17,7 +17,7 @@ from didcomm.core.utils import get_did, is_did, didcomm_id_generator_default
 from didcomm.did_doc.did_doc import DIDCommService
 from didcomm.errors import DIDCommValueError
 from didcomm.core.from_prior import pack_from_prior_in_place
-from didcomm.message import Message, Header
+from didcomm.message import Message, Headers
 from didcomm.protocols.routing.forward import (
     wrap_in_forward,
     resolve_did_services_chain,
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 async def pack_encrypted(
     resolvers_config: ResolversConfig,
-    message: Message,
+    message: Union[Message, JSON_OBJ],
     to: DID_OR_DID_URL,
     frm: Optional[DID_OR_DID_URL] = None,
     sign_frm: Optional[DID_OR_DID_URL] = None,
@@ -109,26 +109,26 @@ async def pack_encrypted(
     pack_config = pack_config or PackEncryptedConfig()
     pack_params = pack_params or PackEncryptedParameters()
 
+    if isinstance(message, Message):
+        message = message.as_dict()
+
     # 1. validate message
     __validate(message, to, frm, sign_frm)
 
-    # 2. message as dict
-    msg_as_dict = message.as_dict()
-
     # 3. Pack from_prior in place
     from_prior_issuer_kid = await pack_from_prior_in_place(
-        msg_as_dict,
+        message,
         resolvers_config,
         pack_params.from_prior_issuer_kid,
     )
 
     # 4. sign if needed
-    sign_res = await __sign_if_needed(resolvers_config, msg_as_dict, sign_frm)
+    sign_res = await __sign_if_needed(resolvers_config, message, sign_frm)
 
     # 5. encrypt
     encrypt_res = await __encrypt(
         resolvers_config,
-        msg=sign_res.msg if sign_res else msg_as_dict,
+        msg=sign_res.msg if sign_res else message,
         to=to,
         frm=frm,
         pack_config=pack_config,
@@ -261,7 +261,7 @@ class PackEncryptedParameters:
             in the packed message
     """
 
-    forward_headers: Optional[Header] = None
+    forward_headers: Optional[Headers] = None
     forward_service_id: Optional[str] = None
     forward_didcomm_id_generator: Optional[
         DIDCommGeneratorType
@@ -270,7 +270,7 @@ class PackEncryptedParameters:
 
 
 def __validate(
-    message: Message,
+    message: JSON_OBJ,
     to: DID_OR_DID_URL,
     frm: Optional[DID_OR_DID_URL] = None,
     sign_frm: Optional[DID_OR_DID_URL] = None,
@@ -286,17 +286,19 @@ def __validate(
             f"`sign_from` value is not a valid DID of DID URL: {sign_frm}"
         )
 
-    if message.to is not None and not isinstance(message.to, List):
-        raise DIDCommValueError(f"`message.to` value is not a list: {message.to}")
+    message_to = message.get("to")
+    if message_to is not None and not isinstance(message_to, List):
+        raise DIDCommValueError(f"message `to` value is not a list: {message_to}")
 
-    if message.to is not None and get_did(to) not in message.to:
+    if message_to is not None and get_did(to) not in message_to:
         raise DIDCommValueError(
-            f"`message.to` value {message.to} does not contain `to` value's DID {get_did(to)}"
+            f"message `to` value {message_to} does not contain `to` value's DID {get_did(to)}"
         )
 
-    if frm is not None and message.frm is not None and get_did(frm) != message.frm:
+    message_from = message.get("from")
+    if frm is not None and message_from is not None and get_did(frm) != message_from:
         raise DIDCommValueError(
-            f"`message.from` value {message.frm} is not equal to `from` value's DID {get_did(frm)}"
+            f"message `from` value {message_from} is not equal to `from` value's DID {get_did(frm)}"
         )
 
 
@@ -344,7 +346,6 @@ async def __forward_if_needed(
     pack_config: PackEncryptedConfig,
     pack_params: PackEncryptedParameters,
 ) -> Optional[ForwardPackResult]:
-
     if not pack_config.forward:
         logger.debug("forward is turned off")
         return None

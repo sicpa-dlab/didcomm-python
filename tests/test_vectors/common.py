@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 from typing import Any
 
-from didcomm.common.types import JSON
-from didcomm.unpack import Metadata
+from didcomm.common.types import JSON, DID
+from didcomm import Metadata
 
-ALICE_DID = "did:example:alice"
-BOB_DID = "did:example:bob"
-CHARLIE_DID = "did:example:charlie"
+ALICE_DID = DID("did:example:alice")
+BOB_DID = DID("did:example:bob")
+CHARLIE_DID = DID("did:example:charlie")
+DAVE_DID = DID("did:example:dave")
 
 
 # Note. additional prefix `T` is to hide the clases

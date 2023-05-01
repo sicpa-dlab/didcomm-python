@@ -48,9 +48,3 @@ To run [pytest](https://docs.pytest.org/en/stable/) in your environment:
 ```bash
 poetry run pytest
 ```
-
-To run tests in all supported environments (like CI does) using [tox](https://tox.wiki/en/latest/index.html):
-
-```bash
-poetry run tox
-```

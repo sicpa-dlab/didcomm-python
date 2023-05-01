@@ -1,7 +1,7 @@
 import pytest
 
 from didcomm.common.algorithms import AuthCryptAlg, AnonCryptAlg
-from didcomm.core.utils import is_did_url
+from didcomm.core.utils import is_did_with_uri_fragment
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 from didcomm.unpack import unpack
 from didcomm.protocols.routing.forward import unpack_forward
@@ -219,13 +219,13 @@ async def check_authcrypt(
     )
 
     expected_to = [to]
-    if not is_did_url(to):
+    if not is_did_with_uri_fragment(to):
         expected_to = [
             vm.id for vm in get_key_agreement_methods(Person.BOB, curve_type)
         ]
 
     expected_frm = frm
-    if not is_did_url(frm):
+    if not is_did_with_uri_fragment(frm):
         expected_frm = get_key_agreement_methods_in_secrets(Person.ALICE)[0].id
 
     expected_sign_frm = None

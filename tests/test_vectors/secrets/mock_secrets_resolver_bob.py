@@ -1,11 +1,11 @@
 from authlib.common.encoding import json_dumps
 
-from didcomm.common.types import (
+from didcomm import (
     VerificationMethodType,
     VerificationMaterial,
     VerificationMaterialFormat,
+    Secret,
 )
-from didcomm.secrets.secrets_resolver import Secret
 from tests.test_vectors.secrets.mock_secrets_resolver import MockSecretsResolverInMemory
 
 BOB_SECRET_KEY_AGREEMENT_KEY_X25519_1 = Secret(
@@ -53,6 +53,15 @@ BOB_SECRET_KEY_AGREEMENT_KEY_X25519_3 = Secret(
                 "x": "82k2BTUiywKv49fKLZa-WwDi8RBf0tB0M8bvSAUQ3yY",
             }
         ),
+    ),
+)
+
+BOB_SECRET_KEY_AGREEMENT_KEY_X25519_4 = Secret(
+    kid="did:example:bob#key-x25519-4",
+    type=VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020,
+    verification_material=VerificationMaterial(
+        format=VerificationMaterialFormat.MULTIBASE,
+        value="z3weet6o3WdATuoPDqbd9mtcu3fRRPf9kcbobHPJuRhqc4Zr",
     ),
 )
 
@@ -166,6 +175,7 @@ class MockSecretsResolverBob(MockSecretsResolverInMemory):
                 BOB_SECRET_KEY_AGREEMENT_KEY_X25519_1,
                 BOB_SECRET_KEY_AGREEMENT_KEY_X25519_2,
                 BOB_SECRET_KEY_AGREEMENT_KEY_X25519_3,
+                BOB_SECRET_KEY_AGREEMENT_KEY_X25519_4,
                 BOB_SECRET_KEY_AGREEMENT_KEY_P256_1,
                 BOB_SECRET_KEY_AGREEMENT_KEY_P256_2,
                 BOB_SECRET_KEY_AGREEMENT_KEY_P384_1,

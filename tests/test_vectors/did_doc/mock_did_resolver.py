@@ -1,4 +1,4 @@
-from didcomm.did_doc.did_resolver_in_memory import DIDResolverInMemory
+from didcomm import DIDResolverInMemory
 from tests.test_vectors.did_doc import (
     DID_DOC_ALICE_WITH_NO_SECRETS,
     DID_DOC_ALICE_SPEC_TEST_VECTORS,
