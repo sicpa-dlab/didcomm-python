@@ -51,6 +51,7 @@ class GenericMessage(Generic[T]):
     ack: Optional[List[str]] = None
     thid: Optional[str] = None
     pthid: Optional[str] = None
+    lang: Optional[str] = None
     attachments: Optional[List[Attachment]] = None
     custom_headers: Optional[List[Header]] = None
 
@@ -68,6 +69,7 @@ class GenericMessage(Generic[T]):
         "ack",
         "thid",
         "pthid",
+        "lang",
         "attachments",
     }
 
@@ -170,6 +172,8 @@ class GenericMessage(Generic[T]):
             and not isinstance(self.thid, str)
             or self.pthid is not None
             and not isinstance(self.pthid, str)
+            or self.lang is not None
+            and not isinstance(self.lang, str)
             or self.from_prior is not None
             and not isinstance(self.from_prior, FromPrior)
             or self.attachments is not None
