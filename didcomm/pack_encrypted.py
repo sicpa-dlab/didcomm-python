@@ -359,9 +359,6 @@ async def __forward_if_needed(
     # last service is for 'to' DID
     routing_keys = did_services_chain[-1].routing_keys
 
-    if not routing_keys:
-        return None
-
     # prepend routing with alternative endpoints
     # starting from the second mediator if any
     # (the first one considered to have URI endpoint)
