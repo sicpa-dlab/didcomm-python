@@ -13,7 +13,6 @@ from didcomm.common.resolvers import ResolversConfig
 
 from tests import mock_module
 
-
 # ==============
 # unittest mocks
 # ==============

@@ -150,12 +150,12 @@ class AttachmentDataJson:
 class Attachment:
     """Plaintext attachment"""
 
-    data: Union[
-        AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson
-    ] = attr.ib(
-        validator=validator__instance_of(
-            (AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson)
-        ),
+    data: Union[AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson] = (
+        attr.ib(
+            validator=validator__instance_of(
+                (AttachmentDataLinks, AttachmentDataBase64, AttachmentDataJson)
+            ),
+        )
     )
     id: Optional[Union[str, Callable]] = attr.ib(
         converter=converter__id, validator=validator__instance_of(str), default=None

@@ -4,7 +4,6 @@ from didcomm.message import Attachment, AttachmentDataJson
 
 from didcomm.protocols.routing.forward import ForwardBody, ForwardMessage
 
-
 # TODO add more if needed
 diff_type_objects = ["1", 2, [3], (4,), {5: 6}, lambda: "7", (8 == 9), {10}]
 

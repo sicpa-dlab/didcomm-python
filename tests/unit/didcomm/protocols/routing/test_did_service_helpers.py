@@ -13,7 +13,6 @@ from didcomm.protocols.routing.forward import (
 from tests import mock_module
 from tests.unit.conftest import build_did_doc, build_didcomm_service
 
-
 # ===============
 # find_did_service
 # ===============

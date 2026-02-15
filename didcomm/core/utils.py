@@ -75,10 +75,12 @@ def _extract_key_from_verification_method(
 
         jwk = {
             "kty": "OKP",
-            "crv": "X25519"
-            if verification_method.type
-            == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019
-            else "Ed25519",
+            "crv": (
+                "X25519"
+                if verification_method.type
+                == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019
+                else "Ed25519"
+            ),
             "x": to_unicode(base64url_value),
         }
 
@@ -121,10 +123,12 @@ def _extract_key_from_verification_method(
 
         jwk = {
             "kty": "OKP",
-            "crv": "X25519"
-            if verification_method.type
-            == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020
-            else "Ed25519",
+            "crv": (
+                "X25519"
+                if verification_method.type
+                == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020
+                else "Ed25519"
+            ),
             "x": to_unicode(base64url_value),
         }
 
@@ -182,9 +186,11 @@ def _extract_key_from_secret(secret: Secret, align_kid) -> AsymmetricKey:
 
         jwk = {
             "kty": "OKP",
-            "crv": "X25519"
-            if secret.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019
-            else "Ed25519",
+            "crv": (
+                "X25519"
+                if secret.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2019
+                else "Ed25519"
+            ),
             "x": to_unicode(base64url_x_value),
             "d": to_unicode(base64url_d_value),
         }
@@ -237,9 +243,11 @@ def _extract_key_from_secret(secret: Secret, align_kid) -> AsymmetricKey:
 
         jwk = {
             "kty": "OKP",
-            "crv": "X25519"
-            if secret.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020
-            else "Ed25519",
+            "crv": (
+                "X25519"
+                if secret.type == VerificationMethodType.X25519_KEY_AGREEMENT_KEY_2020
+                else "Ed25519"
+            ),
             "x": to_unicode(base64url_x_value),
             "d": to_unicode(base64url_d_value),
         }

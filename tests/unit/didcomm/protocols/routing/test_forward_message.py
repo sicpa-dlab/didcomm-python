@@ -15,7 +15,6 @@ from didcomm.protocols.routing.forward import (
 
 from .helper import diff_type_objects, gen_fwd_msg, gen_fwd_msg_dict
 
-
 # TODO add tests for ForwardBody
 # def test_forward_body__(m_id):
 #     pass

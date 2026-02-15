@@ -39,7 +39,6 @@ from didcomm.core.anoncrypt import find_keys_and_anoncrypt, unpack_anoncrypt
 from didcomm.core.utils import get_did, is_did_or_did_url
 from didcomm.did_doc.did_doc import DIDCommService
 
-
 logger = logging.getLogger(__name__)
 
 

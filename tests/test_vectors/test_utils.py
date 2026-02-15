@@ -60,6 +60,22 @@ from tests.test_vectors.utils import (
 )
 
 
+def _to_dict_list(items):
+    res = []
+    for i in items:
+        fn = getattr(i, "model_dump", None)
+        if callable(fn):
+            res.append(fn())
+        else:
+            # For non-pydantic objects (plain dataclasses or primitives), keep as-is
+            res.append(i)
+    return res
+
+
+def _eq_list_objs(a, b):
+    return _to_dict_list(a) == _to_dict_list(b)
+
+
 # ALICE
 
 
@@ -69,12 +85,12 @@ def test_get_alice_auth_verification_methods_in_secrets():
         ALICE_AUTH_METHOD_P256,
         ALICE_AUTH_METHOD_SECPP256K1,
     ]
-    assert get_auth_methods_in_secrets(Person.ALICE) == expected
+    assert _eq_list_objs(get_auth_methods_in_secrets(Person.ALICE), expected)
 
 
 def test_get_alice_auth_verification_methods_not_in_secrets():
     expected = [ALICE_AUTH_METHOD_25519_NOT_IN_SECRET]
-    assert get_auth_methods_not_in_secrets(Person.ALICE) == expected
+    assert _eq_list_objs(get_auth_methods_not_in_secrets(Person.ALICE), expected)
 
 
 def test_get_alice_key_agreement_verification_methods_in_secrets_all():
@@ -83,59 +99,69 @@ def test_get_alice_key_agreement_verification_methods_in_secrets_all():
         ALICE_VERIFICATION_METHOD_KEY_AGREEM_P256,
         ALICE_VERIFICATION_METHOD_KEY_AGREEM_P521,
     ]
-    assert get_key_agreement_methods_in_secrets(Person.ALICE) == expected
+    assert _eq_list_objs(get_key_agreement_methods_in_secrets(Person.ALICE), expected)
 
 
 def test_get_alice_key_agreement_verification_methods_in_secrets_x25519():
     expected = [ALICE_VERIFICATION_METHOD_KEY_AGREEM_X25519]
-    assert (
-        get_key_agreement_methods_in_secrets(Person.ALICE, KeyAgreementCurveType.X25519)
-        == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods_in_secrets(
+            Person.ALICE, KeyAgreementCurveType.X25519
+        ),
+        expected,
     )
 
 
 def test_get_alice_key_agreement_verification_methods_in_secrets_p256():
     expected = [ALICE_VERIFICATION_METHOD_KEY_AGREEM_P256]
-    assert (
-        get_key_agreement_methods_in_secrets(Person.ALICE, KeyAgreementCurveType.P256)
-        == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods_in_secrets(Person.ALICE, KeyAgreementCurveType.P256),
+        expected,
     )
 
 
 def test_get_alice_key_agreement_verification_methods_in_secrets_p384():
     assert (
-        get_key_agreement_methods_in_secrets(Person.ALICE, KeyAgreementCurveType.P384)
+        _to_dict_list(
+            get_key_agreement_methods_in_secrets(
+                Person.ALICE, KeyAgreementCurveType.P384
+            )
+        )
         == []
     )
 
 
 def test_get_alice_key_agreement_verification_methods_in_secrets_p521():
     expected = [ALICE_VERIFICATION_METHOD_KEY_AGREEM_P521]
-    assert (
-        get_key_agreement_methods_in_secrets(Person.ALICE, KeyAgreementCurveType.P521)
-        == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods_in_secrets(Person.ALICE, KeyAgreementCurveType.P521),
+        expected,
     )
 
 
 def test_get_alice_key_agreement_verification_methods_not_in_secrets_all():
     expected = [ALICE_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRET]
-    assert get_key_agreement_methods_not_in_secrets(Person.ALICE) == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods_not_in_secrets(Person.ALICE), expected
+    )
 
 
 def test_get_alice_key_agreement_verification_methods_not_in_secrets_x25519():
     expected = [ALICE_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRET]
-    assert (
+    assert _eq_list_objs(
         get_key_agreement_methods_not_in_secrets(
             Person.ALICE, KeyAgreementCurveType.X25519
-        )
-        == expected
+        ),
+        expected,
     )
 
 
 def test_get_alice_key_agreement_verification_methods_not_in_secrets_p256():
     assert (
-        get_key_agreement_methods_not_in_secrets(
-            Person.ALICE, KeyAgreementCurveType.P256
+        _to_dict_list(
+            get_key_agreement_methods_not_in_secrets(
+                Person.ALICE, KeyAgreementCurveType.P256
+            )
         )
         == []
     )
@@ -143,8 +169,10 @@ def test_get_alice_key_agreement_verification_methods_not_in_secrets_p256():
 
 def test_get_alice_key_agreement_verification_methods_not_in_secrets_p384():
     assert (
-        get_key_agreement_methods_not_in_secrets(
-            Person.ALICE, KeyAgreementCurveType.P384
+        _to_dict_list(
+            get_key_agreement_methods_not_in_secrets(
+                Person.ALICE, KeyAgreementCurveType.P384
+            )
         )
         == []
     )
@@ -152,8 +180,10 @@ def test_get_alice_key_agreement_verification_methods_not_in_secrets_p384():
 
 def test_get_alice_key_agreement_verification_methods_not_in_secrets_p521():
     assert (
-        get_key_agreement_methods_not_in_secrets(
-            Person.ALICE, KeyAgreementCurveType.P521
+        _to_dict_list(
+            get_key_agreement_methods_not_in_secrets(
+                Person.ALICE, KeyAgreementCurveType.P521
+            )
         )
         == []
     )
@@ -210,7 +240,7 @@ def test_get_alice_key_agreement_methods_all():
         ALICE_VERIFICATION_METHOD_KEY_AGREEM_P256,
         ALICE_VERIFICATION_METHOD_KEY_AGREEM_P521,
     ]
-    assert get_key_agreement_methods(Person.ALICE) == expected
+    assert _eq_list_objs(get_key_agreement_methods(Person.ALICE), expected)
 
 
 def test_get_alice_key_agreement_methods_x25519():
@@ -218,27 +248,34 @@ def test_get_alice_key_agreement_methods_x25519():
         ALICE_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRET,
         ALICE_VERIFICATION_METHOD_KEY_AGREEM_X25519,
     ]
-    assert (
-        get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.X25519)
-        == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.X25519),
+        expected,
     )
 
 
 def test_get_alice_key_agreement_methods_p256():
     expected = [ALICE_VERIFICATION_METHOD_KEY_AGREEM_P256]
-    assert (
-        get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.P256) == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.P256),
+        expected,
     )
 
 
 def test_get_alice_key_agreement_methods_p384():
-    assert get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.P384) == []
+    assert (
+        _to_dict_list(
+            get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.P384)
+        )
+        == []
+    )
 
 
 def test_get_alice_key_agreement_methods_p521():
     expected = [ALICE_VERIFICATION_METHOD_KEY_AGREEM_P521]
-    assert (
-        get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.P521) == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.P521),
+        expected,
     )
 
 
@@ -249,13 +286,15 @@ def test_get_alice_authentication_methods():
         ALICE_AUTH_METHOD_P256,
         ALICE_AUTH_METHOD_SECPP256K1,
     ]
-    assert get_auth_methods(Person.ALICE) == expected
+    assert _eq_list_objs(get_auth_methods(Person.ALICE), expected)
 
 
 def test_alice_first_key_agreement_is_x25519():
     assert (
-        get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.X25519)[0]
-        == DID_DOC_ALICE_WITH_NO_SECRETS.verification_method[0]
+        get_key_agreement_methods(Person.ALICE, KeyAgreementCurveType.X25519)[
+            0
+        ].model_dump()
+        == DID_DOC_ALICE_WITH_NO_SECRETS.verification_method[0].model_dump()
     )
 
 
@@ -263,11 +302,11 @@ def test_alice_first_key_agreement_is_x25519():
 
 
 def test_get_bob_auth_verification_methods_in_secrets():
-    assert get_auth_methods_in_secrets(Person.BOB) == []
+    assert _to_dict_list(get_auth_methods_in_secrets(Person.BOB)) == []
 
 
 def test_get_bob_auth_verification_methods_not_in_secrets():
-    assert get_auth_methods_not_in_secrets(Person.BOB) == []
+    assert _to_dict_list(get_auth_methods_not_in_secrets(Person.BOB)) == []
 
 
 def test_get_bob_key_agreement_verification_methods_in_secrets_all():
@@ -283,7 +322,7 @@ def test_get_bob_key_agreement_verification_methods_in_secrets_all():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_2,
     ]
-    assert get_key_agreement_methods_in_secrets(Person.BOB) == expected
+    assert _eq_list_objs(get_key_agreement_methods_in_secrets(Person.BOB), expected)
 
 
 def test_get_bob_key_agreement_verification_methods_in_secrets_x25519():
@@ -293,9 +332,9 @@ def test_get_bob_key_agreement_verification_methods_in_secrets_x25519():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_3,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_4,
     ]
-    assert (
-        get_key_agreement_methods_in_secrets(Person.BOB, KeyAgreementCurveType.X25519)
-        == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods_in_secrets(Person.BOB, KeyAgreementCurveType.X25519),
+        expected,
     )
 
 
@@ -304,9 +343,9 @@ def test_get_bob_key_agreement_verification_methods_in_secrets_p256():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2,
     ]
-    assert (
-        get_key_agreement_methods_in_secrets(Person.BOB, KeyAgreementCurveType.P256)
-        == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods_in_secrets(Person.BOB, KeyAgreementCurveType.P256),
+        expected,
     )
 
 
@@ -315,9 +354,9 @@ def test_get_bob_key_agreement_verification_methods_in_secrets_p384():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_2,
     ]
-    assert (
-        get_key_agreement_methods_in_secrets(Person.BOB, KeyAgreementCurveType.P384)
-        == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods_in_secrets(Person.BOB, KeyAgreementCurveType.P384),
+        expected,
     )
 
 
@@ -326,9 +365,9 @@ def test_get_bob_key_agreement_verification_methods_in_secrets_p521():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_2,
     ]
-    assert (
-        get_key_agreement_methods_in_secrets(Person.BOB, KeyAgreementCurveType.P521)
-        == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods_in_secrets(Person.BOB, KeyAgreementCurveType.P521),
+        expected,
     )
 
 
@@ -339,40 +378,46 @@ def test_get_bob_key_agreement_verification_methods_not_in_secrets_all():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_NOT_IN_SECRETS_1,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_NOT_IN_SECRETS_1,
     ]
-    assert get_key_agreement_methods_not_in_secrets(Person.BOB) == expected
+    assert _eq_list_objs(get_key_agreement_methods_not_in_secrets(Person.BOB), expected)
 
 
 def test_get_bob_key_agreement_verification_methods_not_in_secrets_x25519():
     expected = [BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRETS_1]
-    assert (
+    assert _eq_list_objs(
         get_key_agreement_methods_not_in_secrets(
             Person.BOB, KeyAgreementCurveType.X25519
-        )
-        == expected
+        ),
+        expected,
     )
 
 
 def test_get_bob_key_agreement_verification_methods_not_in_secrets_p256():
     expected = [BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_NOT_IN_SECRETS_1]
-    assert (
-        get_key_agreement_methods_not_in_secrets(Person.BOB, KeyAgreementCurveType.P256)
-        == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods_not_in_secrets(
+            Person.BOB, KeyAgreementCurveType.P256
+        ),
+        expected,
     )
 
 
 def test_get_bob_key_agreement_verification_methods_not_in_secrets_p384():
     expected = [BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_NOT_IN_SECRETS_1]
-    assert (
-        get_key_agreement_methods_not_in_secrets(Person.BOB, KeyAgreementCurveType.P384)
-        == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods_not_in_secrets(
+            Person.BOB, KeyAgreementCurveType.P384
+        ),
+        expected,
     )
 
 
 def test_get_bob_key_agreement_verification_methods_not_in_secrets_p521():
     expected = [BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_NOT_IN_SECRETS_1]
-    assert (
-        get_key_agreement_methods_not_in_secrets(Person.BOB, KeyAgreementCurveType.P521)
-        == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods_not_in_secrets(
+            Person.BOB, KeyAgreementCurveType.P521
+        ),
+        expected,
     )
 
 
@@ -449,7 +494,7 @@ def test_get_bob_key_agreement_methods_all():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_NOT_IN_SECRETS_1,
     ]
-    assert get_key_agreement_methods(Person.BOB) == expected
+    assert _eq_list_objs(get_key_agreement_methods(Person.BOB), expected)
 
 
 def test_get_bob_key_agreement_methods_x25519():
@@ -460,8 +505,9 @@ def test_get_bob_key_agreement_methods_x25519():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_4,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_X25519_NOT_IN_SECRETS_1,
     ]
-    assert (
-        get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.X25519) == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.X25519),
+        expected,
     )
 
 
@@ -471,7 +517,10 @@ def test_get_bob_key_agreement_methods_p256():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P256_NOT_IN_SECRETS_1,
     ]
-    assert get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.P256) == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.P256),
+        expected,
+    )
 
 
 def test_get_bob_key_agreement_methods_p384():
@@ -480,7 +529,10 @@ def test_get_bob_key_agreement_methods_p384():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P384_NOT_IN_SECRETS_1,
     ]
-    assert get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.P384) == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.P384),
+        expected,
+    )
 
 
 def test_get_bob_key_agreement_methods_p521():
@@ -489,16 +541,21 @@ def test_get_bob_key_agreement_methods_p521():
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_2,
         BOB_VERIFICATION_METHOD_KEY_AGREEM_P521_NOT_IN_SECRETS_1,
     ]
-    assert get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.P521) == expected
+    assert _eq_list_objs(
+        get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.P521),
+        expected,
+    )
 
 
 def test_get_bob_authentication_methods():
     expected = []
-    assert get_auth_methods(Person.BOB) == expected
+    assert _to_dict_list(get_auth_methods(Person.BOB)) == expected
 
 
 def test_bob_first_key_agreement_is_x25519():
     assert (
-        get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.X25519)[0]
-        == DID_DOC_BOB_WITH_NO_SECRETS.verification_method[0]
+        get_key_agreement_methods(Person.BOB, KeyAgreementCurveType.X25519)[
+            0
+        ].model_dump()
+        == DID_DOC_BOB_WITH_NO_SECRETS.verification_method[0].model_dump()
     )

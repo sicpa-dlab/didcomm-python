@@ -164,11 +164,13 @@ async def pack_encrypted(
         from_kid=encrypt_res.from_kid,
         sign_from_kid=sign_res.sign_frm_kid if sign_res else None,
         from_prior_issuer_kid=from_prior_issuer_kid,
-        service_metadata=ServiceMetadata(
-            did_services_chain[-1].id, did_services_chain[0].service_endpoint
-        )
-        if did_services_chain
-        else None,
+        service_metadata=(
+            ServiceMetadata(
+                did_services_chain[-1].id, did_services_chain[0].service_endpoint
+            )
+            if did_services_chain
+            else None
+        ),
     )
 
 
@@ -263,9 +265,9 @@ class PackEncryptedParameters:
 
     forward_headers: Optional[Headers] = None
     forward_service_id: Optional[str] = None
-    forward_didcomm_id_generator: Optional[
-        DIDCommGeneratorType
-    ] = didcomm_id_generator_default
+    forward_didcomm_id_generator: Optional[DIDCommGeneratorType] = (
+        didcomm_id_generator_default
+    )
     from_prior_issuer_kid: Optional[DID_URL] = None
 
 
